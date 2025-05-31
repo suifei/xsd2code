@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<person xmlns="http://example.com/test" id="123">
+  <name>John Doe</name>
+  <age>30</age>
+  <email>john@example.com</email>
+</person>
