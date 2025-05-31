@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+
 	"../pkg/generator"
 	"../pkg/validator"
 	"../pkg/xsdparser"
