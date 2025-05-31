@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	"github.com/xsd2code/pkg/generator"
-	"github.com/xsd2code/pkg/validator"
-	"github.com/xsd2code/pkg/xsdparser"
+	"../pkg/generator"
+	"../pkg/validator"
+	"../pkg/xsdparser"
 )
 
 func main() {
