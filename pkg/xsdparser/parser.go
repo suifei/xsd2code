@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/suifei/xsd2code/pkg/generator"
 	"github.com/suifei/xsd2code/pkg/types"
 )
 
@@ -727,11 +728,12 @@ func (p *XSDParser) mapXSDTypeToGo(xsdType string) string {
 		xsdType = xsdType[colonIndex+1:]
 	}
 
-	// Check built-in type mappings
-	mappings := types.GetBuiltinTypeMappings()
+	// Use default Go language mapper for type mappings
+	mapper := &generator.GoLanguageMapper{}
+	mappings := mapper.GetBuiltinTypeMappings()
 	for _, mapping := range mappings {
 		if mapping.XSDType == xsdType {
-			return mapping.GoType
+			return mapping.TargetType
 		}
 	}
 

@@ -9,7 +9,392 @@ import (
 	"github.com/suifei/xsd2code/pkg/types"
 )
 
-// CodeGenerator generates Go code from parsed XSD types
+// TargetLanguage represents the target programming language for code generation
+type TargetLanguage string
+
+const (
+	LanguageGo     TargetLanguage = "go"
+	LanguageJava   TargetLanguage = "java"
+	LanguageCSharp TargetLanguage = "csharp"
+	LanguagePython TargetLanguage = "python"
+)
+
+// TypeMapping represents XSD to target language type mapping
+type TypeMapping struct {
+	XSDType    string
+	TargetType string
+}
+
+// LanguageMapper defines the interface for language-specific type mappings
+type LanguageMapper interface {
+	GetBuiltinTypeMappings() []TypeMapping
+	GetLanguage() TargetLanguage
+	FormatTypeName(typeName string) string
+	GetFileExtension() string
+}
+
+// GoLanguageMapper implements LanguageMapper for Go language
+type GoLanguageMapper struct{}
+
+// GetBuiltinTypeMappings returns the mapping from XSD built-in types to Go types
+func (g *GoLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
+	return []TypeMapping{
+		// Standard XSD types
+		{"string", "string"},
+		{"normalizedString", "string"},
+		{"token", "string"},
+		{"anyURI", "string"},
+		{"language", "string"},
+		{"NMTOKEN", "string"},
+		{"NMTOKENS", "[]string"},
+		{"Name", "string"},
+		{"NCName", "string"},
+		{"ID", "string"},
+		{"IDREF", "string"},
+		{"IDREFS", "[]string"},
+		{"ENTITY", "string"},
+		{"ENTITIES", "[]string"},
+		{"QName", "string"},
+
+		{"boolean", "bool"},
+
+		{"decimal", "float64"},
+		{"float", "float32"},
+		{"double", "float64"},
+
+		{"duration", "string"}, // Could be time.Duration in future
+		{"dateTime", "time.Time"},
+		{"time", "string"},
+		{"date", "string"},
+		{"gYearMonth", "string"},
+		{"gYear", "string"},
+		{"gMonthDay", "string"},
+		{"gDay", "string"},
+		{"gMonth", "string"},
+
+		{"hexBinary", "[]byte"},
+		{"base64Binary", "[]byte"},
+
+		{"integer", "int64"},
+		{"nonPositiveInteger", "int64"},
+		{"negativeInteger", "int64"},
+		{"long", "int64"},
+		{"int", "int32"},
+		{"short", "int16"},
+		{"byte", "int8"},
+		{"nonNegativeInteger", "uint64"},
+		{"unsignedLong", "uint64"},
+		{"unsignedInt", "uint32"},
+		{"unsignedShort", "uint16"},
+		{"unsignedByte", "uint8"},
+		{"positiveInteger", "uint64"},
+		{"anyType", "interface{}"},
+
+		// PLC Open IEC 61131-3 elementary types mapped to appropriate Go types
+		{"BOOL", "bool"},          // Boolean
+		{"BYTE", "uint8"},         // 8-bit unsigned integer (0-255)
+		{"WORD", "uint16"},        // 16-bit unsigned integer (0-65535)
+		{"DWORD", "uint32"},       // 32-bit unsigned integer (0-4294967295)
+		{"LWORD", "uint64"},       // 64-bit unsigned integer (0-18446744073709551615)
+		{"SINT", "int8"},          // Small signed integer (-128 to 127)
+		{"INT", "int16"},          // Signed integer (-32768 to 32767)
+		{"DINT", "int32"},         // Double signed integer (-2147483648 to 2147483647)
+		{"LINT", "int64"},         // Long signed integer (-9223372036854775808 to 9223372036854775807)
+		{"USINT", "uint8"},        // Unsigned small integer (0-255)
+		{"UINT", "uint16"},        // Unsigned integer (0-65535)
+		{"UDINT", "uint32"},       // Unsigned double integer (0-4294967295)
+		{"ULINT", "uint64"},       // Unsigned long integer (0-18446744073709551615)
+		{"REAL", "float32"},       // Single precision floating point
+		{"LREAL", "float64"},      // Double precision floating point
+		{"TIME", "time.Duration"}, // Time duration
+		{"DATE", "time.Time"},     // Date
+		{"DT", "time.Time"},       // Date and time
+		{"TOD", "time.Time"},      // Time of day
+	}
+}
+
+// GetLanguage returns the target language
+func (g *GoLanguageMapper) GetLanguage() TargetLanguage {
+	return LanguageGo
+}
+
+// FormatTypeName formats a type name according to Go conventions
+func (g *GoLanguageMapper) FormatTypeName(typeName string) string {
+	// Remove namespace prefix
+	if colonIndex := strings.LastIndex(typeName, ":"); colonIndex != -1 {
+		typeName = typeName[colonIndex+1:]
+	}
+
+	// Convert to PascalCase for Go
+	parts := strings.FieldsFunc(typeName, func(c rune) bool {
+		return c == '_' || c == '-' || c == '.'
+	})
+
+	var result strings.Builder
+	for _, part := range parts {
+		if len(part) > 0 {
+			result.WriteString(strings.ToUpper(part[:1]))
+			if len(part) > 1 {
+				result.WriteString(strings.ToLower(part[1:]))
+			}
+		}
+	}
+
+	formatted := result.String()
+	if formatted == "" {
+		formatted = "UnknownType"
+	}
+
+	return formatted
+}
+
+// GetFileExtension returns the file extension for Go files
+func (g *GoLanguageMapper) GetFileExtension() string {
+	return ".go"
+}
+
+// JavaLanguageMapper implements LanguageMapper for Java language
+type JavaLanguageMapper struct{}
+
+// GetBuiltinTypeMappings returns the mapping from XSD built-in types to Java types
+func (j *JavaLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
+	return []TypeMapping{
+		// Standard XSD types mapped to Java
+		{"string", "String"},
+		{"normalizedString", "String"},
+		{"token", "String"},
+		{"anyURI", "String"},
+		{"language", "String"},
+		{"NMTOKEN", "String"},
+		{"NMTOKENS", "List<String>"},
+		{"Name", "String"},
+		{"NCName", "String"},
+		{"ID", "String"},
+		{"IDREF", "String"},
+		{"IDREFS", "List<String>"},
+		{"ENTITY", "String"},
+		{"ENTITIES", "List<String>"},
+		{"QName", "String"},
+
+		{"boolean", "Boolean"},
+
+		{"decimal", "BigDecimal"},
+		{"float", "Float"},
+		{"double", "Double"},
+
+		{"duration", "Duration"},
+		{"dateTime", "LocalDateTime"},
+		{"time", "LocalTime"},
+		{"date", "LocalDate"},
+		{"gYearMonth", "YearMonth"},
+		{"gYear", "Year"},
+		{"gMonthDay", "MonthDay"},
+		{"gDay", "String"},
+		{"gMonth", "String"},
+
+		{"hexBinary", "byte[]"},
+		{"base64Binary", "byte[]"},
+
+		{"integer", "BigInteger"},
+		{"nonPositiveInteger", "BigInteger"},
+		{"negativeInteger", "BigInteger"},
+		{"long", "Long"},
+		{"int", "Integer"},
+		{"short", "Short"},
+		{"byte", "Byte"},
+		{"nonNegativeInteger", "BigInteger"},
+		{"unsignedLong", "BigInteger"},
+		{"unsignedInt", "Long"},
+		{"unsignedShort", "Integer"},
+		{"unsignedByte", "Short"},
+		{"positiveInteger", "BigInteger"},
+		{"anyType", "Object"},
+
+		// PLC Open IEC 61131-3 elementary types mapped to appropriate Java types
+		{"BOOL", "Boolean"},     // Boolean
+		{"BYTE", "Byte"},        // 8-bit unsigned integer (0-255), closest Java equivalent
+		{"WORD", "Integer"},     // 16-bit unsigned integer (0-65535), use Integer for safety
+		{"DWORD", "Long"},       // 32-bit unsigned integer (0-4294967295), use Long for safety
+		{"LWORD", "BigInteger"}, // 64-bit unsigned integer, BigInteger to handle full range
+		{"SINT", "Byte"},        // Small signed integer (-128 to 127)
+		{"INT", "Short"},        // Signed integer (-32768 to 32767)
+		{"DINT", "Integer"},     // Double signed integer (-2147483648 to 2147483647)
+		{"LINT", "Long"},        // Long signed integer (-9223372036854775808 to 9223372036854775807)
+		{"USINT", "Short"},      // Unsigned small integer (0-255), use Short for safety
+		{"UINT", "Integer"},     // Unsigned integer (0-65535), use Integer for safety
+		{"UDINT", "Long"},       // Unsigned double integer (0-4294967295), use Long for safety
+		{"ULINT", "BigInteger"}, // Unsigned long integer, BigInteger to handle full range
+		{"REAL", "Float"},       // Single precision floating point
+		{"LREAL", "Double"},     // Double precision floating point
+		{"TIME", "Duration"},    // Time duration
+		{"DATE", "LocalDate"},   // Date
+		{"DT", "LocalDateTime"}, // Date and time
+		{"TOD", "LocalTime"},    // Time of day
+	}
+}
+
+// GetLanguage returns the target language
+func (j *JavaLanguageMapper) GetLanguage() TargetLanguage {
+	return LanguageJava
+}
+
+// FormatTypeName formats a type name according to Java conventions
+func (j *JavaLanguageMapper) FormatTypeName(typeName string) string {
+	// Remove namespace prefix
+	if colonIndex := strings.LastIndex(typeName, ":"); colonIndex != -1 {
+		typeName = typeName[colonIndex+1:]
+	}
+
+	// Convert to PascalCase for Java classes
+	parts := strings.FieldsFunc(typeName, func(c rune) bool {
+		return c == '_' || c == '-' || c == '.'
+	})
+
+	var result strings.Builder
+	for _, part := range parts {
+		if len(part) > 0 {
+			result.WriteString(strings.ToUpper(part[:1]))
+			if len(part) > 1 {
+				result.WriteString(strings.ToLower(part[1:]))
+			}
+		}
+	}
+
+	formatted := result.String()
+	if formatted == "" {
+		formatted = "UnknownType"
+	}
+
+	return formatted
+}
+
+// GetFileExtension returns the file extension for Java files
+func (j *JavaLanguageMapper) GetFileExtension() string {
+	return ".java"
+}
+
+// CSharpLanguageMapper implements LanguageMapper for C# language
+type CSharpLanguageMapper struct{}
+
+// GetBuiltinTypeMappings returns the mapping from XSD built-in types to C# types
+func (c *CSharpLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
+	return []TypeMapping{
+		// Standard XSD types mapped to C#
+		{"string", "string"},
+		{"normalizedString", "string"},
+		{"token", "string"},
+		{"anyURI", "string"},
+		{"language", "string"},
+		{"NMTOKEN", "string"},
+		{"NMTOKENS", "List<string>"},
+		{"Name", "string"},
+		{"NCName", "string"},
+		{"ID", "string"},
+		{"IDREF", "string"},
+		{"IDREFS", "List<string>"},
+		{"ENTITY", "string"},
+		{"ENTITIES", "List<string>"},
+		{"QName", "string"},
+
+		{"boolean", "bool"},
+
+		{"decimal", "decimal"},
+		{"float", "float"},
+		{"double", "double"},
+
+		{"duration", "TimeSpan"},
+		{"dateTime", "DateTime"},
+		{"time", "TimeSpan"},
+		{"date", "DateTime"},
+		{"gYearMonth", "DateTime"},
+		{"gYear", "DateTime"},
+		{"gMonthDay", "DateTime"},
+		{"gDay", "string"},
+		{"gMonth", "string"},
+
+		{"hexBinary", "byte[]"},
+		{"base64Binary", "byte[]"},
+
+		{"integer", "long"},
+		{"nonPositiveInteger", "long"},
+		{"negativeInteger", "long"},
+		{"long", "long"},
+		{"int", "int"},
+		{"short", "short"},
+		{"byte", "sbyte"},
+		{"nonNegativeInteger", "ulong"},
+		{"unsignedLong", "ulong"},
+		{"unsignedInt", "uint"},
+		{"unsignedShort", "ushort"},
+		{"unsignedByte", "byte"},
+		{"positiveInteger", "ulong"},
+
+		{"anyType", "object"},
+
+		// PLC Open IEC 61131-3 elementary types mapped to appropriate C# types
+		{"BOOL", "bool"},     // Boolean
+		{"BYTE", "byte"},     // 8-bit unsigned integer (0-255)
+		{"WORD", "ushort"},   // 16-bit unsigned integer (0-65535)
+		{"DWORD", "uint"},    // 32-bit unsigned integer (0-4294967295)
+		{"LWORD", "ulong"},   // 64-bit unsigned integer (0-18446744073709551615)
+		{"SINT", "sbyte"},    // Small signed integer (-128 to 127)
+		{"INT", "short"},     // Signed integer (-32768 to 32767)
+		{"DINT", "int"},      // Double signed integer (-2147483648 to 2147483647)
+		{"LINT", "long"},     // Long signed integer (-9223372036854775808 to 9223372036854775807)
+		{"USINT", "byte"},    // Unsigned small integer (0-255)
+		{"UINT", "ushort"},   // Unsigned integer (0-65535)
+		{"UDINT", "uint"},    // Unsigned double integer (0-4294967295)
+		{"ULINT", "ulong"},   // Unsigned long integer (0-18446744073709551615)
+		{"REAL", "float"},    // Single precision floating point
+		{"LREAL", "double"},  // Double precision floating point
+		{"TIME", "TimeSpan"}, // Time duration
+		{"DATE", "DateTime"}, // Date
+		{"DT", "DateTime"},   // Date and time
+		{"TOD", "TimeSpan"},  // Time of day
+	}
+}
+
+// GetLanguage returns the target language
+func (c *CSharpLanguageMapper) GetLanguage() TargetLanguage {
+	return LanguageCSharp
+}
+
+// FormatTypeName formats a type name according to C# conventions
+func (c *CSharpLanguageMapper) FormatTypeName(typeName string) string {
+	// Remove namespace prefix
+	if colonIndex := strings.LastIndex(typeName, ":"); colonIndex != -1 {
+		typeName = typeName[colonIndex+1:]
+	}
+
+	// Convert to PascalCase for C# classes
+	parts := strings.FieldsFunc(typeName, func(c rune) bool {
+		return c == '_' || c == '-' || c == '.'
+	})
+
+	var result strings.Builder
+	for _, part := range parts {
+		if len(part) > 0 {
+			result.WriteString(strings.ToUpper(part[:1]))
+			if len(part) > 1 {
+				result.WriteString(strings.ToLower(part[1:]))
+			}
+		}
+	}
+
+	formatted := result.String()
+	if formatted == "" {
+		formatted = "UnknownType"
+	}
+
+	return formatted
+}
+
+// GetFileExtension returns the file extension for C# files
+func (c *CSharpLanguageMapper) GetFileExtension() string {
+	return ".cs"
+}
+
+// CodeGenerator generates code from parsed XSD types
 type CodeGenerator struct {
 	packageName     string
 	outputPath      string
@@ -17,18 +402,24 @@ type CodeGenerator struct {
 	jsonCompatible  bool
 	includeComments bool
 	debugMode       bool
+	languageMapper  LanguageMapper
+	typeMappings    map[string]string // Cache for type mappings
 }
 
 // NewCodeGenerator creates a new code generator
 func NewCodeGenerator(packageName, outputPath string) *CodeGenerator {
-	return &CodeGenerator{
+	generator := &CodeGenerator{
 		packageName:     packageName,
 		outputPath:      outputPath,
 		goTypes:         make([]types.GoType, 0),
 		jsonCompatible:  false,
 		includeComments: true,
 		debugMode:       false,
+		languageMapper:  &GoLanguageMapper{}, // Default to Go
+		typeMappings:    make(map[string]string),
 	}
+	generator.initializeTypeMappings()
+	return generator
 }
 
 // SetGoTypes sets the Go types to generate
@@ -49,6 +440,32 @@ func (g *CodeGenerator) SetIncludeComments(comments bool) {
 // SetDebugMode enables or disables debug mode
 func (g *CodeGenerator) SetDebugMode(debug bool) {
 	g.debugMode = debug
+}
+
+// SetLanguageMapper sets the language mapper for the code generator
+func (g *CodeGenerator) SetLanguageMapper(mapper LanguageMapper) {
+	g.languageMapper = mapper
+	g.initializeTypeMappings()
+}
+
+// initializeTypeMappings initializes the type mapping cache
+func (g *CodeGenerator) initializeTypeMappings() {
+	g.typeMappings = make(map[string]string)
+	mappings := g.languageMapper.GetBuiltinTypeMappings()
+	for _, mapping := range mappings {
+		g.typeMappings[mapping.XSDType] = mapping.TargetType
+	}
+}
+
+// GetTypeMapping returns the target language type for an XSD type
+func (g *CodeGenerator) GetTypeMapping(xsdType string) (string, bool) {
+	targetType, exists := g.typeMappings[xsdType]
+	return targetType, exists
+}
+
+// GetBuiltinTypeMappings returns all builtin type mappings for the current language
+func (g *CodeGenerator) GetBuiltinTypeMappings() []TypeMapping {
+	return g.languageMapper.GetBuiltinTypeMappings()
 }
 
 // Generate generates the Go code and writes it to the output file

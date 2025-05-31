@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<person xmlns="http://example.com/test" id="456">
-  <name>Bob Smith</name>
-  <!-- missing required age element -->
-</person>
