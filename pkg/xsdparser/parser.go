@@ -256,6 +256,12 @@ func (p *XSDParser) mergeSchema(included *types.XSDSchema) {
 
 // convertToGoTypes converts XSD types to Go types
 func (p *XSDParser) convertToGoTypes() error {
+	if p.debugMode {
+		fmt.Printf("Processing schema with %d groups\n", len(p.schema.Groups))
+		for _, group := range p.schema.Groups {
+			fmt.Printf("Found group: %s\n", group.Name)
+		}
+	}
 	if p.schema == nil {
 		return fmt.Errorf("schema not parsed")
 	}
@@ -410,8 +416,13 @@ func (p *XSDParser) convertComplexTypeFromElement(element types.XSDElement) (*ty
 
 // processSequence processes an XSD sequence
 func (p *XSDParser) processSequence(sequence *types.XSDSequence, goType *types.GoType) error {
+	return p.processSequenceWithContext(sequence, goType, []string{goType.Name})
+}
+
+// processSequenceWithContext processes an XSD sequence with context path
+func (p *XSDParser) processSequenceWithContext(sequence *types.XSDSequence, goType *types.GoType, contextPath []string) error {
 	for _, element := range sequence.Elements {
-		field, err := p.convertElement(element)
+		field, err := p.convertElementWithContext(element, contextPath)
 		if err != nil {
 			return err
 		}
@@ -420,14 +431,20 @@ func (p *XSDParser) processSequence(sequence *types.XSDSequence, goType *types.G
 
 	// Process nested sequences
 	for _, nestedSeq := range sequence.Sequences {
-		if err := p.processSequence(&nestedSeq, goType); err != nil {
+		if err := p.processSequenceWithContext(&nestedSeq, goType, contextPath); err != nil {
+			return err
+		}
+	}
+	// Process choices within sequence
+	for _, choice := range sequence.Choices {
+		if err := p.processChoiceWithContext(&choice, goType, contextPath); err != nil {
 			return err
 		}
 	}
 
-	// Process choices within sequence
-	for _, choice := range sequence.Choices {
-		if err := p.processChoice(&choice, goType); err != nil {
+	// Process group references within sequence
+	for _, groupRef := range sequence.Groups {
+		if err := p.processGroupRef(groupRef, goType, contextPath); err != nil {
 			return err
 		}
 	}
@@ -437,26 +454,62 @@ func (p *XSDParser) processSequence(sequence *types.XSDSequence, goType *types.G
 
 // processChoice processes an XSD choice
 func (p *XSDParser) processChoice(choice *types.XSDChoice, goType *types.GoType) error {
-	// For choices, we create optional fields for each choice option
+	return p.processChoiceWithContext(choice, goType, []string{goType.Name})
+}
+
+// processChoiceWithContext processes an XSD choice with context path
+func (p *XSDParser) processChoiceWithContext(choice *types.XSDChoice, goType *types.GoType, contextPath []string) error {
+	// For choices, we create optional pointer fields for each choice option
 	for _, element := range choice.Elements {
-		field, err := p.convertElement(element)
+		field, err := p.convertElementWithContext(element, contextPath)
 		if err != nil {
 			return err
 		}
+
+		// For choice elements, all fields must be optional pointers with omitempty
+		if !strings.HasPrefix(field.Type, "*") && !strings.HasPrefix(field.Type, "[]") {
+			// Check if this is an empty element (no type definition)
+			if element.ComplexType == nil && element.SimpleType == nil && element.Type == "" {
+				// Empty element - use *struct{}
+				field.Type = "*struct{}"
+			} else {
+				// Make it a pointer
+				field.Type = "*" + field.Type
+			}
+		}
+
+		// Ensure omitempty is in both XML and JSON tags
+		if field.XMLTag != "" && !strings.Contains(field.XMLTag, "omitempty") {
+			if strings.Contains(field.XMLTag, ",attr") {
+				field.XMLTag = strings.Replace(field.XMLTag, ",attr", ",omitempty", 1)
+			} else {
+				field.XMLTag += ",omitempty"
+			}
+		}
+		if field.JSONTag != "" && !strings.Contains(field.JSONTag, "omitempty") {
+			field.JSONTag += ",omitempty"
+		}
+
 		field.IsOptional = true // All choice elements are optional
 		goType.Fields = append(goType.Fields, *field)
 	}
 
 	// Process nested choices
 	for _, nestedChoice := range choice.Choices {
-		if err := p.processChoice(&nestedChoice, goType); err != nil {
+		if err := p.processChoiceWithContext(&nestedChoice, goType, contextPath); err != nil {
+			return err
+		}
+	}
+	// Process sequences within choice
+	for _, sequence := range choice.Sequences {
+		if err := p.processSequenceWithContext(&sequence, goType, contextPath); err != nil {
 			return err
 		}
 	}
 
-	// Process sequences within choice
-	for _, sequence := range choice.Sequences {
-		if err := p.processSequence(&sequence, goType); err != nil {
+	// Process group references within choice
+	for _, groupRef := range choice.Groups {
+		if err := p.processGroupRef(groupRef, goType, contextPath); err != nil {
 			return err
 		}
 	}
@@ -466,8 +519,13 @@ func (p *XSDParser) processChoice(choice *types.XSDChoice, goType *types.GoType)
 
 // processAll processes an XSD all
 func (p *XSDParser) processAll(all *types.XSDAll, goType *types.GoType) error {
+	return p.processAllWithContext(all, goType, []string{goType.Name})
+}
+
+// processAllWithContext processes an XSD all with context path
+func (p *XSDParser) processAllWithContext(all *types.XSDAll, goType *types.GoType, contextPath []string) error {
 	for _, element := range all.Elements {
-		field, err := p.convertElement(element)
+		field, err := p.convertElementWithContext(element, contextPath)
 		if err != nil {
 			return err
 		}
@@ -523,6 +581,11 @@ func (p *XSDParser) processExtension(extension *types.XSDExtension, goType *type
 
 // convertElement converts an XSD element to a Go field
 func (p *XSDParser) convertElement(element types.XSDElement) (*types.GoField, error) {
+	return p.convertElementWithContext(element, []string{})
+}
+
+// convertElementWithContext converts an XSD element to a Go field with context path
+func (p *XSDParser) convertElementWithContext(element types.XSDElement, contextPath []string) (*types.GoField, error) {
 	fieldName := types.ToGoFieldName(element.Name)
 	fieldType := p.mapXSDTypeToGo(element.Type)
 
@@ -530,47 +593,46 @@ func (p *XSDParser) convertElement(element types.XSDElement) (*types.GoField, er
 	isOptional := min == 0
 	isArray := max > 1 || max == -1 // Handle inline complex type
 	if element.ComplexType != nil {
-		// Create inline type name
-		fieldType = types.ToGoTypeName(element.Name)
+		// Create context-aware inline type name
+		fullContextPath := append(contextPath, types.ToGoTypeName(element.Name))
+		fieldType = strings.Join(fullContextPath, "")
 
-		// Create and add inline type to goTypes list
-		inlineType := types.GoType{
-			Name:    fieldType,
-			Comment: fmt.Sprintf("%s represents the inline complex type for element %s", fieldType, element.Name),
-			Fields:  make([]types.GoField, 0),
-			XMLName: element.Name,
-		}
-
-		// Get elements from sequence, choice, or all
-		var elements []types.XSDElement
-		if element.ComplexType.Sequence != nil {
-			elements = element.ComplexType.Sequence.Elements
-		} else if element.ComplexType.Choice != nil {
-			elements = element.ComplexType.Choice.Elements
-		} else if element.ComplexType.All != nil {
-			elements = element.ComplexType.All.Elements
-		}
-
-		// Convert complex type elements to fields
-		for _, childElement := range elements {
-			field, err := p.convertElement(childElement)
-			if err != nil {
-				return nil, fmt.Errorf("failed to convert inline element %s: %v", childElement.Name, err)
+		// Check if this type already exists to avoid duplicates
+		existingType := p.findExistingType(fieldType)
+		if existingType == nil {
+			// Create and add inline type to goTypes list
+			inlineType := types.GoType{
+				Name:    fieldType,
+				Comment: fmt.Sprintf("%s represents the inline complex type for element %s", fieldType, element.Name),
+				Fields:  make([]types.GoField, 0),
+				XMLName: element.Name,
+			} // Process content model using proper context-aware methods that handle group references
+			if element.ComplexType.Sequence != nil {
+				if err := p.processSequenceWithContext(element.ComplexType.Sequence, &inlineType, fullContextPath); err != nil {
+					return nil, fmt.Errorf("failed to process sequence in inline type %s: %v", fieldType, err)
+				}
+			} else if element.ComplexType.Choice != nil {
+				if err := p.processChoiceWithContext(element.ComplexType.Choice, &inlineType, fullContextPath); err != nil {
+					return nil, fmt.Errorf("failed to process choice in inline type %s: %v", fieldType, err)
+				}
+			} else if element.ComplexType.All != nil {
+				if err := p.processAllWithContext(element.ComplexType.All, &inlineType, fullContextPath); err != nil {
+					return nil, fmt.Errorf("failed to process all in inline type %s: %v", fieldType, err)
+				}
 			}
-			inlineType.Fields = append(inlineType.Fields, *field)
-		}
 
-		// Convert attributes to fields
-		for _, attr := range element.ComplexType.Attributes {
-			field, err := p.convertAttribute(attr)
-			if err != nil {
-				return nil, fmt.Errorf("failed to convert inline attribute %s: %v", attr.Name, err)
+			// Convert attributes to fields
+			for _, attr := range element.ComplexType.Attributes {
+				field, err := p.convertAttribute(attr)
+				if err != nil {
+					return nil, fmt.Errorf("failed to convert inline attribute %s: %v", attr.Name, err)
+				}
+				inlineType.Fields = append(inlineType.Fields, *field)
 			}
-			inlineType.Fields = append(inlineType.Fields, *field)
-		}
 
-		// Add to types list
-		p.goTypes = append(p.goTypes, inlineType)
+			// Add to types list
+			p.goTypes = append(p.goTypes, inlineType)
+		}
 	}
 
 	// Handle inline simple type
@@ -582,7 +644,6 @@ func (p *XSDParser) convertElement(element types.XSDElement) (*types.GoField, er
 	if isOptional && !isArray {
 		fieldType = "*" + fieldType
 	}
-
 	// Make array type if needed
 	if isArray {
 		fieldType = "[]" + fieldType
@@ -590,7 +651,11 @@ func (p *XSDParser) convertElement(element types.XSDElement) (*types.GoField, er
 
 	xmlTag := element.Name
 	if p.targetNamespace != "" {
-		xmlTag = fmt.Sprintf("%s", element.Name)
+		xmlTag = element.Name
+	}
+	// Add omitempty for optional elements
+	if isOptional {
+		xmlTag += ",omitempty"
 	}
 
 	jsonTag := ""
@@ -676,13 +741,23 @@ func (p *XSDParser) mapXSDTypeToGo(xsdType string) string {
 
 // generateConstantName generates a constant name for enums
 func (p *XSDParser) generateConstantName(typeName, value string) string {
-	// Convert to uppercase with underscores
-	constName := strings.ToUpper(types.ToSnakeCase(typeName))
-	valueConst := strings.ToUpper(types.ToSnakeCase(value))
-	valueConst = strings.ReplaceAll(valueConst, "-", "_")
-	valueConst = strings.ReplaceAll(valueConst, ".", "_")
+	// Use a more concise naming strategy similar to the sample code
+	// TypeNameValue pattern instead of TYPE_NAME_VALUE
+	cleanValue := strings.ReplaceAll(value, "-", "")
+	cleanValue = strings.ReplaceAll(cleanValue, ".", "")
+	cleanValue = types.ToPascalCase(cleanValue)
 
-	return constName + "_" + valueConst
+	return typeName + cleanValue
+}
+
+// findExistingType checks if a type with the given name already exists
+func (p *XSDParser) findExistingType(typeName string) *types.GoType {
+	for i := range p.goTypes {
+		if p.goTypes[i].Name == typeName {
+			return &p.goTypes[i]
+		}
+	}
+	return nil
 }
 
 // GetGoTypes returns the converted Go types
@@ -693,4 +768,67 @@ func (p *XSDParser) GetGoTypes() []types.GoType {
 // GetSchema returns the parsed XSD schema
 func (p *XSDParser) GetSchema() *types.XSDSchema {
 	return p.schema
+}
+
+// processGroupRef processes an XSD group reference
+func (p *XSDParser) processGroupRef(groupRef types.XSDGroupRef, goType *types.GoType, contextPath []string) error {
+	// Extract group name from reference (remove namespace prefix if present)
+	groupName := groupRef.Ref
+	if parts := strings.Split(groupName, ":"); len(parts) > 1 {
+		groupName = parts[1]
+	}
+
+	if p.debugMode {
+		fmt.Printf("Processing group reference: %s in type %s\n", groupName, goType.Name)
+	}
+
+	// Find the group definition in the schema
+	var foundGroup *types.XSDGroup
+	for i := range p.schema.Groups {
+		if p.schema.Groups[i].Name == groupName {
+			foundGroup = &p.schema.Groups[i]
+			break
+		}
+	}
+
+	if foundGroup == nil {
+		if p.debugMode {
+			fmt.Printf("Warning: group '%s' not found\n", groupName)
+		}
+		return nil // Skip if group not found
+	}
+
+	if p.debugMode {
+		fmt.Printf("Found group '%s', processing its contents\n", groupName)
+	}
+
+	// Process the group's content (choice, sequence, or all)
+	if foundGroup.Choice != nil {
+		if p.debugMode {
+			fmt.Printf("Processing choice in group %s with %d elements\n", groupName, len(foundGroup.Choice.Elements))
+		}
+		if err := p.processChoiceWithContext(foundGroup.Choice, goType, contextPath); err != nil {
+			return fmt.Errorf("failed to process choice in group %s: %v", groupName, err)
+		}
+	}
+
+	if foundGroup.Sequence != nil {
+		if p.debugMode {
+			fmt.Printf("Processing sequence in group %s\n", groupName)
+		}
+		if err := p.processSequenceWithContext(foundGroup.Sequence, goType, contextPath); err != nil {
+			return fmt.Errorf("failed to process sequence in group %s: %v", groupName, err)
+		}
+	}
+
+	if foundGroup.All != nil {
+		if p.debugMode {
+			fmt.Printf("Processing all in group %s\n", groupName)
+		}
+		if err := p.processAllWithContext(foundGroup.All, goType, contextPath); err != nil {
+			return fmt.Errorf("failed to process all in group %s: %v", groupName, err)
+		}
+	}
+
+	return nil
 }

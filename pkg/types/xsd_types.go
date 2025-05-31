@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"strings"
-	"unicode"
 )
 
 // XSDSchema represents the root XSD schema element
@@ -439,74 +438,20 @@ func ToGoFieldName(name string) string {
 	return ToPascalCase(name)
 }
 
-// ToPascalCase converts a string to PascalCase
+// ToPascalCase converts a string to PascalCase by making the first letter uppercase
 func ToPascalCase(s string) string {
 	if s == "" {
 		return s
 	}
 
-	// Handle special cases
-	s = strings.ReplaceAll(s, "-", "_")
-	s = strings.ReplaceAll(s, ".", "_")
-
-	// Split on underscores, spaces, and dashes first
-	words := strings.FieldsFunc(s, func(r rune) bool {
-		return r == '_' || r == ' ' || r == '-'
-	})
-
-	var allWords []string
-	for _, word := range words {
-		// Further split each word on camelCase boundaries
-		camelWords := splitCamelCase(word)
-		allWords = append(allWords, camelWords...)
-	}
-
-	result := ""
-	for _, word := range allWords {
-		if len(word) > 0 {
-			result += strings.ToUpper(word[:1]) + strings.ToLower(word[1:])
-		}
-	}
-
-	return result
+	// Simply capitalize the first letter, keep the rest as-is
+	return strings.ToUpper(s[:1]) + s[1:]
 }
 
-// splitCamelCase splits a camelCase or PascalCase string into separate words
-func splitCamelCase(s string) []string {
-	if s == "" {
-		return nil
-	}
-
-	var words []string
-	var currentWord []rune
-
-	for i, r := range s {
-		if i > 0 && unicode.IsUpper(r) && len(currentWord) > 0 {
-			// Found a word boundary
-			words = append(words, string(currentWord))
-			currentWord = []rune{r}
-		} else {
-			currentWord = append(currentWord, r)
-		}
-	}
-
-	if len(currentWord) > 0 {
-		words = append(words, string(currentWord))
-	}
-
-	return words
-}
-
-// ToSnakeCase converts a string to snake_case
+// ToSnakeCase returns the original string as-is for JSON tags
+// No case conversion needed - use XSD original text directly
 func ToSnakeCase(s string) string {
-	var result []rune
-	for i, r := range s {
-		if i > 0 && ('A' <= r && r <= 'Z') {
-			result = append(result, '_')
-		}
-		result = append(result, rune(strings.ToLower(string(r))[0]))
-	}
-	return string(result)
+	return s
 }
 
 // ParseOccurs parses minOccurs and maxOccurs attributes
