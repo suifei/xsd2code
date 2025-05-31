@@ -458,6 +458,25 @@ func (p *XSDParser) processChoice(choice *types.XSDChoice, goType *types.GoType)
 	return p.processChoiceWithContext(choice, goType, []string{goType.Name})
 }
 
+// isGoBasicType checks if a type is a Go basic type that doesn't need pointer wrapping in choices
+func (p *XSDParser) isGoBasicType(goType string) bool {
+	basicTypes := map[string]bool{
+		"bool":    true,
+		"int8":    true,
+		"int16":   true,
+		"int32":   true,
+		"int64":   true,
+		"uint8":   true,
+		"uint16":  true,
+		"uint32":  true,
+		"uint64":  true,
+		"float32": true,
+		"float64": true,
+		"string":  true,
+	}
+	return basicTypes[goType]
+}
+
 // processChoiceWithContext processes an XSD choice with context path
 func (p *XSDParser) processChoiceWithContext(choice *types.XSDChoice, goType *types.GoType, contextPath []string) error {
 	// For choices, we create optional pointer fields for each choice option
@@ -465,17 +484,34 @@ func (p *XSDParser) processChoiceWithContext(choice *types.XSDChoice, goType *ty
 		field, err := p.convertElementWithContext(element, contextPath)
 		if err != nil {
 			return err
-		}
-
-		// For choice elements, all fields must be optional pointers with omitempty
+		} // For choice elements, all fields must be optional with omitempty
 		if !strings.HasPrefix(field.Type, "*") && !strings.HasPrefix(field.Type, "[]") {
 			// Check if this is an empty element (no type definition)
 			if element.ComplexType == nil && element.SimpleType == nil && element.Type == "" {
-				// Empty element - use *struct{}
-				field.Type = "*struct{}"
+				// For empty elements, try to map the element name as a type
+				// This handles elementary types like BOOL, BYTE, WORD, etc.
+				mappedType := p.mapXSDTypeToGo(element.Name)
+				if mappedType != types.ToGoTypeName(element.Name) {
+					// Element name was successfully mapped to a built-in type
+					// Check if it's a basic type that doesn't need pointer wrapping
+					if p.isGoBasicType(mappedType) {
+						field.Type = mappedType
+					} else {
+						field.Type = "*" + mappedType
+					}
+				} else {
+					// Empty element with no known mapping - use *struct{}
+					field.Type = "*struct{}"
+				}
 			} else {
-				// Make it a pointer
-				field.Type = "*" + field.Type
+				// For non-empty elements, check if the mapped type is basic
+				if p.isGoBasicType(field.Type) {
+					// Basic types don't need pointer wrapping in choices
+					// Keep as is
+				} else {
+					// Make it a pointer for complex types
+					field.Type = "*" + field.Type
+				}
 			}
 		}
 

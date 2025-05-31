@@ -854,17 +854,24 @@ func (g *CodeGenerator) GenerateTestCode() string {
 // generateTypeTest generates test function for a specific type
 func (g *CodeGenerator) generateTypeTest(builder *strings.Builder, goType *types.GoType) {
 	typeName := goType.Name
-
 	// Test XML marshaling/unmarshaling
 	builder.WriteString(fmt.Sprintf("func Test%sXMLMarshaling(t *testing.T) {\n", typeName))
-	builder.WriteString(fmt.Sprintf("\toriginal := &%s{\n", typeName))
 
-	// Generate test data for fields
-	for _, field := range goType.Fields {
-		g.generateTestFieldData(builder, &field)
+	// Use heuristic to detect enum types and generate appropriate initialization
+	if strings.HasSuffix(typeName, "Type") && !strings.Contains(typeName, "DataType") {
+		// For string-based enum types, use value initialization instead of pointer
+		builder.WriteString(fmt.Sprintf("\toriginal := %s(\"\")\n\n", typeName))
+	} else {
+		// For struct types, use pointer initialization
+		builder.WriteString(fmt.Sprintf("\toriginal := &%s{\n", typeName))
+
+		// Generate test data for fields
+		for _, field := range goType.Fields {
+			g.generateTestFieldData(builder, &field)
+		}
+
+		builder.WriteString("\t}\n\n")
 	}
-
-	builder.WriteString("\t}\n\n")
 
 	// Test marshaling
 	builder.WriteString("\t// Test marshaling\n")
@@ -914,6 +921,21 @@ func (g *CodeGenerator) generateTestFieldData(builder *strings.Builder, field *t
 	}
 }
 
+// isBasicGoType checks if a type is a basic Go type
+func isBasicGoType(typeName string) bool {
+	basicTypes := []string{
+		"bool", "int8", "uint8", "int16", "uint16", "int32", "uint32",
+		"int64", "uint64", "int", "uint", "float32", "float64", "string",
+		"byte", "rune",
+	}
+	for _, basicType := range basicTypes {
+		if typeName == basicType {
+			return true
+		}
+	}
+	return false
+}
+
 // generateSampleValue generates a sample value for a type
 func (g *CodeGenerator) generateSampleValue(builder *strings.Builder, typeName string) {
 	switch typeName {
@@ -921,15 +943,35 @@ func (g *CodeGenerator) generateSampleValue(builder *strings.Builder, typeName s
 		builder.WriteString("\"test_value\"")
 	case "int", "int32", "int64":
 		builder.WriteString("42")
+	case "uint", "uint32", "uint64":
+		builder.WriteString("42")
+	case "int8":
+		builder.WriteString("int8(42)")
+	case "int16":
+		builder.WriteString("int16(42)")
+	case "uint8":
+		builder.WriteString("uint8(42)")
+	case "uint16":
+		builder.WriteString("uint16(42)")
 	case "float32", "float64":
 		builder.WriteString("3.14")
 	case "bool":
 		builder.WriteString("true")
 	case "time.Time":
 		builder.WriteString("time.Now()")
+	case "time.Duration":
+		builder.WriteString("time.Second")
 	default:
-		// Assume it's a custom type
-		builder.WriteString(fmt.Sprintf("%s{}", typeName))
+		// For custom types, check if it appears to be an enum (string-based type)
+		// by using a simple heuristic: if it's a custom type that ends with "Type",
+		// treat it as a string-based enum, otherwise as a struct
+		if strings.HasSuffix(typeName, "Type") && !strings.Contains(typeName, "DataType") {
+			// For string-based enum types, use type conversion with empty string
+			builder.WriteString(fmt.Sprintf("%s(\"\")", typeName))
+		} else {
+			// Assume it's a custom struct type
+			builder.WriteString(fmt.Sprintf("%s{}", typeName))
+		}
 	}
 }
 
@@ -940,15 +982,27 @@ func (g *CodeGenerator) generatePointerValue(builder *strings.Builder, typeName 
 		builder.WriteString("stringPtr(\"test_value\")")
 	case "int", "int32", "int64":
 		builder.WriteString("intPtr(42)")
+	case "uint", "uint32", "uint64":
+		builder.WriteString("uintPtr(42)")
 	case "float32", "float64":
 		builder.WriteString("floatPtr(3.14)")
 	case "bool":
 		builder.WriteString("boolPtr(true)")
 	case "time.Time":
 		builder.WriteString("timePtr(time.Now())")
+	case "time.Duration":
+		builder.WriteString("durationPtr(time.Second)")
 	default:
-		// Assume it's a custom type
-		builder.WriteString(fmt.Sprintf("&%s{}", typeName))
+		// For custom types, check if it appears to be an enum (string-based type)
+		// by using a simple heuristic: if it's a custom type that ends with "Type",
+		// treat it as a string-based enum, otherwise as a struct
+		if strings.HasSuffix(typeName, "Type") && !strings.Contains(typeName, "DataType") {
+			// For string-based enum types, create inline function to return pointer
+			builder.WriteString(fmt.Sprintf("func() *%s { v := %s(\"\"); return &v }()", typeName, typeName))
+		} else {
+			// Assume it's a custom struct type
+			builder.WriteString(fmt.Sprintf("&%s{}", typeName))
+		}
 	}
 }
 
@@ -999,16 +1053,24 @@ func (g *CodeGenerator) generateBenchmarkTests(builder *strings.Builder) {
 		typeName := goType.Name
 
 		builder.WriteString(fmt.Sprintf("func Benchmark%sMarshaling(b *testing.B) {\n", typeName))
-		builder.WriteString(fmt.Sprintf("\tobj := &%s{\n", typeName))
 
-		// Generate sample data
-		for _, field := range goType.Fields {
-			if !field.IsOptional {
-				g.generateTestFieldData(builder, &field)
+		// Use heuristic to detect enum types and generate appropriate initialization
+		if strings.HasSuffix(typeName, "Type") && !strings.Contains(typeName, "DataType") {
+			// For string-based enum types, use value initialization
+			builder.WriteString(fmt.Sprintf("\tobj := %s(\"\")\n\n", typeName))
+		} else {
+			// For struct types, use pointer initialization
+			builder.WriteString(fmt.Sprintf("\tobj := &%s{\n", typeName))
+
+			// Generate sample data
+			for _, field := range goType.Fields {
+				if !field.IsOptional {
+					g.generateTestFieldData(builder, &field)
+				}
 			}
-		}
 
-		builder.WriteString("\t}\n\n")
+			builder.WriteString("\t}\n\n")
+		}
 
 		builder.WriteString("\tb.ResetTimer()\n")
 		builder.WriteString("\tfor i := 0; i < b.N; i++ {\n")
@@ -1018,13 +1080,15 @@ func (g *CodeGenerator) generateBenchmarkTests(builder *strings.Builder) {
 		builder.WriteString("\t\t}\n")
 		builder.WriteString("\t}\n")
 		builder.WriteString("}\n\n")
-	}
-
-	// Helper functions for pointer creation
+	}// Helper functions for pointer creation
 	builder.WriteString("// Helper functions for creating pointers\n\n")
 	builder.WriteString("func stringPtr(s string) *string { return &s }\n")
 	builder.WriteString("func intPtr(i int) *int { return &i }\n")
+	builder.WriteString("func uintPtr(u uint64) *uint64 { return &u }\n")
 	builder.WriteString("func floatPtr(f float64) *float64 { return &f }\n")
 	builder.WriteString("func boolPtr(b bool) *bool { return &b }\n")
 	builder.WriteString("func timePtr(t time.Time) *time.Time { return &t }\n")
+	builder.WriteString("func durationPtr(d time.Duration) *time.Duration { return &d }\n")
+	builder.WriteString("func edgeModifierTypePtr(e EdgeModifierType) *EdgeModifierType { return &e }\n")
+	builder.WriteString("func storageModifierTypePtr(s StorageModifierType) *StorageModifierType { return &s }\n")
 }
