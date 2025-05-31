@@ -369,6 +369,7 @@ type TypeMapping struct {
 // GetBuiltinTypeMappings returns the mapping from XSD built-in types to Go types
 func GetBuiltinTypeMappings() []TypeMapping {
 	return []TypeMapping{
+		// Standard XSD types
 		{"string", "string"},
 		{"normalizedString", "string"},
 		{"token", "string"},
@@ -419,6 +420,27 @@ func GetBuiltinTypeMappings() []TypeMapping {
 		{"positiveInteger", "uint64"},
 
 		{"anyType", "interface{}"},
+
+		// PLC Open IEC 61131-3 elementary types - these are empty elements in choice
+		{"BOOL", "*struct{}"},
+		{"BYTE", "*struct{}"},
+		{"WORD", "*struct{}"},
+		{"DWORD", "*struct{}"},
+		{"LWORD", "*struct{}"},
+		{"SINT", "*struct{}"},
+		{"INT", "*struct{}"},
+		{"DINT", "*struct{}"},
+		{"LINT", "*struct{}"},
+		{"USINT", "*struct{}"},
+		{"UINT", "*struct{}"},
+		{"UDINT", "*struct{}"},
+		{"ULINT", "*struct{}"},
+		{"REAL", "*struct{}"},
+		{"LREAL", "*struct{}"},
+		{"TIME", "*struct{}"},
+		{"DATE", "*struct{}"},
+		{"DT", "*struct{}"},
+		{"TOD", "*struct{}"},
 	}
 }
 
