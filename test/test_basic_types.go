@@ -84,7 +84,6 @@ type DataTypePointer struct {
 
 // DataType A generic data type
 type DataType struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd dataType"`
 	BOOL bool `xml:"BOOL,omitempty"`
 	BYTE uint8 `xml:"BYTE,omitempty"`
 	WORD uint16 `xml:"WORD,omitempty"`
@@ -119,14 +118,12 @@ type DataType struct {
 
 // RangeSigned Defines a range with signed bounds
 type RangeSigned struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd rangeSigned"`
 	Lower int64 `xml:"lower,attr"`
 	Upper int64 `xml:"upper,attr"`
 }
 
 // RangeUnsigned Defines a range with unsigned bounds
 type RangeUnsigned struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd rangeUnsigned"`
 	Lower uint64 `xml:"lower,attr"`
 	Upper uint64 `xml:"upper,attr"`
 }
@@ -166,7 +163,6 @@ type ValueStructValue struct {
 
 // Value A generic value
 type Value struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd value"`
 	SimpleValue *ValueSimpleValue `xml:"simpleValue,omitempty"`
 	ArrayValue *ValueArrayValue `xml:"arrayValue,omitempty"`
 	StructValue *ValueStructValue `xml:"structValue,omitempty"`
@@ -1365,7 +1361,6 @@ type BodySFC struct {
 
 // Body Implementation part of a POU, action or transistion
 type Body struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd body"`
 	// Additional userspecific information to the element
 	Documentation *FormattedText `xml:"documentation,omitempty"`
 	IL *FormattedText `xml:"IL,omitempty"`
@@ -1378,7 +1373,6 @@ type Body struct {
 // VarList List of variable declarations that share the same memory attributes
 // (CONSTANT, RETAIN, NON_RETAIN, PERSISTENT); extends ppx:varListPlain
 type VarList struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd varList"`
 	Name *string `xml:"name,attr"`
 	Constant *bool `xml:"constant,attr"`
 	Retain *bool `xml:"retain,attr"`
@@ -1400,14 +1394,12 @@ type VarListPlainVariable struct {
 
 // VarListPlain List of variable declarations without attributes
 type VarListPlain struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd varListPlain"`
 	Variable []VarListPlainVariable `xml:"variable,omitempty"`
 	Documentation *FormattedText `xml:"documentation,omitempty"`
 }
 
 // Position Defines a graphical position in X, Y coordinates
 type Position struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd position"`
 	X float64 `xml:"x,attr"`
 	Y float64 `xml:"y,attr"`
 }
@@ -1467,7 +1459,6 @@ type PouInstance struct {
 
 // FormattedText Formatted text according to parts of XHTML 1.1
 type FormattedText struct {
-	XMLName xml.Name `xml:"http://www.plcopen.org/xml/tc6.xsd formattedText"`
 }
 
 // EdgeModifierType Defines the edge detection behaviour of a variable
@@ -1588,7 +1579,7 @@ type ProjectContentHeader struct {
 	CoordinateInfo ProjectContentHeaderCoordinateInfo `xml:"coordinateInfo"`
 	Name string `xml:"name,attr"`
 	Version *string `xml:"version,attr"`
-	ModificationDateTime *time.Time `xml:"modificationDateTime,attr"`
+	ModificationDateTime *time.Time `xml:"modificationDateTime,attr,omitempty"`
 	Organization *string `xml:"organization,attr"`
 	Author *string `xml:"author,attr"`
 	// Documentation language of the project e.g. "en-US"

@@ -1080,7 +1080,7 @@ func (g *CodeGenerator) generateBenchmarkTests(builder *strings.Builder) {
 		builder.WriteString("\t\t}\n")
 		builder.WriteString("\t}\n")
 		builder.WriteString("}\n\n")
-	}// Helper functions for pointer creation
+	} // Helper functions for pointer creation
 	builder.WriteString("// Helper functions for creating pointers\n\n")
 	builder.WriteString("func stringPtr(s string) *string { return &s }\n")
 	builder.WriteString("func intPtr(i int) *int { return &i }\n")

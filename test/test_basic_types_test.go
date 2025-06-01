@@ -34,8 +34,7 @@ func TestDataTypeStringXMLMarshaling(t *testing.T) {
 
 func TestDataTypeStringValidation(t *testing.T) {
 	// Test valid case
-	valid := &DataTypeString{
-	}
+	valid := &DataTypeString{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -68,8 +67,7 @@ func TestDataTypeWstringXMLMarshaling(t *testing.T) {
 
 func TestDataTypeWstringValidation(t *testing.T) {
 	// Test valid case
-	valid := &DataTypeWstring{
-	}
+	valid := &DataTypeWstring{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -79,7 +77,7 @@ func TestDataTypeWstringValidation(t *testing.T) {
 func TestDataTypeArrayXMLMarshaling(t *testing.T) {
 	original := &DataTypeArray{
 		Dimension: []RangeSigned{RangeSigned{}},
-		BaseType: DataType{},
+		BaseType:  DataType{},
 	}
 
 	// Test marshaling
@@ -105,7 +103,7 @@ func TestDataTypeArrayValidation(t *testing.T) {
 	// Test valid case
 	valid := &DataTypeArray{
 		Dimension: []RangeSigned{RangeSigned{}},
-		BaseType: DataType{},
+		BaseType:  DataType{},
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -168,7 +166,7 @@ func TestDataTypeDerivedValidation(t *testing.T) {
 
 func TestDataTypeEnumValuesValueXMLMarshaling(t *testing.T) {
 	original := &DataTypeEnumValuesValue{
-		Name: "test_value",
+		Name:  "test_value",
 		Value: stringPtr("test_value"),
 	}
 
@@ -251,7 +249,7 @@ func TestDataTypeEnumValuesValidation(t *testing.T) {
 
 func TestDataTypeEnumXMLMarshaling(t *testing.T) {
 	original := &DataTypeEnum{
-		Values: DataTypeEnumValues{},
+		Values:   DataTypeEnumValues{},
 		BaseType: &DataType{},
 	}
 
@@ -293,7 +291,7 @@ func TestDataTypeEnumValidation(t *testing.T) {
 
 func TestDataTypeSubrangeSignedXMLMarshaling(t *testing.T) {
 	original := &DataTypeSubrangeSigned{
-		Range: RangeSigned{},
+		Range:    RangeSigned{},
 		BaseType: DataType{},
 	}
 
@@ -319,7 +317,7 @@ func TestDataTypeSubrangeSignedXMLMarshaling(t *testing.T) {
 func TestDataTypeSubrangeSignedValidation(t *testing.T) {
 	// Test valid case
 	valid := &DataTypeSubrangeSigned{
-		Range: RangeSigned{},
+		Range:    RangeSigned{},
 		BaseType: DataType{},
 	}
 	if err := valid.Validate(); err != nil {
@@ -342,7 +340,7 @@ func TestDataTypeSubrangeSignedValidation(t *testing.T) {
 
 func TestDataTypeSubrangeUnsignedXMLMarshaling(t *testing.T) {
 	original := &DataTypeSubrangeUnsigned{
-		Range: RangeUnsigned{},
+		Range:    RangeUnsigned{},
 		BaseType: DataType{},
 	}
 
@@ -368,7 +366,7 @@ func TestDataTypeSubrangeUnsignedXMLMarshaling(t *testing.T) {
 func TestDataTypeSubrangeUnsignedValidation(t *testing.T) {
 	// Test valid case
 	valid := &DataTypeSubrangeUnsigned{
-		Range: RangeUnsigned{},
+		Range:    RangeUnsigned{},
 		BaseType: DataType{},
 	}
 	if err := valid.Validate(); err != nil {
@@ -432,34 +430,34 @@ func TestDataTypePointerValidation(t *testing.T) {
 
 func TestDataTypeXMLMarshaling(t *testing.T) {
 	original := &DataType{
-		BOOL: true,
-		BYTE: uint8(42),
-		WORD: uint16(42),
-		DWORD: 42,
-		LWORD: 42,
-		SINT: int8(42),
-		INT: int16(42),
-		DINT: 42,
-		LINT: 42,
-		USINT: uint8(42),
-		UINT: uint16(42),
-		UDINT: 42,
-		ULINT: 42,
-		REAL: 3.14,
-		LREAL: 3.14,
-		TIME: durationPtr(time.Second),
-		DATE: timePtr(time.Now()),
-		DT: timePtr(time.Now()),
-		TOD: timePtr(time.Now()),
-		String: &DataTypeString{},
-		Wstring: &DataTypeWstring{},
-		Array: &DataTypeArray{},
-		Derived: &DataTypeDerived{},
-		Enum: &DataTypeEnum{},
-		Struct: &VarListPlain{},
-		SubrangeSigned: &DataTypeSubrangeSigned{},
+		BOOL:             true,
+		BYTE:             uint8(42),
+		WORD:             uint16(42),
+		DWORD:            42,
+		LWORD:            42,
+		SINT:             int8(42),
+		INT:              int16(42),
+		DINT:             42,
+		LINT:             42,
+		USINT:            uint8(42),
+		UINT:             uint16(42),
+		UDINT:            42,
+		ULINT:            42,
+		REAL:             3.14,
+		LREAL:            3.14,
+		TIME:             durationPtr(time.Second),
+		DATE:             timePtr(time.Now()),
+		DT:               timePtr(time.Now()),
+		TOD:              timePtr(time.Now()),
+		String:           &DataTypeString{},
+		Wstring:          &DataTypeWstring{},
+		Array:            &DataTypeArray{},
+		Derived:          &DataTypeDerived{},
+		Enum:             &DataTypeEnum{},
+		Struct:           &VarListPlain{},
+		SubrangeSigned:   &DataTypeSubrangeSigned{},
 		SubrangeUnsigned: &DataTypeSubrangeUnsigned{},
-		Pointer: &DataTypePointer{},
+		Pointer:          &DataTypePointer{},
 	}
 
 	// Test marshaling
@@ -483,8 +481,7 @@ func TestDataTypeXMLMarshaling(t *testing.T) {
 
 func TestDataTypeValidation(t *testing.T) {
 	// Test valid case
-	valid := &DataType{
-	}
+	valid := &DataType{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -615,8 +612,7 @@ func TestValueSimpleValueXMLMarshaling(t *testing.T) {
 
 func TestValueSimpleValueValidation(t *testing.T) {
 	// Test valid case
-	valid := &ValueSimpleValue{
-	}
+	valid := &ValueSimpleValue{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -624,8 +620,7 @@ func TestValueSimpleValueValidation(t *testing.T) {
 }
 
 func TestValueArrayValueValueXMLMarshaling(t *testing.T) {
-	original := &ValueArrayValueValue{
-	}
+	original := &ValueArrayValueValue{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -648,8 +643,7 @@ func TestValueArrayValueValueXMLMarshaling(t *testing.T) {
 
 func TestValueArrayValueValueValidation(t *testing.T) {
 	// Test valid case
-	valid := &ValueArrayValueValue{
-	}
+	valid := &ValueArrayValueValue{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -698,8 +692,7 @@ func TestValueArrayValueValidation(t *testing.T) {
 }
 
 func TestValueStructValueValueXMLMarshaling(t *testing.T) {
-	original := &ValueStructValueValue{
-	}
+	original := &ValueStructValueValue{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -722,8 +715,7 @@ func TestValueStructValueValueXMLMarshaling(t *testing.T) {
 
 func TestValueStructValueValueValidation(t *testing.T) {
 	// Test valid case
-	valid := &ValueStructValueValue{
-	}
+	valid := &ValueStructValueValue{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -774,7 +766,7 @@ func TestValueStructValueValidation(t *testing.T) {
 func TestValueXMLMarshaling(t *testing.T) {
 	original := &Value{
 		SimpleValue: &ValueSimpleValue{},
-		ArrayValue: &ValueArrayValue{},
+		ArrayValue:  &ValueArrayValue{},
 		StructValue: &ValueStructValue{},
 	}
 
@@ -799,8 +791,7 @@ func TestValueXMLMarshaling(t *testing.T) {
 
 func TestValueValidation(t *testing.T) {
 	// Test valid case
-	valid := &Value{
-	}
+	valid := &Value{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -809,12 +800,12 @@ func TestValueValidation(t *testing.T) {
 
 func TestBodyFBDCommentXMLMarshaling(t *testing.T) {
 	original := &BodyFBDComment{
-		Position: Position{},
-		Content: FormattedText{},
+		Position:      Position{},
+		Content:       FormattedText{},
 		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		LocalId:       42,
+		Height:        3.14,
+		Width:         3.14,
 	}
 
 	// Test marshaling
@@ -840,10 +831,10 @@ func TestBodyFBDCommentValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDComment{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -883,12 +874,12 @@ func TestBodyFBDCommentValidation(t *testing.T) {
 
 func TestBodyFBDErrorXMLMarshaling(t *testing.T) {
 	original := &BodyFBDError{
-		Position: Position{},
-		Content: FormattedText{},
+		Position:      Position{},
+		Content:       FormattedText{},
 		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		LocalId:       42,
+		Height:        3.14,
+		Width:         3.14,
 	}
 
 	// Test marshaling
@@ -914,10 +905,10 @@ func TestBodyFBDErrorValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDError{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -957,13 +948,13 @@ func TestBodyFBDErrorValidation(t *testing.T) {
 
 func TestBodyFBDConnectorXMLMarshaling(t *testing.T) {
 	original := &BodyFBDConnector{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		Name: "test_value",
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:     &FormattedText{},
+		Name:              "test_value",
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -989,8 +980,8 @@ func TestBodyFBDConnectorValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDConnector{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1018,13 +1009,13 @@ func TestBodyFBDConnectorValidation(t *testing.T) {
 
 func TestBodyFBDContinuationXMLMarshaling(t *testing.T) {
 	original := &BodyFBDContinuation{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		Name: "test_value",
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		Name:               "test_value",
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -1050,8 +1041,8 @@ func TestBodyFBDContinuationValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDContinuation{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1120,12 +1111,12 @@ func TestBodyFBDActionBlockActionReferenceValidation(t *testing.T) {
 
 func TestBodyFBDActionBlockActionXMLMarshaling(t *testing.T) {
 	original := &BodyFBDActionBlockAction{
-		Reference: &BodyFBDActionBlockActionReference{},
-		Inline: &Body{},
+		Reference:     &BodyFBDActionBlockActionReference{},
+		Inline:        &Body{},
 		Documentation: &FormattedText{},
-		Qualifier: stringPtr("test_value"),
-		Duration: stringPtr("test_value"),
-		Indicator: stringPtr("test_value"),
+		Qualifier:     stringPtr("test_value"),
+		Duration:      stringPtr("test_value"),
+		Indicator:     stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -1149,8 +1140,7 @@ func TestBodyFBDActionBlockActionXMLMarshaling(t *testing.T) {
 
 func TestBodyFBDActionBlockActionValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyFBDActionBlockAction{
-	}
+	valid := &BodyFBDActionBlockAction{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -1159,15 +1149,15 @@ func TestBodyFBDActionBlockActionValidation(t *testing.T) {
 
 func TestBodyFBDActionBlockXMLMarshaling(t *testing.T) {
 	original := &BodyFBDActionBlock{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Action: []BodyFBDActionBlockAction{BodyFBDActionBlockAction{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Negated: boolPtr(true),
+		Action:             []BodyFBDActionBlockAction{BodyFBDActionBlockAction{}},
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		Negated:            boolPtr(true),
 	}
 
 	// Test marshaling
@@ -1193,7 +1183,7 @@ func TestBodyFBDActionBlockValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDActionBlock{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1216,12 +1206,12 @@ func TestBodyFBDActionBlockValidation(t *testing.T) {
 func TestBodyFBDBlockInputVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodyFBDBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:     &FormattedText{},
+		FormalParameter:   "test_value",
+		Negated:           boolPtr(true),
+		Edge:              func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:           func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:            boolPtr(true),
 	}
 
 	// Test marshaling
@@ -1247,7 +1237,7 @@ func TestBodyFBDBlockInputVariablesVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		FormalParameter: "test_value",
+		FormalParameter:   "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1293,8 +1283,7 @@ func TestBodyFBDBlockInputVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodyFBDBlockInputVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyFBDBlockInputVariables{
-	}
+	valid := &BodyFBDBlockInputVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -1303,14 +1292,14 @@ func TestBodyFBDBlockInputVariablesValidation(t *testing.T) {
 
 func TestBodyFBDBlockInOutVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodyFBDBlockInOutVariablesVariable{
-		ConnectionPointIn: &ConnectionPointIn{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:      &FormattedText{},
+		FormalParameter:    "test_value",
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:             boolPtr(true),
 	}
 
 	// Test marshaling
@@ -1375,8 +1364,7 @@ func TestBodyFBDBlockInOutVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodyFBDBlockInOutVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyFBDBlockInOutVariables{
-	}
+	valid := &BodyFBDBlockInOutVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -1386,12 +1374,12 @@ func TestBodyFBDBlockInOutVariablesValidation(t *testing.T) {
 func TestBodyFBDBlockOutputVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodyFBDBlockOutputVariablesVariable{
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:      &FormattedText{},
+		FormalParameter:    "test_value",
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:             boolPtr(true),
 	}
 
 	// Test marshaling
@@ -1456,8 +1444,7 @@ func TestBodyFBDBlockOutputVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodyFBDBlockOutputVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyFBDBlockOutputVariables{
-	}
+	valid := &BodyFBDBlockOutputVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -1466,16 +1453,16 @@ func TestBodyFBDBlockOutputVariablesValidation(t *testing.T) {
 
 func TestBodyFBDBlockXMLMarshaling(t *testing.T) {
 	original := &BodyFBDBlock{
-		Position: Position{},
-		InputVariables: BodyFBDBlockInputVariables{},
-		InOutVariables: BodyFBDBlockInOutVariables{},
-		OutputVariables: BodyFBDBlockOutputVariables{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Width: floatPtr(3.14),
-		Height: floatPtr(3.14),
-		TypeName: "test_value",
-		InstanceName: stringPtr("test_value"),
+		Position:         Position{},
+		InputVariables:   BodyFBDBlockInputVariables{},
+		InOutVariables:   BodyFBDBlockInOutVariables{},
+		OutputVariables:  BodyFBDBlockOutputVariables{},
+		Documentation:    &FormattedText{},
+		LocalId:          42,
+		Width:            floatPtr(3.14),
+		Height:           floatPtr(3.14),
+		TypeName:         "test_value",
+		InstanceName:     stringPtr("test_value"),
 		ExecutionOrderId: uintPtr(42),
 	}
 
@@ -1501,12 +1488,12 @@ func TestBodyFBDBlockXMLMarshaling(t *testing.T) {
 func TestBodyFBDBlockValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDBlock{
-		Position: Position{},
-		InputVariables: BodyFBDBlockInputVariables{},
-		InOutVariables: BodyFBDBlockInOutVariables{},
+		Position:        Position{},
+		InputVariables:  BodyFBDBlockInputVariables{},
+		InOutVariables:  BodyFBDBlockInOutVariables{},
 		OutputVariables: BodyFBDBlockOutputVariables{},
-		LocalId: 42,
-		TypeName: "test_value",
+		LocalId:         42,
+		TypeName:        "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1552,17 +1539,17 @@ func TestBodyFBDBlockValidation(t *testing.T) {
 
 func TestBodyFBDInVariableXMLMarshaling(t *testing.T) {
 	original := &BodyFBDInVariable{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:         "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -1587,9 +1574,9 @@ func TestBodyFBDInVariableXMLMarshaling(t *testing.T) {
 func TestBodyFBDInVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDInVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1617,17 +1604,17 @@ func TestBodyFBDInVariableValidation(t *testing.T) {
 
 func TestBodyFBDOutVariableXMLMarshaling(t *testing.T) {
 	original := &BodyFBDOutVariable{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:        "test_value",
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		ExecutionOrderId:  uintPtr(42),
+		Negated:           boolPtr(true),
+		Edge:              func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:           func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -1652,9 +1639,9 @@ func TestBodyFBDOutVariableXMLMarshaling(t *testing.T) {
 func TestBodyFBDOutVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1682,21 +1669,21 @@ func TestBodyFBDOutVariableValidation(t *testing.T) {
 
 func TestBodyFBDInOutVariableXMLMarshaling(t *testing.T) {
 	original := &BodyFBDInOutVariable{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		NegatedIn: boolPtr(true),
-		EdgeIn: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		StorageIn: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		NegatedOut: boolPtr(true),
-		EdgeOut: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		StorageOut: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:         "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		NegatedIn:          boolPtr(true),
+		EdgeIn:             func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		StorageIn:          func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		NegatedOut:         boolPtr(true),
+		EdgeOut:            func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		StorageOut:         func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -1721,9 +1708,9 @@ func TestBodyFBDInOutVariableXMLMarshaling(t *testing.T) {
 func TestBodyFBDInOutVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDInOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1751,12 +1738,12 @@ func TestBodyFBDInOutVariableValidation(t *testing.T) {
 
 func TestBodyFBDLabelXMLMarshaling(t *testing.T) {
 	original := &BodyFBDLabel{
-		Position: Position{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Label: "test_value",
+		Position:         Position{},
+		Documentation:    &FormattedText{},
+		LocalId:          42,
+		Height:           floatPtr(3.14),
+		Width:            floatPtr(3.14),
+		Label:            "test_value",
 		ExecutionOrderId: uintPtr(42),
 	}
 
@@ -1783,8 +1770,8 @@ func TestBodyFBDLabelValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDLabel{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1812,14 +1799,14 @@ func TestBodyFBDLabelValidation(t *testing.T) {
 
 func TestBodyFBDJumpXMLMarshaling(t *testing.T) {
 	original := &BodyFBDJump{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Label: "test_value",
-		ExecutionOrderId: uintPtr(42),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		Label:             "test_value",
+		ExecutionOrderId:  uintPtr(42),
 	}
 
 	// Test marshaling
@@ -1845,8 +1832,8 @@ func TestBodyFBDJumpValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDJump{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1874,13 +1861,13 @@ func TestBodyFBDJumpValidation(t *testing.T) {
 
 func TestBodyFBDReturnXMLMarshaling(t *testing.T) {
 	original := &BodyFBDReturn{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		ExecutionOrderId:  uintPtr(42),
 	}
 
 	// Test marshaling
@@ -1906,7 +1893,7 @@ func TestBodyFBDReturnValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyFBDReturn{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -1928,18 +1915,18 @@ func TestBodyFBDReturnValidation(t *testing.T) {
 
 func TestBodyFBDXMLMarshaling(t *testing.T) {
 	original := &BodyFBD{
-		Comment: &BodyFBDComment{},
-		Error: &BodyFBDError{},
-		Connector: &BodyFBDConnector{},
-		Continuation: &BodyFBDContinuation{},
-		ActionBlock: &BodyFBDActionBlock{},
-		Block: &BodyFBDBlock{},
-		InVariable: &BodyFBDInVariable{},
-		OutVariable: &BodyFBDOutVariable{},
+		Comment:       &BodyFBDComment{},
+		Error:         &BodyFBDError{},
+		Connector:     &BodyFBDConnector{},
+		Continuation:  &BodyFBDContinuation{},
+		ActionBlock:   &BodyFBDActionBlock{},
+		Block:         &BodyFBDBlock{},
+		InVariable:    &BodyFBDInVariable{},
+		OutVariable:   &BodyFBDOutVariable{},
 		InOutVariable: &BodyFBDInOutVariable{},
-		Label: &BodyFBDLabel{},
-		Jump: &BodyFBDJump{},
-		Return: &BodyFBDReturn{},
+		Label:         &BodyFBDLabel{},
+		Jump:          &BodyFBDJump{},
+		Return:        &BodyFBDReturn{},
 	}
 
 	// Test marshaling
@@ -1963,8 +1950,7 @@ func TestBodyFBDXMLMarshaling(t *testing.T) {
 
 func TestBodyFBDValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyFBD{
-	}
+	valid := &BodyFBD{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -1973,12 +1959,12 @@ func TestBodyFBDValidation(t *testing.T) {
 
 func TestBodyLDCommentXMLMarshaling(t *testing.T) {
 	original := &BodyLDComment{
-		Position: Position{},
-		Content: FormattedText{},
+		Position:      Position{},
+		Content:       FormattedText{},
 		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		LocalId:       42,
+		Height:        3.14,
+		Width:         3.14,
 	}
 
 	// Test marshaling
@@ -2004,10 +1990,10 @@ func TestBodyLDCommentValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDComment{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2047,12 +2033,12 @@ func TestBodyLDCommentValidation(t *testing.T) {
 
 func TestBodyLDErrorXMLMarshaling(t *testing.T) {
 	original := &BodyLDError{
-		Position: Position{},
-		Content: FormattedText{},
+		Position:      Position{},
+		Content:       FormattedText{},
 		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		LocalId:       42,
+		Height:        3.14,
+		Width:         3.14,
 	}
 
 	// Test marshaling
@@ -2078,10 +2064,10 @@ func TestBodyLDErrorValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDError{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2121,13 +2107,13 @@ func TestBodyLDErrorValidation(t *testing.T) {
 
 func TestBodyLDConnectorXMLMarshaling(t *testing.T) {
 	original := &BodyLDConnector{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		Name: "test_value",
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:     &FormattedText{},
+		Name:              "test_value",
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -2153,8 +2139,8 @@ func TestBodyLDConnectorValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDConnector{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2182,13 +2168,13 @@ func TestBodyLDConnectorValidation(t *testing.T) {
 
 func TestBodyLDContinuationXMLMarshaling(t *testing.T) {
 	original := &BodyLDContinuation{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		Name: "test_value",
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		Name:               "test_value",
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -2214,8 +2200,8 @@ func TestBodyLDContinuationValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDContinuation{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2284,12 +2270,12 @@ func TestBodyLDActionBlockActionReferenceValidation(t *testing.T) {
 
 func TestBodyLDActionBlockActionXMLMarshaling(t *testing.T) {
 	original := &BodyLDActionBlockAction{
-		Reference: &BodyLDActionBlockActionReference{},
-		Inline: &Body{},
+		Reference:     &BodyLDActionBlockActionReference{},
+		Inline:        &Body{},
 		Documentation: &FormattedText{},
-		Qualifier: stringPtr("test_value"),
-		Duration: stringPtr("test_value"),
-		Indicator: stringPtr("test_value"),
+		Qualifier:     stringPtr("test_value"),
+		Duration:      stringPtr("test_value"),
+		Indicator:     stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -2313,8 +2299,7 @@ func TestBodyLDActionBlockActionXMLMarshaling(t *testing.T) {
 
 func TestBodyLDActionBlockActionValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyLDActionBlockAction{
-	}
+	valid := &BodyLDActionBlockAction{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -2323,15 +2308,15 @@ func TestBodyLDActionBlockActionValidation(t *testing.T) {
 
 func TestBodyLDActionBlockXMLMarshaling(t *testing.T) {
 	original := &BodyLDActionBlock{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Action: []BodyLDActionBlockAction{BodyLDActionBlockAction{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Negated: boolPtr(true),
+		Action:             []BodyLDActionBlockAction{BodyLDActionBlockAction{}},
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		Negated:            boolPtr(true),
 	}
 
 	// Test marshaling
@@ -2357,7 +2342,7 @@ func TestBodyLDActionBlockValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDActionBlock{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2380,12 +2365,12 @@ func TestBodyLDActionBlockValidation(t *testing.T) {
 func TestBodyLDBlockInputVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodyLDBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:     &FormattedText{},
+		FormalParameter:   "test_value",
+		Negated:           boolPtr(true),
+		Edge:              func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:           func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:            boolPtr(true),
 	}
 
 	// Test marshaling
@@ -2411,7 +2396,7 @@ func TestBodyLDBlockInputVariablesVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		FormalParameter: "test_value",
+		FormalParameter:   "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2457,8 +2442,7 @@ func TestBodyLDBlockInputVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodyLDBlockInputVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyLDBlockInputVariables{
-	}
+	valid := &BodyLDBlockInputVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -2467,14 +2451,14 @@ func TestBodyLDBlockInputVariablesValidation(t *testing.T) {
 
 func TestBodyLDBlockInOutVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodyLDBlockInOutVariablesVariable{
-		ConnectionPointIn: &ConnectionPointIn{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:      &FormattedText{},
+		FormalParameter:    "test_value",
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:             boolPtr(true),
 	}
 
 	// Test marshaling
@@ -2539,8 +2523,7 @@ func TestBodyLDBlockInOutVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodyLDBlockInOutVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyLDBlockInOutVariables{
-	}
+	valid := &BodyLDBlockInOutVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -2550,12 +2533,12 @@ func TestBodyLDBlockInOutVariablesValidation(t *testing.T) {
 func TestBodyLDBlockOutputVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodyLDBlockOutputVariablesVariable{
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:      &FormattedText{},
+		FormalParameter:    "test_value",
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:             boolPtr(true),
 	}
 
 	// Test marshaling
@@ -2620,8 +2603,7 @@ func TestBodyLDBlockOutputVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodyLDBlockOutputVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyLDBlockOutputVariables{
-	}
+	valid := &BodyLDBlockOutputVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -2630,16 +2612,16 @@ func TestBodyLDBlockOutputVariablesValidation(t *testing.T) {
 
 func TestBodyLDBlockXMLMarshaling(t *testing.T) {
 	original := &BodyLDBlock{
-		Position: Position{},
-		InputVariables: BodyLDBlockInputVariables{},
-		InOutVariables: BodyLDBlockInOutVariables{},
-		OutputVariables: BodyLDBlockOutputVariables{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Width: floatPtr(3.14),
-		Height: floatPtr(3.14),
-		TypeName: "test_value",
-		InstanceName: stringPtr("test_value"),
+		Position:         Position{},
+		InputVariables:   BodyLDBlockInputVariables{},
+		InOutVariables:   BodyLDBlockInOutVariables{},
+		OutputVariables:  BodyLDBlockOutputVariables{},
+		Documentation:    &FormattedText{},
+		LocalId:          42,
+		Width:            floatPtr(3.14),
+		Height:           floatPtr(3.14),
+		TypeName:         "test_value",
+		InstanceName:     stringPtr("test_value"),
 		ExecutionOrderId: uintPtr(42),
 	}
 
@@ -2665,12 +2647,12 @@ func TestBodyLDBlockXMLMarshaling(t *testing.T) {
 func TestBodyLDBlockValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDBlock{
-		Position: Position{},
-		InputVariables: BodyLDBlockInputVariables{},
-		InOutVariables: BodyLDBlockInOutVariables{},
+		Position:        Position{},
+		InputVariables:  BodyLDBlockInputVariables{},
+		InOutVariables:  BodyLDBlockInOutVariables{},
 		OutputVariables: BodyLDBlockOutputVariables{},
-		LocalId: 42,
-		TypeName: "test_value",
+		LocalId:         42,
+		TypeName:        "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2716,17 +2698,17 @@ func TestBodyLDBlockValidation(t *testing.T) {
 
 func TestBodyLDInVariableXMLMarshaling(t *testing.T) {
 	original := &BodyLDInVariable{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:         "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -2751,9 +2733,9 @@ func TestBodyLDInVariableXMLMarshaling(t *testing.T) {
 func TestBodyLDInVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDInVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2781,17 +2763,17 @@ func TestBodyLDInVariableValidation(t *testing.T) {
 
 func TestBodyLDOutVariableXMLMarshaling(t *testing.T) {
 	original := &BodyLDOutVariable{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:        "test_value",
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		ExecutionOrderId:  uintPtr(42),
+		Negated:           boolPtr(true),
+		Edge:              func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:           func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -2816,9 +2798,9 @@ func TestBodyLDOutVariableXMLMarshaling(t *testing.T) {
 func TestBodyLDOutVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2846,21 +2828,21 @@ func TestBodyLDOutVariableValidation(t *testing.T) {
 
 func TestBodyLDInOutVariableXMLMarshaling(t *testing.T) {
 	original := &BodyLDInOutVariable{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		NegatedIn: boolPtr(true),
-		EdgeIn: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		StorageIn: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		NegatedOut: boolPtr(true),
-		EdgeOut: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		StorageOut: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:         "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		NegatedIn:          boolPtr(true),
+		EdgeIn:             func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		StorageIn:          func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		NegatedOut:         boolPtr(true),
+		EdgeOut:            func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		StorageOut:         func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -2885,9 +2867,9 @@ func TestBodyLDInOutVariableXMLMarshaling(t *testing.T) {
 func TestBodyLDInOutVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDInOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2915,12 +2897,12 @@ func TestBodyLDInOutVariableValidation(t *testing.T) {
 
 func TestBodyLDLabelXMLMarshaling(t *testing.T) {
 	original := &BodyLDLabel{
-		Position: Position{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Label: "test_value",
+		Position:         Position{},
+		Documentation:    &FormattedText{},
+		LocalId:          42,
+		Height:           floatPtr(3.14),
+		Width:            floatPtr(3.14),
+		Label:            "test_value",
 		ExecutionOrderId: uintPtr(42),
 	}
 
@@ -2947,8 +2929,8 @@ func TestBodyLDLabelValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDLabel{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -2976,14 +2958,14 @@ func TestBodyLDLabelValidation(t *testing.T) {
 
 func TestBodyLDJumpXMLMarshaling(t *testing.T) {
 	original := &BodyLDJump{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Label: "test_value",
-		ExecutionOrderId: uintPtr(42),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		Label:             "test_value",
+		ExecutionOrderId:  uintPtr(42),
 	}
 
 	// Test marshaling
@@ -3009,8 +2991,8 @@ func TestBodyLDJumpValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDJump{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3038,13 +3020,13 @@ func TestBodyLDJumpValidation(t *testing.T) {
 
 func TestBodyLDReturnXMLMarshaling(t *testing.T) {
 	original := &BodyLDReturn{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		ExecutionOrderId:  uintPtr(42),
 	}
 
 	// Test marshaling
@@ -3070,7 +3052,7 @@ func TestBodyLDReturnValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDReturn{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3091,8 +3073,7 @@ func TestBodyLDReturnValidation(t *testing.T) {
 }
 
 func TestBodyLDLeftPowerRailConnectionPointOutXMLMarshaling(t *testing.T) {
-	original := &BodyLDLeftPowerRailConnectionPointOut{
-	}
+	original := &BodyLDLeftPowerRailConnectionPointOut{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -3115,8 +3096,7 @@ func TestBodyLDLeftPowerRailConnectionPointOutXMLMarshaling(t *testing.T) {
 
 func TestBodyLDLeftPowerRailConnectionPointOutValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyLDLeftPowerRailConnectionPointOut{
-	}
+	valid := &BodyLDLeftPowerRailConnectionPointOut{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -3125,12 +3105,12 @@ func TestBodyLDLeftPowerRailConnectionPointOutValidation(t *testing.T) {
 
 func TestBodyLDLeftPowerRailXMLMarshaling(t *testing.T) {
 	original := &BodyLDLeftPowerRail{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: []BodyLDLeftPowerRailConnectionPointOut{BodyLDLeftPowerRailConnectionPointOut{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -3156,7 +3136,7 @@ func TestBodyLDLeftPowerRailValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDLeftPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3178,12 +3158,12 @@ func TestBodyLDLeftPowerRailValidation(t *testing.T) {
 
 func TestBodyLDRightPowerRailXMLMarshaling(t *testing.T) {
 	original := &BodyLDRightPowerRail{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: []ConnectionPointIn{ConnectionPointIn{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -3209,7 +3189,7 @@ func TestBodyLDRightPowerRailValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodyLDRightPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3231,18 +3211,18 @@ func TestBodyLDRightPowerRailValidation(t *testing.T) {
 
 func TestBodyLDCoilXMLMarshaling(t *testing.T) {
 	original := &BodyLDCoil{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Variable: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Variable:           "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -3269,7 +3249,7 @@ func TestBodyLDCoilValidation(t *testing.T) {
 	valid := &BodyLDCoil{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3297,18 +3277,18 @@ func TestBodyLDCoilValidation(t *testing.T) {
 
 func TestBodyLDContactXMLMarshaling(t *testing.T) {
 	original := &BodyLDContact{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Variable: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Variable:           "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -3335,7 +3315,7 @@ func TestBodyLDContactValidation(t *testing.T) {
 	valid := &BodyLDContact{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3363,22 +3343,22 @@ func TestBodyLDContactValidation(t *testing.T) {
 
 func TestBodyLDXMLMarshaling(t *testing.T) {
 	original := &BodyLD{
-		Comment: &BodyLDComment{},
-		Error: &BodyLDError{},
-		Connector: &BodyLDConnector{},
-		Continuation: &BodyLDContinuation{},
-		ActionBlock: &BodyLDActionBlock{},
-		Block: &BodyLDBlock{},
-		InVariable: &BodyLDInVariable{},
-		OutVariable: &BodyLDOutVariable{},
-		InOutVariable: &BodyLDInOutVariable{},
-		Label: &BodyLDLabel{},
-		Jump: &BodyLDJump{},
-		Return: &BodyLDReturn{},
-		LeftPowerRail: &BodyLDLeftPowerRail{},
+		Comment:        &BodyLDComment{},
+		Error:          &BodyLDError{},
+		Connector:      &BodyLDConnector{},
+		Continuation:   &BodyLDContinuation{},
+		ActionBlock:    &BodyLDActionBlock{},
+		Block:          &BodyLDBlock{},
+		InVariable:     &BodyLDInVariable{},
+		OutVariable:    &BodyLDOutVariable{},
+		InOutVariable:  &BodyLDInOutVariable{},
+		Label:          &BodyLDLabel{},
+		Jump:           &BodyLDJump{},
+		Return:         &BodyLDReturn{},
+		LeftPowerRail:  &BodyLDLeftPowerRail{},
 		RightPowerRail: &BodyLDRightPowerRail{},
-		Coil: &BodyLDCoil{},
-		Contact: &BodyLDContact{},
+		Coil:           &BodyLDCoil{},
+		Contact:        &BodyLDContact{},
 	}
 
 	// Test marshaling
@@ -3402,8 +3382,7 @@ func TestBodyLDXMLMarshaling(t *testing.T) {
 
 func TestBodyLDValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodyLD{
-	}
+	valid := &BodyLD{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -3412,12 +3391,12 @@ func TestBodyLDValidation(t *testing.T) {
 
 func TestBodySFCCommentXMLMarshaling(t *testing.T) {
 	original := &BodySFCComment{
-		Position: Position{},
-		Content: FormattedText{},
+		Position:      Position{},
+		Content:       FormattedText{},
 		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		LocalId:       42,
+		Height:        3.14,
+		Width:         3.14,
 	}
 
 	// Test marshaling
@@ -3443,10 +3422,10 @@ func TestBodySFCCommentValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCComment{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3486,12 +3465,12 @@ func TestBodySFCCommentValidation(t *testing.T) {
 
 func TestBodySFCErrorXMLMarshaling(t *testing.T) {
 	original := &BodySFCError{
-		Position: Position{},
-		Content: FormattedText{},
+		Position:      Position{},
+		Content:       FormattedText{},
 		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		LocalId:       42,
+		Height:        3.14,
+		Width:         3.14,
 	}
 
 	// Test marshaling
@@ -3517,10 +3496,10 @@ func TestBodySFCErrorValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCError{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3560,13 +3539,13 @@ func TestBodySFCErrorValidation(t *testing.T) {
 
 func TestBodySFCConnectorXMLMarshaling(t *testing.T) {
 	original := &BodySFCConnector{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		Name: "test_value",
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:     &FormattedText{},
+		Name:              "test_value",
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -3592,8 +3571,8 @@ func TestBodySFCConnectorValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCConnector{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3621,13 +3600,13 @@ func TestBodySFCConnectorValidation(t *testing.T) {
 
 func TestBodySFCContinuationXMLMarshaling(t *testing.T) {
 	original := &BodySFCContinuation{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		Name: "test_value",
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		Name:               "test_value",
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -3653,8 +3632,8 @@ func TestBodySFCContinuationValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCContinuation{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3723,12 +3702,12 @@ func TestBodySFCActionBlockActionReferenceValidation(t *testing.T) {
 
 func TestBodySFCActionBlockActionXMLMarshaling(t *testing.T) {
 	original := &BodySFCActionBlockAction{
-		Reference: &BodySFCActionBlockActionReference{},
-		Inline: &Body{},
+		Reference:     &BodySFCActionBlockActionReference{},
+		Inline:        &Body{},
 		Documentation: &FormattedText{},
-		Qualifier: stringPtr("test_value"),
-		Duration: stringPtr("test_value"),
-		Indicator: stringPtr("test_value"),
+		Qualifier:     stringPtr("test_value"),
+		Duration:      stringPtr("test_value"),
+		Indicator:     stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -3752,8 +3731,7 @@ func TestBodySFCActionBlockActionXMLMarshaling(t *testing.T) {
 
 func TestBodySFCActionBlockActionValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCActionBlockAction{
-	}
+	valid := &BodySFCActionBlockAction{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -3762,15 +3740,15 @@ func TestBodySFCActionBlockActionValidation(t *testing.T) {
 
 func TestBodySFCActionBlockXMLMarshaling(t *testing.T) {
 	original := &BodySFCActionBlock{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Action: []BodySFCActionBlockAction{BodySFCActionBlockAction{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Negated: boolPtr(true),
+		Action:             []BodySFCActionBlockAction{BodySFCActionBlockAction{}},
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		Negated:            boolPtr(true),
 	}
 
 	// Test marshaling
@@ -3796,7 +3774,7 @@ func TestBodySFCActionBlockValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCActionBlock{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3819,12 +3797,12 @@ func TestBodySFCActionBlockValidation(t *testing.T) {
 func TestBodySFCBlockInputVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodySFCBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:     &FormattedText{},
+		FormalParameter:   "test_value",
+		Negated:           boolPtr(true),
+		Edge:              func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:           func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:            boolPtr(true),
 	}
 
 	// Test marshaling
@@ -3850,7 +3828,7 @@ func TestBodySFCBlockInputVariablesVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		FormalParameter: "test_value",
+		FormalParameter:   "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -3896,8 +3874,7 @@ func TestBodySFCBlockInputVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodySFCBlockInputVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCBlockInputVariables{
-	}
+	valid := &BodySFCBlockInputVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -3906,14 +3883,14 @@ func TestBodySFCBlockInputVariablesValidation(t *testing.T) {
 
 func TestBodySFCBlockInOutVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodySFCBlockInOutVariablesVariable{
-		ConnectionPointIn: &ConnectionPointIn{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:      &FormattedText{},
+		FormalParameter:    "test_value",
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:             boolPtr(true),
 	}
 
 	// Test marshaling
@@ -3978,8 +3955,7 @@ func TestBodySFCBlockInOutVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodySFCBlockInOutVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCBlockInOutVariables{
-	}
+	valid := &BodySFCBlockInOutVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -3989,12 +3965,12 @@ func TestBodySFCBlockInOutVariablesValidation(t *testing.T) {
 func TestBodySFCBlockOutputVariablesVariableXMLMarshaling(t *testing.T) {
 	original := &BodySFCBlockOutputVariablesVariable{
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		FormalParameter: "test_value",
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		Hidden: boolPtr(true),
+		Documentation:      &FormattedText{},
+		FormalParameter:    "test_value",
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Hidden:             boolPtr(true),
 	}
 
 	// Test marshaling
@@ -4059,8 +4035,7 @@ func TestBodySFCBlockOutputVariablesXMLMarshaling(t *testing.T) {
 
 func TestBodySFCBlockOutputVariablesValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCBlockOutputVariables{
-	}
+	valid := &BodySFCBlockOutputVariables{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -4069,16 +4044,16 @@ func TestBodySFCBlockOutputVariablesValidation(t *testing.T) {
 
 func TestBodySFCBlockXMLMarshaling(t *testing.T) {
 	original := &BodySFCBlock{
-		Position: Position{},
-		InputVariables: BodySFCBlockInputVariables{},
-		InOutVariables: BodySFCBlockInOutVariables{},
-		OutputVariables: BodySFCBlockOutputVariables{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Width: floatPtr(3.14),
-		Height: floatPtr(3.14),
-		TypeName: "test_value",
-		InstanceName: stringPtr("test_value"),
+		Position:         Position{},
+		InputVariables:   BodySFCBlockInputVariables{},
+		InOutVariables:   BodySFCBlockInOutVariables{},
+		OutputVariables:  BodySFCBlockOutputVariables{},
+		Documentation:    &FormattedText{},
+		LocalId:          42,
+		Width:            floatPtr(3.14),
+		Height:           floatPtr(3.14),
+		TypeName:         "test_value",
+		InstanceName:     stringPtr("test_value"),
 		ExecutionOrderId: uintPtr(42),
 	}
 
@@ -4104,12 +4079,12 @@ func TestBodySFCBlockXMLMarshaling(t *testing.T) {
 func TestBodySFCBlockValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCBlock{
-		Position: Position{},
-		InputVariables: BodySFCBlockInputVariables{},
-		InOutVariables: BodySFCBlockInOutVariables{},
+		Position:        Position{},
+		InputVariables:  BodySFCBlockInputVariables{},
+		InOutVariables:  BodySFCBlockInOutVariables{},
 		OutputVariables: BodySFCBlockOutputVariables{},
-		LocalId: 42,
-		TypeName: "test_value",
+		LocalId:         42,
+		TypeName:        "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4155,17 +4130,17 @@ func TestBodySFCBlockValidation(t *testing.T) {
 
 func TestBodySFCInVariableXMLMarshaling(t *testing.T) {
 	original := &BodySFCInVariable{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:         "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -4190,9 +4165,9 @@ func TestBodySFCInVariableXMLMarshaling(t *testing.T) {
 func TestBodySFCInVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCInVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4220,17 +4195,17 @@ func TestBodySFCInVariableValidation(t *testing.T) {
 
 func TestBodySFCOutVariableXMLMarshaling(t *testing.T) {
 	original := &BodySFCOutVariable{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:        "test_value",
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		ExecutionOrderId:  uintPtr(42),
+		Negated:           boolPtr(true),
+		Edge:              func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:           func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -4255,9 +4230,9 @@ func TestBodySFCOutVariableXMLMarshaling(t *testing.T) {
 func TestBodySFCOutVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4285,21 +4260,21 @@ func TestBodySFCOutVariableValidation(t *testing.T) {
 
 func TestBodySFCInOutVariableXMLMarshaling(t *testing.T) {
 	original := &BodySFCInOutVariable{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Expression: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		NegatedIn: boolPtr(true),
-		EdgeIn: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		StorageIn: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
-		NegatedOut: boolPtr(true),
-		EdgeOut: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		StorageOut: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Expression:         "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		NegatedIn:          boolPtr(true),
+		EdgeIn:             func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		StorageIn:          func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		NegatedOut:         boolPtr(true),
+		EdgeOut:            func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		StorageOut:         func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -4324,9 +4299,9 @@ func TestBodySFCInOutVariableXMLMarshaling(t *testing.T) {
 func TestBodySFCInOutVariableValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCInOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4354,12 +4329,12 @@ func TestBodySFCInOutVariableValidation(t *testing.T) {
 
 func TestBodySFCLabelXMLMarshaling(t *testing.T) {
 	original := &BodySFCLabel{
-		Position: Position{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Label: "test_value",
+		Position:         Position{},
+		Documentation:    &FormattedText{},
+		LocalId:          42,
+		Height:           floatPtr(3.14),
+		Width:            floatPtr(3.14),
+		Label:            "test_value",
 		ExecutionOrderId: uintPtr(42),
 	}
 
@@ -4386,8 +4361,8 @@ func TestBodySFCLabelValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCLabel{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4415,14 +4390,14 @@ func TestBodySFCLabelValidation(t *testing.T) {
 
 func TestBodySFCJumpXMLMarshaling(t *testing.T) {
 	original := &BodySFCJump{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Label: "test_value",
-		ExecutionOrderId: uintPtr(42),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		Label:             "test_value",
+		ExecutionOrderId:  uintPtr(42),
 	}
 
 	// Test marshaling
@@ -4448,8 +4423,8 @@ func TestBodySFCJumpValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCJump{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4477,13 +4452,13 @@ func TestBodySFCJumpValidation(t *testing.T) {
 
 func TestBodySFCReturnXMLMarshaling(t *testing.T) {
 	original := &BodySFCReturn{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		ExecutionOrderId:  uintPtr(42),
 	}
 
 	// Test marshaling
@@ -4509,7 +4484,7 @@ func TestBodySFCReturnValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCReturn{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4530,8 +4505,7 @@ func TestBodySFCReturnValidation(t *testing.T) {
 }
 
 func TestBodySFCLeftPowerRailConnectionPointOutXMLMarshaling(t *testing.T) {
-	original := &BodySFCLeftPowerRailConnectionPointOut{
-	}
+	original := &BodySFCLeftPowerRailConnectionPointOut{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -4554,8 +4528,7 @@ func TestBodySFCLeftPowerRailConnectionPointOutXMLMarshaling(t *testing.T) {
 
 func TestBodySFCLeftPowerRailConnectionPointOutValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCLeftPowerRailConnectionPointOut{
-	}
+	valid := &BodySFCLeftPowerRailConnectionPointOut{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -4564,12 +4537,12 @@ func TestBodySFCLeftPowerRailConnectionPointOutValidation(t *testing.T) {
 
 func TestBodySFCLeftPowerRailXMLMarshaling(t *testing.T) {
 	original := &BodySFCLeftPowerRail{
-		Position: Position{},
+		Position:           Position{},
 		ConnectionPointOut: []BodySFCLeftPowerRailConnectionPointOut{BodySFCLeftPowerRailConnectionPointOut{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -4595,7 +4568,7 @@ func TestBodySFCLeftPowerRailValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCLeftPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4617,12 +4590,12 @@ func TestBodySFCLeftPowerRailValidation(t *testing.T) {
 
 func TestBodySFCRightPowerRailXMLMarshaling(t *testing.T) {
 	original := &BodySFCRightPowerRail{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: []ConnectionPointIn{ConnectionPointIn{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -4648,7 +4621,7 @@ func TestBodySFCRightPowerRailValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCRightPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4670,18 +4643,18 @@ func TestBodySFCRightPowerRailValidation(t *testing.T) {
 
 func TestBodySFCCoilXMLMarshaling(t *testing.T) {
 	original := &BodySFCCoil{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Variable: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Variable:           "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -4708,7 +4681,7 @@ func TestBodySFCCoilValidation(t *testing.T) {
 	valid := &BodySFCCoil{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4736,18 +4709,18 @@ func TestBodySFCCoilValidation(t *testing.T) {
 
 func TestBodySFCContactXMLMarshaling(t *testing.T) {
 	original := &BodySFCContact{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Variable: "test_value",
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		ExecutionOrderId: uintPtr(42),
-		Negated: boolPtr(true),
-		Edge: func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
-		Storage: func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
+		Variable:           "test_value",
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		ExecutionOrderId:   uintPtr(42),
+		Negated:            boolPtr(true),
+		Edge:               func() *EdgeModifierType { v := EdgeModifierType(""); return &v }(),
+		Storage:            func() *StorageModifierType { v := StorageModifierType(""); return &v }(),
 	}
 
 	// Test marshaling
@@ -4774,7 +4747,7 @@ func TestBodySFCContactValidation(t *testing.T) {
 	valid := &BodySFCContact{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4801,8 +4774,7 @@ func TestBodySFCContactValidation(t *testing.T) {
 }
 
 func TestBodySFCStepConnectionPointOutXMLMarshaling(t *testing.T) {
-	original := &BodySFCStepConnectionPointOut{
-	}
+	original := &BodySFCStepConnectionPointOut{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -4825,8 +4797,7 @@ func TestBodySFCStepConnectionPointOutXMLMarshaling(t *testing.T) {
 
 func TestBodySFCStepConnectionPointOutValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCStepConnectionPointOut{
-	}
+	valid := &BodySFCStepConnectionPointOut{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -4834,8 +4805,7 @@ func TestBodySFCStepConnectionPointOutValidation(t *testing.T) {
 }
 
 func TestBodySFCStepConnectionPointOutActionXMLMarshaling(t *testing.T) {
-	original := &BodySFCStepConnectionPointOutAction{
-	}
+	original := &BodySFCStepConnectionPointOutAction{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -4858,8 +4828,7 @@ func TestBodySFCStepConnectionPointOutActionXMLMarshaling(t *testing.T) {
 
 func TestBodySFCStepConnectionPointOutActionValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCStepConnectionPointOutAction{
-	}
+	valid := &BodySFCStepConnectionPointOutAction{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -4868,17 +4837,17 @@ func TestBodySFCStepConnectionPointOutActionValidation(t *testing.T) {
 
 func TestBodySFCStepXMLMarshaling(t *testing.T) {
 	original := &BodySFCStep{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
-		ConnectionPointOut: &BodySFCStepConnectionPointOut{},
+		Position:                 Position{},
+		ConnectionPointIn:        &ConnectionPointIn{},
+		ConnectionPointOut:       &BodySFCStepConnectionPointOut{},
 		ConnectionPointOutAction: &BodySFCStepConnectionPointOutAction{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Name: "test_value",
-		InitialStep: boolPtr(true),
-		Negated: boolPtr(true),
+		Documentation:            &FormattedText{},
+		LocalId:                  42,
+		Height:                   floatPtr(3.14),
+		Width:                    floatPtr(3.14),
+		Name:                     "test_value",
+		InitialStep:              boolPtr(true),
+		Negated:                  boolPtr(true),
 	}
 
 	// Test marshaling
@@ -4904,8 +4873,8 @@ func TestBodySFCStepValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCStep{
 		Position: Position{},
-		LocalId: 42,
-		Name: "test_value",
+		LocalId:  42,
+		Name:     "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4933,15 +4902,15 @@ func TestBodySFCStepValidation(t *testing.T) {
 
 func TestBodySFCMacroStepXMLMarshaling(t *testing.T) {
 	original := &BodySFCMacroStep{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Body: &Body{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Name: stringPtr("test_value"),
+		Body:               &Body{},
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		Name:               stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -4967,7 +4936,7 @@ func TestBodySFCMacroStepValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCMacroStep{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -4989,13 +4958,13 @@ func TestBodySFCMacroStepValidation(t *testing.T) {
 
 func TestBodySFCJumpStepXMLMarshaling(t *testing.T) {
 	original := &BodySFCJumpStep{
-		Position: Position{},
+		Position:          Position{},
 		ConnectionPointIn: &ConnectionPointIn{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		TargetName: "test_value",
+		Documentation:     &FormattedText{},
+		LocalId:           42,
+		Height:            floatPtr(3.14),
+		Width:             floatPtr(3.14),
+		TargetName:        "test_value",
 	}
 
 	// Test marshaling
@@ -5020,8 +4989,8 @@ func TestBodySFCJumpStepXMLMarshaling(t *testing.T) {
 func TestBodySFCJumpStepValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCJumpStep{
-		Position: Position{},
-		LocalId: 42,
+		Position:   Position{},
+		LocalId:    42,
 		TargetName: "test_value",
 	}
 	if err := valid.Validate(); err != nil {
@@ -5090,8 +5059,7 @@ func TestBodySFCTransitionConditionReferenceValidation(t *testing.T) {
 }
 
 func TestBodySFCTransitionConditionInlineXMLMarshaling(t *testing.T) {
-	original := &BodySFCTransitionConditionInline{
-	}
+	original := &BodySFCTransitionConditionInline{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -5114,8 +5082,7 @@ func TestBodySFCTransitionConditionInlineXMLMarshaling(t *testing.T) {
 
 func TestBodySFCTransitionConditionInlineValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCTransitionConditionInline{
-	}
+	valid := &BodySFCTransitionConditionInline{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5124,10 +5091,10 @@ func TestBodySFCTransitionConditionInlineValidation(t *testing.T) {
 
 func TestBodySFCTransitionConditionXMLMarshaling(t *testing.T) {
 	original := &BodySFCTransitionCondition{
-		Reference: &BodySFCTransitionConditionReference{},
+		Reference:  &BodySFCTransitionConditionReference{},
 		Connection: []Connection{Connection{}},
-		Inline: &BodySFCTransitionConditionInline{},
-		Negated: boolPtr(true),
+		Inline:     &BodySFCTransitionConditionInline{},
+		Negated:    boolPtr(true),
 	}
 
 	// Test marshaling
@@ -5151,8 +5118,7 @@ func TestBodySFCTransitionConditionXMLMarshaling(t *testing.T) {
 
 func TestBodySFCTransitionConditionValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCTransitionCondition{
-	}
+	valid := &BodySFCTransitionCondition{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5161,15 +5127,15 @@ func TestBodySFCTransitionConditionValidation(t *testing.T) {
 
 func TestBodySFCTransitionXMLMarshaling(t *testing.T) {
 	original := &BodySFCTransition{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Condition: &BodySFCTransitionCondition{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Priority: uintPtr(42),
+		Condition:          &BodySFCTransitionCondition{},
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		Priority:           uintPtr(42),
 	}
 
 	// Test marshaling
@@ -5195,7 +5161,7 @@ func TestBodySFCTransitionValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCTransition{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -5216,8 +5182,7 @@ func TestBodySFCTransitionValidation(t *testing.T) {
 }
 
 func TestBodySFCSelectionDivergenceConnectionPointOutXMLMarshaling(t *testing.T) {
-	original := &BodySFCSelectionDivergenceConnectionPointOut{
-	}
+	original := &BodySFCSelectionDivergenceConnectionPointOut{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -5240,8 +5205,7 @@ func TestBodySFCSelectionDivergenceConnectionPointOutXMLMarshaling(t *testing.T)
 
 func TestBodySFCSelectionDivergenceConnectionPointOutValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCSelectionDivergenceConnectionPointOut{
-	}
+	valid := &BodySFCSelectionDivergenceConnectionPointOut{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5250,13 +5214,13 @@ func TestBodySFCSelectionDivergenceConnectionPointOutValidation(t *testing.T) {
 
 func TestBodySFCSelectionDivergenceXMLMarshaling(t *testing.T) {
 	original := &BodySFCSelectionDivergence{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: []BodySFCSelectionDivergenceConnectionPointOut{BodySFCSelectionDivergenceConnectionPointOut{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -5282,7 +5246,7 @@ func TestBodySFCSelectionDivergenceValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCSelectionDivergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -5303,8 +5267,7 @@ func TestBodySFCSelectionDivergenceValidation(t *testing.T) {
 }
 
 func TestBodySFCSelectionConvergenceConnectionPointInXMLMarshaling(t *testing.T) {
-	original := &BodySFCSelectionConvergenceConnectionPointIn{
-	}
+	original := &BodySFCSelectionConvergenceConnectionPointIn{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -5327,8 +5290,7 @@ func TestBodySFCSelectionConvergenceConnectionPointInXMLMarshaling(t *testing.T)
 
 func TestBodySFCSelectionConvergenceConnectionPointInValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCSelectionConvergenceConnectionPointIn{
-	}
+	valid := &BodySFCSelectionConvergenceConnectionPointIn{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5337,13 +5299,13 @@ func TestBodySFCSelectionConvergenceConnectionPointInValidation(t *testing.T) {
 
 func TestBodySFCSelectionConvergenceXMLMarshaling(t *testing.T) {
 	original := &BodySFCSelectionConvergence{
-		Position: Position{},
-		ConnectionPointIn: []BodySFCSelectionConvergenceConnectionPointIn{BodySFCSelectionConvergenceConnectionPointIn{}},
+		Position:           Position{},
+		ConnectionPointIn:  []BodySFCSelectionConvergenceConnectionPointIn{BodySFCSelectionConvergenceConnectionPointIn{}},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -5369,7 +5331,7 @@ func TestBodySFCSelectionConvergenceValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCSelectionConvergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -5390,8 +5352,7 @@ func TestBodySFCSelectionConvergenceValidation(t *testing.T) {
 }
 
 func TestBodySFCSimultaneousDivergenceConnectionPointOutXMLMarshaling(t *testing.T) {
-	original := &BodySFCSimultaneousDivergenceConnectionPointOut{
-	}
+	original := &BodySFCSimultaneousDivergenceConnectionPointOut{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -5414,8 +5375,7 @@ func TestBodySFCSimultaneousDivergenceConnectionPointOutXMLMarshaling(t *testing
 
 func TestBodySFCSimultaneousDivergenceConnectionPointOutValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFCSimultaneousDivergenceConnectionPointOut{
-	}
+	valid := &BodySFCSimultaneousDivergenceConnectionPointOut{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5424,14 +5384,14 @@ func TestBodySFCSimultaneousDivergenceConnectionPointOutValidation(t *testing.T)
 
 func TestBodySFCSimultaneousDivergenceXMLMarshaling(t *testing.T) {
 	original := &BodySFCSimultaneousDivergence{
-		Position: Position{},
-		ConnectionPointIn: &ConnectionPointIn{},
+		Position:           Position{},
+		ConnectionPointIn:  &ConnectionPointIn{},
 		ConnectionPointOut: []BodySFCSimultaneousDivergenceConnectionPointOut{BodySFCSimultaneousDivergenceConnectionPointOut{}},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
-		Name: stringPtr("test_value"),
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
+		Name:               stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -5457,7 +5417,7 @@ func TestBodySFCSimultaneousDivergenceValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCSimultaneousDivergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -5479,13 +5439,13 @@ func TestBodySFCSimultaneousDivergenceValidation(t *testing.T) {
 
 func TestBodySFCSimultaneousConvergenceXMLMarshaling(t *testing.T) {
 	original := &BodySFCSimultaneousConvergence{
-		Position: Position{},
-		ConnectionPointIn: []ConnectionPointIn{ConnectionPointIn{}},
+		Position:           Position{},
+		ConnectionPointIn:  []ConnectionPointIn{ConnectionPointIn{}},
 		ConnectionPointOut: &ConnectionPointOut{},
-		Documentation: &FormattedText{},
-		LocalId: 42,
-		Height: floatPtr(3.14),
-		Width: floatPtr(3.14),
+		Documentation:      &FormattedText{},
+		LocalId:            42,
+		Height:             floatPtr(3.14),
+		Width:              floatPtr(3.14),
 	}
 
 	// Test marshaling
@@ -5511,7 +5471,7 @@ func TestBodySFCSimultaneousConvergenceValidation(t *testing.T) {
 	// Test valid case
 	valid := &BodySFCSimultaneousConvergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -5533,29 +5493,29 @@ func TestBodySFCSimultaneousConvergenceValidation(t *testing.T) {
 
 func TestBodySFCXMLMarshaling(t *testing.T) {
 	original := &BodySFC{
-		Comment: &BodySFCComment{},
-		Error: &BodySFCError{},
-		Connector: &BodySFCConnector{},
-		Continuation: &BodySFCContinuation{},
-		ActionBlock: &BodySFCActionBlock{},
-		Block: &BodySFCBlock{},
-		InVariable: &BodySFCInVariable{},
-		OutVariable: &BodySFCOutVariable{},
-		InOutVariable: &BodySFCInOutVariable{},
-		Label: &BodySFCLabel{},
-		Jump: &BodySFCJump{},
-		Return: &BodySFCReturn{},
-		LeftPowerRail: &BodySFCLeftPowerRail{},
-		RightPowerRail: &BodySFCRightPowerRail{},
-		Coil: &BodySFCCoil{},
-		Contact: &BodySFCContact{},
-		Step: &BodySFCStep{},
-		MacroStep: &BodySFCMacroStep{},
-		JumpStep: &BodySFCJumpStep{},
-		Transition: &BodySFCTransition{},
-		SelectionDivergence: &BodySFCSelectionDivergence{},
-		SelectionConvergence: &BodySFCSelectionConvergence{},
-		SimultaneousDivergence: &BodySFCSimultaneousDivergence{},
+		Comment:                 &BodySFCComment{},
+		Error:                   &BodySFCError{},
+		Connector:               &BodySFCConnector{},
+		Continuation:            &BodySFCContinuation{},
+		ActionBlock:             &BodySFCActionBlock{},
+		Block:                   &BodySFCBlock{},
+		InVariable:              &BodySFCInVariable{},
+		OutVariable:             &BodySFCOutVariable{},
+		InOutVariable:           &BodySFCInOutVariable{},
+		Label:                   &BodySFCLabel{},
+		Jump:                    &BodySFCJump{},
+		Return:                  &BodySFCReturn{},
+		LeftPowerRail:           &BodySFCLeftPowerRail{},
+		RightPowerRail:          &BodySFCRightPowerRail{},
+		Coil:                    &BodySFCCoil{},
+		Contact:                 &BodySFCContact{},
+		Step:                    &BodySFCStep{},
+		MacroStep:               &BodySFCMacroStep{},
+		JumpStep:                &BodySFCJumpStep{},
+		Transition:              &BodySFCTransition{},
+		SelectionDivergence:     &BodySFCSelectionDivergence{},
+		SelectionConvergence:    &BodySFCSelectionConvergence{},
+		SimultaneousDivergence:  &BodySFCSimultaneousDivergence{},
 		SimultaneousConvergence: &BodySFCSimultaneousConvergence{},
 	}
 
@@ -5580,8 +5540,7 @@ func TestBodySFCXMLMarshaling(t *testing.T) {
 
 func TestBodySFCValidation(t *testing.T) {
 	// Test valid case
-	valid := &BodySFC{
-	}
+	valid := &BodySFC{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5591,11 +5550,11 @@ func TestBodySFCValidation(t *testing.T) {
 func TestBodyXMLMarshaling(t *testing.T) {
 	original := &Body{
 		Documentation: &FormattedText{},
-		IL: &FormattedText{},
-		ST: &FormattedText{},
-		FBD: &BodyFBD{},
-		LD: &BodyLD{},
-		SFC: &BodySFC{},
+		IL:            &FormattedText{},
+		ST:            &FormattedText{},
+		FBD:           &BodyFBD{},
+		LD:            &BodyLD{},
+		SFC:           &BodySFC{},
 	}
 
 	// Test marshaling
@@ -5619,8 +5578,7 @@ func TestBodyXMLMarshaling(t *testing.T) {
 
 func TestBodyValidation(t *testing.T) {
 	// Test valid case
-	valid := &Body{
-	}
+	valid := &Body{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5629,11 +5587,11 @@ func TestBodyValidation(t *testing.T) {
 
 func TestVarListXMLMarshaling(t *testing.T) {
 	original := &VarList{
-		Name: stringPtr("test_value"),
-		Constant: boolPtr(true),
-		Retain: boolPtr(true),
-		Nonretain: boolPtr(true),
-		Persistent: boolPtr(true),
+		Name:          stringPtr("test_value"),
+		Constant:      boolPtr(true),
+		Retain:        boolPtr(true),
+		Nonretain:     boolPtr(true),
+		Persistent:    boolPtr(true),
 		Nonpersistent: boolPtr(true),
 	}
 
@@ -5658,8 +5616,7 @@ func TestVarListXMLMarshaling(t *testing.T) {
 
 func TestVarListValidation(t *testing.T) {
 	// Test valid case
-	valid := &VarList{
-	}
+	valid := &VarList{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5668,11 +5625,11 @@ func TestVarListValidation(t *testing.T) {
 
 func TestVarListPlainVariableXMLMarshaling(t *testing.T) {
 	original := &VarListPlainVariable{
-		Type: DataType{},
-		InitialValue: &Value{},
+		Type:          DataType{},
+		InitialValue:  &Value{},
 		Documentation: &FormattedText{},
-		Name: "test_value",
-		Address: stringPtr("test_value"),
+		Name:          "test_value",
+		Address:       stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -5720,7 +5677,7 @@ func TestVarListPlainVariableValidation(t *testing.T) {
 
 func TestVarListPlainXMLMarshaling(t *testing.T) {
 	original := &VarListPlain{
-		Variable: []VarListPlainVariable{VarListPlainVariable{}},
+		Variable:      []VarListPlainVariable{VarListPlainVariable{}},
 		Documentation: &FormattedText{},
 	}
 
@@ -5745,8 +5702,7 @@ func TestVarListPlainXMLMarshaling(t *testing.T) {
 
 func TestVarListPlainValidation(t *testing.T) {
 	// Test valid case
-	valid := &VarListPlain{
-	}
+	valid := &VarListPlain{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5804,8 +5760,8 @@ func TestPositionValidation(t *testing.T) {
 
 func TestConnectionXMLMarshaling(t *testing.T) {
 	original := &Connection{
-		Position: []Position{Position{}},
-		RefLocalId: 42,
+		Position:        []Position{Position{}},
+		RefLocalId:      42,
 		FormalParameter: stringPtr("test_value"),
 	}
 
@@ -5848,8 +5804,8 @@ func TestConnectionValidation(t *testing.T) {
 func TestConnectionPointInXMLMarshaling(t *testing.T) {
 	original := &ConnectionPointIn{
 		RelPosition: &Position{},
-		Connection: []Connection{Connection{}},
-		Expression: "test_value",
+		Connection:  []Connection{Connection{}},
+		Expression:  "test_value",
 	}
 
 	// Test marshaling
@@ -5873,8 +5829,7 @@ func TestConnectionPointInXMLMarshaling(t *testing.T) {
 
 func TestConnectionPointInValidation(t *testing.T) {
 	// Test valid case
-	valid := &ConnectionPointIn{
-	}
+	valid := &ConnectionPointIn{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5884,7 +5839,7 @@ func TestConnectionPointInValidation(t *testing.T) {
 func TestConnectionPointOutXMLMarshaling(t *testing.T) {
 	original := &ConnectionPointOut{
 		RelPosition: &Position{},
-		Expression: stringPtr("test_value"),
+		Expression:  stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -5908,8 +5863,7 @@ func TestConnectionPointOutXMLMarshaling(t *testing.T) {
 
 func TestConnectionPointOutValidation(t *testing.T) {
 	// Test valid case
-	valid := &ConnectionPointOut{
-	}
+	valid := &ConnectionPointOut{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -5919,8 +5873,8 @@ func TestConnectionPointOutValidation(t *testing.T) {
 func TestPouInstanceXMLMarshaling(t *testing.T) {
 	original := &PouInstance{
 		Documentation: &FormattedText{},
-		Name: "test_value",
-		Type: "test_value",
+		Name:          "test_value",
+		Type:          "test_value",
 	}
 
 	// Test marshaling
@@ -5967,8 +5921,7 @@ func TestPouInstanceValidation(t *testing.T) {
 }
 
 func TestFormattedTextXMLMarshaling(t *testing.T) {
-	original := &FormattedText{
-	}
+	original := &FormattedText{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -5991,8 +5944,7 @@ func TestFormattedTextXMLMarshaling(t *testing.T) {
 
 func TestFormattedTextValidation(t *testing.T) {
 	// Test valid case
-	valid := &FormattedText{
-	}
+	valid := &FormattedText{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6023,8 +5975,7 @@ func TestEdgeModifierTypeXMLMarshaling(t *testing.T) {
 
 func TestEdgeModifierTypeValidation(t *testing.T) {
 	// Test valid case
-	valid := &EdgeModifierType{
-	}
+	valid := EdgeModifierType("")
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6055,8 +6006,7 @@ func TestStorageModifierTypeXMLMarshaling(t *testing.T) {
 
 func TestStorageModifierTypeValidation(t *testing.T) {
 	// Test valid case
-	valid := &StorageModifierType{
-	}
+	valid := StorageModifierTypeNone
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6087,8 +6037,7 @@ func TestPouTypeXMLMarshaling(t *testing.T) {
 
 func TestPouTypeValidation(t *testing.T) {
 	// Test valid case
-	valid := &PouType{
-	}
+	valid := PouTypeFunction
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6097,12 +6046,12 @@ func TestPouTypeValidation(t *testing.T) {
 
 func TestProjectFileHeaderXMLMarshaling(t *testing.T) {
 	original := &ProjectFileHeader{
-		CompanyName: "test_value",
-		CompanyURL: stringPtr("test_value"),
-		ProductName: "test_value",
-		ProductVersion: "test_value",
-		ProductRelease: stringPtr("test_value"),
-		CreationDateTime: time.Now(),
+		CompanyName:        "test_value",
+		CompanyURL:         stringPtr("test_value"),
+		ProductName:        "test_value",
+		ProductVersion:     "test_value",
+		ProductRelease:     stringPtr("test_value"),
+		CreationDateTime:   time.Now(),
 		ContentDescription: stringPtr("test_value"),
 	}
 
@@ -6128,9 +6077,9 @@ func TestProjectFileHeaderXMLMarshaling(t *testing.T) {
 func TestProjectFileHeaderValidation(t *testing.T) {
 	// Test valid case
 	valid := &ProjectFileHeader{
-		CompanyName: "test_value",
-		ProductName: "test_value",
-		ProductVersion: "test_value",
+		CompanyName:      "test_value",
+		ProductName:      "test_value",
+		ProductVersion:   "test_value",
 		CreationDateTime: time.Now(),
 	}
 	if err := valid.Validate(); err != nil {
@@ -6485,9 +6434,9 @@ func TestProjectContentHeaderCoordinateInfoSfcValidation(t *testing.T) {
 func TestProjectContentHeaderCoordinateInfoXMLMarshaling(t *testing.T) {
 	original := &ProjectContentHeaderCoordinateInfo{
 		PageSize: &ProjectContentHeaderCoordinateInfoPageSize{},
-		Fbd: ProjectContentHeaderCoordinateInfoFbd{},
-		Ld: ProjectContentHeaderCoordinateInfoLd{},
-		Sfc: ProjectContentHeaderCoordinateInfoSfc{},
+		Fbd:      ProjectContentHeaderCoordinateInfoFbd{},
+		Ld:       ProjectContentHeaderCoordinateInfoLd{},
+		Sfc:      ProjectContentHeaderCoordinateInfoSfc{},
 	}
 
 	// Test marshaling
@@ -6513,7 +6462,7 @@ func TestProjectContentHeaderCoordinateInfoValidation(t *testing.T) {
 	// Test valid case
 	valid := &ProjectContentHeaderCoordinateInfo{
 		Fbd: ProjectContentHeaderCoordinateInfoFbd{},
-		Ld: ProjectContentHeaderCoordinateInfoLd{},
+		Ld:  ProjectContentHeaderCoordinateInfoLd{},
 		Sfc: ProjectContentHeaderCoordinateInfoSfc{},
 	}
 	if err := valid.Validate(); err != nil {
@@ -6542,14 +6491,14 @@ func TestProjectContentHeaderCoordinateInfoValidation(t *testing.T) {
 
 func TestProjectContentHeaderXMLMarshaling(t *testing.T) {
 	original := &ProjectContentHeader{
-		Comment: stringPtr("test_value"),
-		CoordinateInfo: ProjectContentHeaderCoordinateInfo{},
-		Name: "test_value",
-		Version: stringPtr("test_value"),
+		Comment:              stringPtr("test_value"),
+		CoordinateInfo:       ProjectContentHeaderCoordinateInfo{},
+		Name:                 "test_value",
+		Version:              stringPtr("test_value"),
 		ModificationDateTime: timePtr(time.Now()),
-		Organization: stringPtr("test_value"),
-		Author: stringPtr("test_value"),
-		Language: stringPtr("test_value"),
+		Organization:         stringPtr("test_value"),
+		Author:               stringPtr("test_value"),
+		Language:             stringPtr("test_value"),
 	}
 
 	// Test marshaling
@@ -6575,7 +6524,7 @@ func TestProjectContentHeaderValidation(t *testing.T) {
 	// Test valid case
 	valid := &ProjectContentHeader{
 		CoordinateInfo: ProjectContentHeaderCoordinateInfo{},
-		Name: "test_value",
+		Name:           "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -6597,10 +6546,10 @@ func TestProjectContentHeaderValidation(t *testing.T) {
 
 func TestProjectTypesDataTypesDataTypeXMLMarshaling(t *testing.T) {
 	original := &ProjectTypesDataTypesDataType{
-		BaseType: DataType{},
-		InitialValue: &Value{},
+		BaseType:      DataType{},
+		InitialValue:  &Value{},
 		Documentation: &FormattedText{},
-		Name: "test_value",
+		Name:          "test_value",
 	}
 
 	// Test marshaling
@@ -6626,7 +6575,7 @@ func TestProjectTypesDataTypesDataTypeValidation(t *testing.T) {
 	// Test valid case
 	valid := &ProjectTypesDataTypesDataType{
 		BaseType: DataType{},
-		Name: "test_value",
+		Name:     "test_value",
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -6672,8 +6621,7 @@ func TestProjectTypesDataTypesXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesDataTypesValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesDataTypes{
-	}
+	valid := &ProjectTypesDataTypes{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6681,8 +6629,7 @@ func TestProjectTypesDataTypesValidation(t *testing.T) {
 }
 
 func TestProjectTypesPousPouInterfaceLocalVarsXMLMarshaling(t *testing.T) {
-	original := &ProjectTypesPousPouInterfaceLocalVars{
-	}
+	original := &ProjectTypesPousPouInterfaceLocalVars{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -6705,8 +6652,7 @@ func TestProjectTypesPousPouInterfaceLocalVarsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceLocalVarsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterfaceLocalVars{
-	}
+	valid := &ProjectTypesPousPouInterfaceLocalVars{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6714,8 +6660,7 @@ func TestProjectTypesPousPouInterfaceLocalVarsValidation(t *testing.T) {
 }
 
 func TestProjectTypesPousPouInterfaceTempVarsXMLMarshaling(t *testing.T) {
-	original := &ProjectTypesPousPouInterfaceTempVars{
-	}
+	original := &ProjectTypesPousPouInterfaceTempVars{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -6738,8 +6683,7 @@ func TestProjectTypesPousPouInterfaceTempVarsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceTempVarsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterfaceTempVars{
-	}
+	valid := &ProjectTypesPousPouInterfaceTempVars{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6747,8 +6691,7 @@ func TestProjectTypesPousPouInterfaceTempVarsValidation(t *testing.T) {
 }
 
 func TestProjectTypesPousPouInterfaceInputVarsXMLMarshaling(t *testing.T) {
-	original := &ProjectTypesPousPouInterfaceInputVars{
-	}
+	original := &ProjectTypesPousPouInterfaceInputVars{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -6771,8 +6714,7 @@ func TestProjectTypesPousPouInterfaceInputVarsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceInputVarsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterfaceInputVars{
-	}
+	valid := &ProjectTypesPousPouInterfaceInputVars{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6780,8 +6722,7 @@ func TestProjectTypesPousPouInterfaceInputVarsValidation(t *testing.T) {
 }
 
 func TestProjectTypesPousPouInterfaceOutputVarsXMLMarshaling(t *testing.T) {
-	original := &ProjectTypesPousPouInterfaceOutputVars{
-	}
+	original := &ProjectTypesPousPouInterfaceOutputVars{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -6804,8 +6745,7 @@ func TestProjectTypesPousPouInterfaceOutputVarsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceOutputVarsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterfaceOutputVars{
-	}
+	valid := &ProjectTypesPousPouInterfaceOutputVars{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6813,8 +6753,7 @@ func TestProjectTypesPousPouInterfaceOutputVarsValidation(t *testing.T) {
 }
 
 func TestProjectTypesPousPouInterfaceInOutVarsXMLMarshaling(t *testing.T) {
-	original := &ProjectTypesPousPouInterfaceInOutVars{
-	}
+	original := &ProjectTypesPousPouInterfaceInOutVars{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -6837,8 +6776,7 @@ func TestProjectTypesPousPouInterfaceInOutVarsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceInOutVarsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterfaceInOutVars{
-	}
+	valid := &ProjectTypesPousPouInterfaceInOutVars{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6846,8 +6784,7 @@ func TestProjectTypesPousPouInterfaceInOutVarsValidation(t *testing.T) {
 }
 
 func TestProjectTypesPousPouInterfaceExternalVarsXMLMarshaling(t *testing.T) {
-	original := &ProjectTypesPousPouInterfaceExternalVars{
-	}
+	original := &ProjectTypesPousPouInterfaceExternalVars{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -6870,8 +6807,7 @@ func TestProjectTypesPousPouInterfaceExternalVarsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceExternalVarsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterfaceExternalVars{
-	}
+	valid := &ProjectTypesPousPouInterfaceExternalVars{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6879,8 +6815,7 @@ func TestProjectTypesPousPouInterfaceExternalVarsValidation(t *testing.T) {
 }
 
 func TestProjectTypesPousPouInterfaceGlobalVarsXMLMarshaling(t *testing.T) {
-	original := &ProjectTypesPousPouInterfaceGlobalVars{
-	}
+	original := &ProjectTypesPousPouInterfaceGlobalVars{}
 
 	// Test marshaling
 	xmlData, err := xml.Marshal(original)
@@ -6903,8 +6838,7 @@ func TestProjectTypesPousPouInterfaceGlobalVarsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceGlobalVarsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterfaceGlobalVars{
-	}
+	valid := &ProjectTypesPousPouInterfaceGlobalVars{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6913,16 +6847,16 @@ func TestProjectTypesPousPouInterfaceGlobalVarsValidation(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceXMLMarshaling(t *testing.T) {
 	original := &ProjectTypesPousPouInterface{
-		ReturnType: &DataType{},
+		ReturnType:    &DataType{},
 		Documentation: &FormattedText{},
-		LocalVars: &ProjectTypesPousPouInterfaceLocalVars{},
-		TempVars: &ProjectTypesPousPouInterfaceTempVars{},
-		InputVars: &ProjectTypesPousPouInterfaceInputVars{},
-		OutputVars: &ProjectTypesPousPouInterfaceOutputVars{},
-		InOutVars: &ProjectTypesPousPouInterfaceInOutVars{},
-		ExternalVars: &ProjectTypesPousPouInterfaceExternalVars{},
-		GlobalVars: &ProjectTypesPousPouInterfaceGlobalVars{},
-		AccessVars: &VarList{},
+		LocalVars:     &ProjectTypesPousPouInterfaceLocalVars{},
+		TempVars:      &ProjectTypesPousPouInterfaceTempVars{},
+		InputVars:     &ProjectTypesPousPouInterfaceInputVars{},
+		OutputVars:    &ProjectTypesPousPouInterfaceOutputVars{},
+		InOutVars:     &ProjectTypesPousPouInterfaceInOutVars{},
+		ExternalVars:  &ProjectTypesPousPouInterfaceExternalVars{},
+		GlobalVars:    &ProjectTypesPousPouInterfaceGlobalVars{},
+		AccessVars:    &VarList{},
 	}
 
 	// Test marshaling
@@ -6946,8 +6880,7 @@ func TestProjectTypesPousPouInterfaceXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouInterfaceValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouInterface{
-	}
+	valid := &ProjectTypesPousPouInterface{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -6956,9 +6889,9 @@ func TestProjectTypesPousPouInterfaceValidation(t *testing.T) {
 
 func TestProjectTypesPousPouActionsActionXMLMarshaling(t *testing.T) {
 	original := &ProjectTypesPousPouActionsAction{
-		Body: Body{},
+		Body:          Body{},
 		Documentation: &FormattedText{},
-		Name: "test_value",
+		Name:          "test_value",
 	}
 
 	// Test marshaling
@@ -7030,8 +6963,7 @@ func TestProjectTypesPousPouActionsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouActionsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouActions{
-	}
+	valid := &ProjectTypesPousPouActions{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -7040,9 +6972,9 @@ func TestProjectTypesPousPouActionsValidation(t *testing.T) {
 
 func TestProjectTypesPousPouTransitionsTransitionXMLMarshaling(t *testing.T) {
 	original := &ProjectTypesPousPouTransitionsTransition{
-		Body: Body{},
+		Body:          Body{},
 		Documentation: &FormattedText{},
-		Name: "test_value",
+		Name:          "test_value",
 	}
 
 	// Test marshaling
@@ -7114,8 +7046,7 @@ func TestProjectTypesPousPouTransitionsXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousPouTransitionsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPousPouTransitions{
-	}
+	valid := &ProjectTypesPousPouTransitions{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -7124,13 +7055,13 @@ func TestProjectTypesPousPouTransitionsValidation(t *testing.T) {
 
 func TestProjectTypesPousPouXMLMarshaling(t *testing.T) {
 	original := &ProjectTypesPousPou{
-		Interface: &ProjectTypesPousPouInterface{},
-		Actions: &ProjectTypesPousPouActions{},
-		Transitions: &ProjectTypesPousPouTransitions{},
-		Body: &Body{},
+		Interface:     &ProjectTypesPousPouInterface{},
+		Actions:       &ProjectTypesPousPouActions{},
+		Transitions:   &ProjectTypesPousPouTransitions{},
+		Body:          &Body{},
 		Documentation: &FormattedText{},
-		Name: "test_value",
-		PouType: PouType(""),
+		Name:          "test_value",
+		PouType:       PouType(""),
 	}
 
 	// Test marshaling
@@ -7155,7 +7086,7 @@ func TestProjectTypesPousPouXMLMarshaling(t *testing.T) {
 func TestProjectTypesPousPouValidation(t *testing.T) {
 	// Test valid case
 	valid := &ProjectTypesPousPou{
-		Name: "test_value",
+		Name:    "test_value",
 		PouType: PouType(""),
 	}
 	if err := valid.Validate(); err != nil {
@@ -7202,8 +7133,7 @@ func TestProjectTypesPousXMLMarshaling(t *testing.T) {
 
 func TestProjectTypesPousValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectTypesPous{
-	}
+	valid := &ProjectTypesPous{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -7213,7 +7143,7 @@ func TestProjectTypesPousValidation(t *testing.T) {
 func TestProjectTypesXMLMarshaling(t *testing.T) {
 	original := &ProjectTypes{
 		DataTypes: ProjectTypesDataTypes{},
-		Pous: ProjectTypesPous{},
+		Pous:      ProjectTypesPous{},
 	}
 
 	// Test marshaling
@@ -7239,7 +7169,7 @@ func TestProjectTypesValidation(t *testing.T) {
 	// Test valid case
 	valid := &ProjectTypes{
 		DataTypes: ProjectTypesDataTypes{},
-		Pous: ProjectTypesPous{},
+		Pous:      ProjectTypesPous{},
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -7261,12 +7191,12 @@ func TestProjectTypesValidation(t *testing.T) {
 
 func TestProjectInstancesConfigurationsConfigurationResourceTaskXMLMarshaling(t *testing.T) {
 	original := &ProjectInstancesConfigurationsConfigurationResourceTask{
-		PouInstance: []PouInstance{PouInstance{}},
+		PouInstance:   []PouInstance{PouInstance{}},
 		Documentation: &FormattedText{},
-		Name: "test_value",
-		Single: stringPtr("test_value"),
-		Interval: stringPtr("test_value"),
-		Priority: "test_value",
+		Name:          "test_value",
+		Single:        stringPtr("test_value"),
+		Interval:      stringPtr("test_value"),
+		Priority:      "test_value",
 	}
 
 	// Test marshaling
@@ -7291,7 +7221,7 @@ func TestProjectInstancesConfigurationsConfigurationResourceTaskXMLMarshaling(t 
 func TestProjectInstancesConfigurationsConfigurationResourceTaskValidation(t *testing.T) {
 	// Test valid case
 	valid := &ProjectInstancesConfigurationsConfigurationResourceTask{
-		Name: "test_value",
+		Name:     "test_value",
 		Priority: "test_value",
 	}
 	if err := valid.Validate(); err != nil {
@@ -7314,11 +7244,11 @@ func TestProjectInstancesConfigurationsConfigurationResourceTaskValidation(t *te
 
 func TestProjectInstancesConfigurationsConfigurationResourceXMLMarshaling(t *testing.T) {
 	original := &ProjectInstancesConfigurationsConfigurationResource{
-		Task: []ProjectInstancesConfigurationsConfigurationResourceTask{ProjectInstancesConfigurationsConfigurationResourceTask{}},
-		GlobalVars: []VarList{VarList{}},
-		PouInstance: []PouInstance{PouInstance{}},
+		Task:          []ProjectInstancesConfigurationsConfigurationResourceTask{ProjectInstancesConfigurationsConfigurationResourceTask{}},
+		GlobalVars:    []VarList{VarList{}},
+		PouInstance:   []PouInstance{PouInstance{}},
 		Documentation: &FormattedText{},
-		Name: "test_value",
+		Name:          "test_value",
 	}
 
 	// Test marshaling
@@ -7359,10 +7289,10 @@ func TestProjectInstancesConfigurationsConfigurationResourceValidation(t *testin
 
 func TestProjectInstancesConfigurationsConfigurationXMLMarshaling(t *testing.T) {
 	original := &ProjectInstancesConfigurationsConfiguration{
-		Resource: []ProjectInstancesConfigurationsConfigurationResource{ProjectInstancesConfigurationsConfigurationResource{}},
-		GlobalVars: []VarList{VarList{}},
+		Resource:      []ProjectInstancesConfigurationsConfigurationResource{ProjectInstancesConfigurationsConfigurationResource{}},
+		GlobalVars:    []VarList{VarList{}},
 		Documentation: &FormattedText{},
-		Name: "test_value",
+		Name:          "test_value",
 	}
 
 	// Test marshaling
@@ -7427,8 +7357,7 @@ func TestProjectInstancesConfigurationsXMLMarshaling(t *testing.T) {
 
 func TestProjectInstancesConfigurationsValidation(t *testing.T) {
 	// Test valid case
-	valid := &ProjectInstancesConfigurations{
-	}
+	valid := &ProjectInstancesConfigurations{}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
 	}
@@ -7478,10 +7407,10 @@ func TestProjectInstancesValidation(t *testing.T) {
 
 func TestProjectXMLMarshaling(t *testing.T) {
 	original := &Project{
-		FileHeader: ProjectFileHeader{},
+		FileHeader:    ProjectFileHeader{},
 		ContentHeader: ProjectContentHeader{},
-		Types: ProjectTypes{},
-		Instances: ProjectInstances{},
+		Types:         ProjectTypes{},
+		Instances:     ProjectInstances{},
 	}
 
 	// Test marshaling
@@ -7506,10 +7435,10 @@ func TestProjectXMLMarshaling(t *testing.T) {
 func TestProjectValidation(t *testing.T) {
 	// Test valid case
 	valid := &Project{
-		FileHeader: ProjectFileHeader{},
+		FileHeader:    ProjectFileHeader{},
 		ContentHeader: ProjectContentHeader{},
-		Types: ProjectTypes{},
-		Instances: ProjectInstances{},
+		Types:         ProjectTypes{},
+		Instances:     ProjectInstances{},
 	}
 	if err := valid.Validate(); err != nil {
 		t.Errorf("Valid object should not have validation errors: %v", err)
@@ -7544,8 +7473,7 @@ func TestProjectValidation(t *testing.T) {
 // Benchmark tests
 
 func BenchmarkDataTypeStringMarshaling(b *testing.B) {
-	obj := &DataTypeString{
-	}
+	obj := &DataTypeString{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7557,8 +7485,7 @@ func BenchmarkDataTypeStringMarshaling(b *testing.B) {
 }
 
 func BenchmarkDataTypeWstringMarshaling(b *testing.B) {
-	obj := &DataTypeWstring{
-	}
+	obj := &DataTypeWstring{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7572,7 +7499,7 @@ func BenchmarkDataTypeWstringMarshaling(b *testing.B) {
 func BenchmarkDataTypeArrayMarshaling(b *testing.B) {
 	obj := &DataTypeArray{
 		Dimension: []RangeSigned{RangeSigned{}},
-		BaseType: DataType{},
+		BaseType:  DataType{},
 	}
 
 	b.ResetTimer()
@@ -7642,7 +7569,7 @@ func BenchmarkDataTypeEnumMarshaling(b *testing.B) {
 
 func BenchmarkDataTypeSubrangeSignedMarshaling(b *testing.B) {
 	obj := &DataTypeSubrangeSigned{
-		Range: RangeSigned{},
+		Range:    RangeSigned{},
 		BaseType: DataType{},
 	}
 
@@ -7657,7 +7584,7 @@ func BenchmarkDataTypeSubrangeSignedMarshaling(b *testing.B) {
 
 func BenchmarkDataTypeSubrangeUnsignedMarshaling(b *testing.B) {
 	obj := &DataTypeSubrangeUnsigned{
-		Range: RangeUnsigned{},
+		Range:    RangeUnsigned{},
 		BaseType: DataType{},
 	}
 
@@ -7685,8 +7612,7 @@ func BenchmarkDataTypePointerMarshaling(b *testing.B) {
 }
 
 func BenchmarkDataTypeMarshaling(b *testing.B) {
-	obj := &DataType{
-	}
+	obj := &DataType{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7728,8 +7654,7 @@ func BenchmarkRangeUnsignedMarshaling(b *testing.B) {
 }
 
 func BenchmarkValueSimpleValueMarshaling(b *testing.B) {
-	obj := &ValueSimpleValue{
-	}
+	obj := &ValueSimpleValue{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7741,8 +7666,7 @@ func BenchmarkValueSimpleValueMarshaling(b *testing.B) {
 }
 
 func BenchmarkValueArrayValueValueMarshaling(b *testing.B) {
-	obj := &ValueArrayValueValue{
-	}
+	obj := &ValueArrayValueValue{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7768,8 +7692,7 @@ func BenchmarkValueArrayValueMarshaling(b *testing.B) {
 }
 
 func BenchmarkValueStructValueValueMarshaling(b *testing.B) {
-	obj := &ValueStructValueValue{
-	}
+	obj := &ValueStructValueValue{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7795,8 +7718,7 @@ func BenchmarkValueStructValueMarshaling(b *testing.B) {
 }
 
 func BenchmarkValueMarshaling(b *testing.B) {
-	obj := &Value{
-	}
+	obj := &Value{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7810,10 +7732,10 @@ func BenchmarkValueMarshaling(b *testing.B) {
 func BenchmarkBodyFBDCommentMarshaling(b *testing.B) {
 	obj := &BodyFBDComment{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 
 	b.ResetTimer()
@@ -7828,10 +7750,10 @@ func BenchmarkBodyFBDCommentMarshaling(b *testing.B) {
 func BenchmarkBodyFBDErrorMarshaling(b *testing.B) {
 	obj := &BodyFBDError{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 
 	b.ResetTimer()
@@ -7846,8 +7768,8 @@ func BenchmarkBodyFBDErrorMarshaling(b *testing.B) {
 func BenchmarkBodyFBDConnectorMarshaling(b *testing.B) {
 	obj := &BodyFBDConnector{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -7862,8 +7784,8 @@ func BenchmarkBodyFBDConnectorMarshaling(b *testing.B) {
 func BenchmarkBodyFBDContinuationMarshaling(b *testing.B) {
 	obj := &BodyFBDContinuation{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -7890,8 +7812,7 @@ func BenchmarkBodyFBDActionBlockActionReferenceMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyFBDActionBlockActionMarshaling(b *testing.B) {
-	obj := &BodyFBDActionBlockAction{
-	}
+	obj := &BodyFBDActionBlockAction{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7905,7 +7826,7 @@ func BenchmarkBodyFBDActionBlockActionMarshaling(b *testing.B) {
 func BenchmarkBodyFBDActionBlockMarshaling(b *testing.B) {
 	obj := &BodyFBDActionBlock{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -7920,7 +7841,7 @@ func BenchmarkBodyFBDActionBlockMarshaling(b *testing.B) {
 func BenchmarkBodyFBDBlockInputVariablesVariableMarshaling(b *testing.B) {
 	obj := &BodyFBDBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		FormalParameter: "test_value",
+		FormalParameter:   "test_value",
 	}
 
 	b.ResetTimer()
@@ -7933,8 +7854,7 @@ func BenchmarkBodyFBDBlockInputVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyFBDBlockInputVariablesMarshaling(b *testing.B) {
-	obj := &BodyFBDBlockInputVariables{
-	}
+	obj := &BodyFBDBlockInputVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7960,8 +7880,7 @@ func BenchmarkBodyFBDBlockInOutVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyFBDBlockInOutVariablesMarshaling(b *testing.B) {
-	obj := &BodyFBDBlockInOutVariables{
-	}
+	obj := &BodyFBDBlockInOutVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -7987,8 +7906,7 @@ func BenchmarkBodyFBDBlockOutputVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyFBDBlockOutputVariablesMarshaling(b *testing.B) {
-	obj := &BodyFBDBlockOutputVariables{
-	}
+	obj := &BodyFBDBlockOutputVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8001,12 +7919,12 @@ func BenchmarkBodyFBDBlockOutputVariablesMarshaling(b *testing.B) {
 
 func BenchmarkBodyFBDBlockMarshaling(b *testing.B) {
 	obj := &BodyFBDBlock{
-		Position: Position{},
-		InputVariables: BodyFBDBlockInputVariables{},
-		InOutVariables: BodyFBDBlockInOutVariables{},
+		Position:        Position{},
+		InputVariables:  BodyFBDBlockInputVariables{},
+		InOutVariables:  BodyFBDBlockInOutVariables{},
 		OutputVariables: BodyFBDBlockOutputVariables{},
-		LocalId: 42,
-		TypeName: "test_value",
+		LocalId:         42,
+		TypeName:        "test_value",
 	}
 
 	b.ResetTimer()
@@ -8020,9 +7938,9 @@ func BenchmarkBodyFBDBlockMarshaling(b *testing.B) {
 
 func BenchmarkBodyFBDInVariableMarshaling(b *testing.B) {
 	obj := &BodyFBDInVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8036,9 +7954,9 @@ func BenchmarkBodyFBDInVariableMarshaling(b *testing.B) {
 
 func BenchmarkBodyFBDOutVariableMarshaling(b *testing.B) {
 	obj := &BodyFBDOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8052,9 +7970,9 @@ func BenchmarkBodyFBDOutVariableMarshaling(b *testing.B) {
 
 func BenchmarkBodyFBDInOutVariableMarshaling(b *testing.B) {
 	obj := &BodyFBDInOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8069,8 +7987,8 @@ func BenchmarkBodyFBDInOutVariableMarshaling(b *testing.B) {
 func BenchmarkBodyFBDLabelMarshaling(b *testing.B) {
 	obj := &BodyFBDLabel{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 
 	b.ResetTimer()
@@ -8085,8 +8003,8 @@ func BenchmarkBodyFBDLabelMarshaling(b *testing.B) {
 func BenchmarkBodyFBDJumpMarshaling(b *testing.B) {
 	obj := &BodyFBDJump{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 
 	b.ResetTimer()
@@ -8101,7 +8019,7 @@ func BenchmarkBodyFBDJumpMarshaling(b *testing.B) {
 func BenchmarkBodyFBDReturnMarshaling(b *testing.B) {
 	obj := &BodyFBDReturn{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8114,8 +8032,7 @@ func BenchmarkBodyFBDReturnMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyFBDMarshaling(b *testing.B) {
-	obj := &BodyFBD{
-	}
+	obj := &BodyFBD{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8129,10 +8046,10 @@ func BenchmarkBodyFBDMarshaling(b *testing.B) {
 func BenchmarkBodyLDCommentMarshaling(b *testing.B) {
 	obj := &BodyLDComment{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 
 	b.ResetTimer()
@@ -8147,10 +8064,10 @@ func BenchmarkBodyLDCommentMarshaling(b *testing.B) {
 func BenchmarkBodyLDErrorMarshaling(b *testing.B) {
 	obj := &BodyLDError{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 
 	b.ResetTimer()
@@ -8165,8 +8082,8 @@ func BenchmarkBodyLDErrorMarshaling(b *testing.B) {
 func BenchmarkBodyLDConnectorMarshaling(b *testing.B) {
 	obj := &BodyLDConnector{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8181,8 +8098,8 @@ func BenchmarkBodyLDConnectorMarshaling(b *testing.B) {
 func BenchmarkBodyLDContinuationMarshaling(b *testing.B) {
 	obj := &BodyLDContinuation{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8209,8 +8126,7 @@ func BenchmarkBodyLDActionBlockActionReferenceMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyLDActionBlockActionMarshaling(b *testing.B) {
-	obj := &BodyLDActionBlockAction{
-	}
+	obj := &BodyLDActionBlockAction{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8224,7 +8140,7 @@ func BenchmarkBodyLDActionBlockActionMarshaling(b *testing.B) {
 func BenchmarkBodyLDActionBlockMarshaling(b *testing.B) {
 	obj := &BodyLDActionBlock{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8239,7 +8155,7 @@ func BenchmarkBodyLDActionBlockMarshaling(b *testing.B) {
 func BenchmarkBodyLDBlockInputVariablesVariableMarshaling(b *testing.B) {
 	obj := &BodyLDBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		FormalParameter: "test_value",
+		FormalParameter:   "test_value",
 	}
 
 	b.ResetTimer()
@@ -8252,8 +8168,7 @@ func BenchmarkBodyLDBlockInputVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyLDBlockInputVariablesMarshaling(b *testing.B) {
-	obj := &BodyLDBlockInputVariables{
-	}
+	obj := &BodyLDBlockInputVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8279,8 +8194,7 @@ func BenchmarkBodyLDBlockInOutVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyLDBlockInOutVariablesMarshaling(b *testing.B) {
-	obj := &BodyLDBlockInOutVariables{
-	}
+	obj := &BodyLDBlockInOutVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8306,8 +8220,7 @@ func BenchmarkBodyLDBlockOutputVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyLDBlockOutputVariablesMarshaling(b *testing.B) {
-	obj := &BodyLDBlockOutputVariables{
-	}
+	obj := &BodyLDBlockOutputVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8320,12 +8233,12 @@ func BenchmarkBodyLDBlockOutputVariablesMarshaling(b *testing.B) {
 
 func BenchmarkBodyLDBlockMarshaling(b *testing.B) {
 	obj := &BodyLDBlock{
-		Position: Position{},
-		InputVariables: BodyLDBlockInputVariables{},
-		InOutVariables: BodyLDBlockInOutVariables{},
+		Position:        Position{},
+		InputVariables:  BodyLDBlockInputVariables{},
+		InOutVariables:  BodyLDBlockInOutVariables{},
 		OutputVariables: BodyLDBlockOutputVariables{},
-		LocalId: 42,
-		TypeName: "test_value",
+		LocalId:         42,
+		TypeName:        "test_value",
 	}
 
 	b.ResetTimer()
@@ -8339,9 +8252,9 @@ func BenchmarkBodyLDBlockMarshaling(b *testing.B) {
 
 func BenchmarkBodyLDInVariableMarshaling(b *testing.B) {
 	obj := &BodyLDInVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8355,9 +8268,9 @@ func BenchmarkBodyLDInVariableMarshaling(b *testing.B) {
 
 func BenchmarkBodyLDOutVariableMarshaling(b *testing.B) {
 	obj := &BodyLDOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8371,9 +8284,9 @@ func BenchmarkBodyLDOutVariableMarshaling(b *testing.B) {
 
 func BenchmarkBodyLDInOutVariableMarshaling(b *testing.B) {
 	obj := &BodyLDInOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8388,8 +8301,8 @@ func BenchmarkBodyLDInOutVariableMarshaling(b *testing.B) {
 func BenchmarkBodyLDLabelMarshaling(b *testing.B) {
 	obj := &BodyLDLabel{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 
 	b.ResetTimer()
@@ -8404,8 +8317,8 @@ func BenchmarkBodyLDLabelMarshaling(b *testing.B) {
 func BenchmarkBodyLDJumpMarshaling(b *testing.B) {
 	obj := &BodyLDJump{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 
 	b.ResetTimer()
@@ -8420,7 +8333,7 @@ func BenchmarkBodyLDJumpMarshaling(b *testing.B) {
 func BenchmarkBodyLDReturnMarshaling(b *testing.B) {
 	obj := &BodyLDReturn{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8433,8 +8346,7 @@ func BenchmarkBodyLDReturnMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyLDLeftPowerRailConnectionPointOutMarshaling(b *testing.B) {
-	obj := &BodyLDLeftPowerRailConnectionPointOut{
-	}
+	obj := &BodyLDLeftPowerRailConnectionPointOut{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8448,7 +8360,7 @@ func BenchmarkBodyLDLeftPowerRailConnectionPointOutMarshaling(b *testing.B) {
 func BenchmarkBodyLDLeftPowerRailMarshaling(b *testing.B) {
 	obj := &BodyLDLeftPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8463,7 +8375,7 @@ func BenchmarkBodyLDLeftPowerRailMarshaling(b *testing.B) {
 func BenchmarkBodyLDRightPowerRailMarshaling(b *testing.B) {
 	obj := &BodyLDRightPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8479,7 +8391,7 @@ func BenchmarkBodyLDCoilMarshaling(b *testing.B) {
 	obj := &BodyLDCoil{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8495,7 +8407,7 @@ func BenchmarkBodyLDContactMarshaling(b *testing.B) {
 	obj := &BodyLDContact{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8508,8 +8420,7 @@ func BenchmarkBodyLDContactMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyLDMarshaling(b *testing.B) {
-	obj := &BodyLD{
-	}
+	obj := &BodyLD{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8523,10 +8434,10 @@ func BenchmarkBodyLDMarshaling(b *testing.B) {
 func BenchmarkBodySFCCommentMarshaling(b *testing.B) {
 	obj := &BodySFCComment{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 
 	b.ResetTimer()
@@ -8541,10 +8452,10 @@ func BenchmarkBodySFCCommentMarshaling(b *testing.B) {
 func BenchmarkBodySFCErrorMarshaling(b *testing.B) {
 	obj := &BodySFCError{
 		Position: Position{},
-		Content: FormattedText{},
-		LocalId: 42,
-		Height: 3.14,
-		Width: 3.14,
+		Content:  FormattedText{},
+		LocalId:  42,
+		Height:   3.14,
+		Width:    3.14,
 	}
 
 	b.ResetTimer()
@@ -8559,8 +8470,8 @@ func BenchmarkBodySFCErrorMarshaling(b *testing.B) {
 func BenchmarkBodySFCConnectorMarshaling(b *testing.B) {
 	obj := &BodySFCConnector{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8575,8 +8486,8 @@ func BenchmarkBodySFCConnectorMarshaling(b *testing.B) {
 func BenchmarkBodySFCContinuationMarshaling(b *testing.B) {
 	obj := &BodySFCContinuation{
 		Position: Position{},
-		Name: "test_value",
-		LocalId: 42,
+		Name:     "test_value",
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8603,8 +8514,7 @@ func BenchmarkBodySFCActionBlockActionReferenceMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCActionBlockActionMarshaling(b *testing.B) {
-	obj := &BodySFCActionBlockAction{
-	}
+	obj := &BodySFCActionBlockAction{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8618,7 +8528,7 @@ func BenchmarkBodySFCActionBlockActionMarshaling(b *testing.B) {
 func BenchmarkBodySFCActionBlockMarshaling(b *testing.B) {
 	obj := &BodySFCActionBlock{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8633,7 +8543,7 @@ func BenchmarkBodySFCActionBlockMarshaling(b *testing.B) {
 func BenchmarkBodySFCBlockInputVariablesVariableMarshaling(b *testing.B) {
 	obj := &BodySFCBlockInputVariablesVariable{
 		ConnectionPointIn: ConnectionPointIn{},
-		FormalParameter: "test_value",
+		FormalParameter:   "test_value",
 	}
 
 	b.ResetTimer()
@@ -8646,8 +8556,7 @@ func BenchmarkBodySFCBlockInputVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCBlockInputVariablesMarshaling(b *testing.B) {
-	obj := &BodySFCBlockInputVariables{
-	}
+	obj := &BodySFCBlockInputVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8673,8 +8582,7 @@ func BenchmarkBodySFCBlockInOutVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCBlockInOutVariablesMarshaling(b *testing.B) {
-	obj := &BodySFCBlockInOutVariables{
-	}
+	obj := &BodySFCBlockInOutVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8700,8 +8608,7 @@ func BenchmarkBodySFCBlockOutputVariablesVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCBlockOutputVariablesMarshaling(b *testing.B) {
-	obj := &BodySFCBlockOutputVariables{
-	}
+	obj := &BodySFCBlockOutputVariables{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8714,12 +8621,12 @@ func BenchmarkBodySFCBlockOutputVariablesMarshaling(b *testing.B) {
 
 func BenchmarkBodySFCBlockMarshaling(b *testing.B) {
 	obj := &BodySFCBlock{
-		Position: Position{},
-		InputVariables: BodySFCBlockInputVariables{},
-		InOutVariables: BodySFCBlockInOutVariables{},
+		Position:        Position{},
+		InputVariables:  BodySFCBlockInputVariables{},
+		InOutVariables:  BodySFCBlockInOutVariables{},
 		OutputVariables: BodySFCBlockOutputVariables{},
-		LocalId: 42,
-		TypeName: "test_value",
+		LocalId:         42,
+		TypeName:        "test_value",
 	}
 
 	b.ResetTimer()
@@ -8733,9 +8640,9 @@ func BenchmarkBodySFCBlockMarshaling(b *testing.B) {
 
 func BenchmarkBodySFCInVariableMarshaling(b *testing.B) {
 	obj := &BodySFCInVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8749,9 +8656,9 @@ func BenchmarkBodySFCInVariableMarshaling(b *testing.B) {
 
 func BenchmarkBodySFCOutVariableMarshaling(b *testing.B) {
 	obj := &BodySFCOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8765,9 +8672,9 @@ func BenchmarkBodySFCOutVariableMarshaling(b *testing.B) {
 
 func BenchmarkBodySFCInOutVariableMarshaling(b *testing.B) {
 	obj := &BodySFCInOutVariable{
-		Position: Position{},
+		Position:   Position{},
 		Expression: "test_value",
-		LocalId: 42,
+		LocalId:    42,
 	}
 
 	b.ResetTimer()
@@ -8782,8 +8689,8 @@ func BenchmarkBodySFCInOutVariableMarshaling(b *testing.B) {
 func BenchmarkBodySFCLabelMarshaling(b *testing.B) {
 	obj := &BodySFCLabel{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 
 	b.ResetTimer()
@@ -8798,8 +8705,8 @@ func BenchmarkBodySFCLabelMarshaling(b *testing.B) {
 func BenchmarkBodySFCJumpMarshaling(b *testing.B) {
 	obj := &BodySFCJump{
 		Position: Position{},
-		LocalId: 42,
-		Label: "test_value",
+		LocalId:  42,
+		Label:    "test_value",
 	}
 
 	b.ResetTimer()
@@ -8814,7 +8721,7 @@ func BenchmarkBodySFCJumpMarshaling(b *testing.B) {
 func BenchmarkBodySFCReturnMarshaling(b *testing.B) {
 	obj := &BodySFCReturn{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8827,8 +8734,7 @@ func BenchmarkBodySFCReturnMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCLeftPowerRailConnectionPointOutMarshaling(b *testing.B) {
-	obj := &BodySFCLeftPowerRailConnectionPointOut{
-	}
+	obj := &BodySFCLeftPowerRailConnectionPointOut{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8842,7 +8748,7 @@ func BenchmarkBodySFCLeftPowerRailConnectionPointOutMarshaling(b *testing.B) {
 func BenchmarkBodySFCLeftPowerRailMarshaling(b *testing.B) {
 	obj := &BodySFCLeftPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8857,7 +8763,7 @@ func BenchmarkBodySFCLeftPowerRailMarshaling(b *testing.B) {
 func BenchmarkBodySFCRightPowerRailMarshaling(b *testing.B) {
 	obj := &BodySFCRightPowerRail{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8873,7 +8779,7 @@ func BenchmarkBodySFCCoilMarshaling(b *testing.B) {
 	obj := &BodySFCCoil{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8889,7 +8795,7 @@ func BenchmarkBodySFCContactMarshaling(b *testing.B) {
 	obj := &BodySFCContact{
 		Position: Position{},
 		Variable: "test_value",
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8902,8 +8808,7 @@ func BenchmarkBodySFCContactMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCStepConnectionPointOutMarshaling(b *testing.B) {
-	obj := &BodySFCStepConnectionPointOut{
-	}
+	obj := &BodySFCStepConnectionPointOut{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8915,8 +8820,7 @@ func BenchmarkBodySFCStepConnectionPointOutMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCStepConnectionPointOutActionMarshaling(b *testing.B) {
-	obj := &BodySFCStepConnectionPointOutAction{
-	}
+	obj := &BodySFCStepConnectionPointOutAction{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -8930,8 +8834,8 @@ func BenchmarkBodySFCStepConnectionPointOutActionMarshaling(b *testing.B) {
 func BenchmarkBodySFCStepMarshaling(b *testing.B) {
 	obj := &BodySFCStep{
 		Position: Position{},
-		LocalId: 42,
-		Name: "test_value",
+		LocalId:  42,
+		Name:     "test_value",
 	}
 
 	b.ResetTimer()
@@ -8946,7 +8850,7 @@ func BenchmarkBodySFCStepMarshaling(b *testing.B) {
 func BenchmarkBodySFCMacroStepMarshaling(b *testing.B) {
 	obj := &BodySFCMacroStep{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -8960,8 +8864,8 @@ func BenchmarkBodySFCMacroStepMarshaling(b *testing.B) {
 
 func BenchmarkBodySFCJumpStepMarshaling(b *testing.B) {
 	obj := &BodySFCJumpStep{
-		Position: Position{},
-		LocalId: 42,
+		Position:   Position{},
+		LocalId:    42,
 		TargetName: "test_value",
 	}
 
@@ -8989,8 +8893,7 @@ func BenchmarkBodySFCTransitionConditionReferenceMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCTransitionConditionInlineMarshaling(b *testing.B) {
-	obj := &BodySFCTransitionConditionInline{
-	}
+	obj := &BodySFCTransitionConditionInline{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9002,8 +8905,7 @@ func BenchmarkBodySFCTransitionConditionInlineMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCTransitionConditionMarshaling(b *testing.B) {
-	obj := &BodySFCTransitionCondition{
-	}
+	obj := &BodySFCTransitionCondition{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9017,7 +8919,7 @@ func BenchmarkBodySFCTransitionConditionMarshaling(b *testing.B) {
 func BenchmarkBodySFCTransitionMarshaling(b *testing.B) {
 	obj := &BodySFCTransition{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -9030,8 +8932,7 @@ func BenchmarkBodySFCTransitionMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCSelectionDivergenceConnectionPointOutMarshaling(b *testing.B) {
-	obj := &BodySFCSelectionDivergenceConnectionPointOut{
-	}
+	obj := &BodySFCSelectionDivergenceConnectionPointOut{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9045,7 +8946,7 @@ func BenchmarkBodySFCSelectionDivergenceConnectionPointOutMarshaling(b *testing.
 func BenchmarkBodySFCSelectionDivergenceMarshaling(b *testing.B) {
 	obj := &BodySFCSelectionDivergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -9058,8 +8959,7 @@ func BenchmarkBodySFCSelectionDivergenceMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCSelectionConvergenceConnectionPointInMarshaling(b *testing.B) {
-	obj := &BodySFCSelectionConvergenceConnectionPointIn{
-	}
+	obj := &BodySFCSelectionConvergenceConnectionPointIn{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9073,7 +8973,7 @@ func BenchmarkBodySFCSelectionConvergenceConnectionPointInMarshaling(b *testing.
 func BenchmarkBodySFCSelectionConvergenceMarshaling(b *testing.B) {
 	obj := &BodySFCSelectionConvergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -9086,8 +8986,7 @@ func BenchmarkBodySFCSelectionConvergenceMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCSimultaneousDivergenceConnectionPointOutMarshaling(b *testing.B) {
-	obj := &BodySFCSimultaneousDivergenceConnectionPointOut{
-	}
+	obj := &BodySFCSimultaneousDivergenceConnectionPointOut{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9101,7 +9000,7 @@ func BenchmarkBodySFCSimultaneousDivergenceConnectionPointOutMarshaling(b *testi
 func BenchmarkBodySFCSimultaneousDivergenceMarshaling(b *testing.B) {
 	obj := &BodySFCSimultaneousDivergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -9116,7 +9015,7 @@ func BenchmarkBodySFCSimultaneousDivergenceMarshaling(b *testing.B) {
 func BenchmarkBodySFCSimultaneousConvergenceMarshaling(b *testing.B) {
 	obj := &BodySFCSimultaneousConvergence{
 		Position: Position{},
-		LocalId: 42,
+		LocalId:  42,
 	}
 
 	b.ResetTimer()
@@ -9129,8 +9028,7 @@ func BenchmarkBodySFCSimultaneousConvergenceMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodySFCMarshaling(b *testing.B) {
-	obj := &BodySFC{
-	}
+	obj := &BodySFC{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9142,8 +9040,7 @@ func BenchmarkBodySFCMarshaling(b *testing.B) {
 }
 
 func BenchmarkBodyMarshaling(b *testing.B) {
-	obj := &Body{
-	}
+	obj := &Body{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9155,8 +9052,7 @@ func BenchmarkBodyMarshaling(b *testing.B) {
 }
 
 func BenchmarkVarListMarshaling(b *testing.B) {
-	obj := &VarList{
-	}
+	obj := &VarList{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9183,8 +9079,7 @@ func BenchmarkVarListPlainVariableMarshaling(b *testing.B) {
 }
 
 func BenchmarkVarListPlainMarshaling(b *testing.B) {
-	obj := &VarListPlain{
-	}
+	obj := &VarListPlain{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9225,8 +9120,7 @@ func BenchmarkConnectionMarshaling(b *testing.B) {
 }
 
 func BenchmarkConnectionPointInMarshaling(b *testing.B) {
-	obj := &ConnectionPointIn{
-	}
+	obj := &ConnectionPointIn{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9238,8 +9132,7 @@ func BenchmarkConnectionPointInMarshaling(b *testing.B) {
 }
 
 func BenchmarkConnectionPointOutMarshaling(b *testing.B) {
-	obj := &ConnectionPointOut{
-	}
+	obj := &ConnectionPointOut{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9266,8 +9159,7 @@ func BenchmarkPouInstanceMarshaling(b *testing.B) {
 }
 
 func BenchmarkFormattedTextMarshaling(b *testing.B) {
-	obj := &FormattedText{
-	}
+	obj := &FormattedText{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9316,9 +9208,9 @@ func BenchmarkPouTypeMarshaling(b *testing.B) {
 
 func BenchmarkProjectFileHeaderMarshaling(b *testing.B) {
 	obj := &ProjectFileHeader{
-		CompanyName: "test_value",
-		ProductName: "test_value",
-		ProductVersion: "test_value",
+		CompanyName:      "test_value",
+		ProductName:      "test_value",
+		ProductVersion:   "test_value",
 		CreationDateTime: time.Now(),
 	}
 
@@ -9436,7 +9328,7 @@ func BenchmarkProjectContentHeaderCoordinateInfoSfcMarshaling(b *testing.B) {
 func BenchmarkProjectContentHeaderCoordinateInfoMarshaling(b *testing.B) {
 	obj := &ProjectContentHeaderCoordinateInfo{
 		Fbd: ProjectContentHeaderCoordinateInfoFbd{},
-		Ld: ProjectContentHeaderCoordinateInfoLd{},
+		Ld:  ProjectContentHeaderCoordinateInfoLd{},
 		Sfc: ProjectContentHeaderCoordinateInfoSfc{},
 	}
 
@@ -9452,7 +9344,7 @@ func BenchmarkProjectContentHeaderCoordinateInfoMarshaling(b *testing.B) {
 func BenchmarkProjectContentHeaderMarshaling(b *testing.B) {
 	obj := &ProjectContentHeader{
 		CoordinateInfo: ProjectContentHeaderCoordinateInfo{},
-		Name: "test_value",
+		Name:           "test_value",
 	}
 
 	b.ResetTimer()
@@ -9467,7 +9359,7 @@ func BenchmarkProjectContentHeaderMarshaling(b *testing.B) {
 func BenchmarkProjectTypesDataTypesDataTypeMarshaling(b *testing.B) {
 	obj := &ProjectTypesDataTypesDataType{
 		BaseType: DataType{},
-		Name: "test_value",
+		Name:     "test_value",
 	}
 
 	b.ResetTimer()
@@ -9480,8 +9372,7 @@ func BenchmarkProjectTypesDataTypesDataTypeMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesDataTypesMarshaling(b *testing.B) {
-	obj := &ProjectTypesDataTypes{
-	}
+	obj := &ProjectTypesDataTypes{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9493,8 +9384,7 @@ func BenchmarkProjectTypesDataTypesMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceLocalVarsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterfaceLocalVars{
-	}
+	obj := &ProjectTypesPousPouInterfaceLocalVars{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9506,8 +9396,7 @@ func BenchmarkProjectTypesPousPouInterfaceLocalVarsMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceTempVarsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterfaceTempVars{
-	}
+	obj := &ProjectTypesPousPouInterfaceTempVars{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9519,8 +9408,7 @@ func BenchmarkProjectTypesPousPouInterfaceTempVarsMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceInputVarsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterfaceInputVars{
-	}
+	obj := &ProjectTypesPousPouInterfaceInputVars{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9532,8 +9420,7 @@ func BenchmarkProjectTypesPousPouInterfaceInputVarsMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceOutputVarsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterfaceOutputVars{
-	}
+	obj := &ProjectTypesPousPouInterfaceOutputVars{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9545,8 +9432,7 @@ func BenchmarkProjectTypesPousPouInterfaceOutputVarsMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceInOutVarsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterfaceInOutVars{
-	}
+	obj := &ProjectTypesPousPouInterfaceInOutVars{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9558,8 +9444,7 @@ func BenchmarkProjectTypesPousPouInterfaceInOutVarsMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceExternalVarsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterfaceExternalVars{
-	}
+	obj := &ProjectTypesPousPouInterfaceExternalVars{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9571,8 +9456,7 @@ func BenchmarkProjectTypesPousPouInterfaceExternalVarsMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceGlobalVarsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterfaceGlobalVars{
-	}
+	obj := &ProjectTypesPousPouInterfaceGlobalVars{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9584,8 +9468,7 @@ func BenchmarkProjectTypesPousPouInterfaceGlobalVarsMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouInterfaceMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouInterface{
-	}
+	obj := &ProjectTypesPousPouInterface{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9612,8 +9495,7 @@ func BenchmarkProjectTypesPousPouActionsActionMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouActionsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouActions{
-	}
+	obj := &ProjectTypesPousPouActions{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9640,8 +9522,7 @@ func BenchmarkProjectTypesPousPouTransitionsTransitionMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousPouTransitionsMarshaling(b *testing.B) {
-	obj := &ProjectTypesPousPouTransitions{
-	}
+	obj := &ProjectTypesPousPouTransitions{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9654,7 +9535,7 @@ func BenchmarkProjectTypesPousPouTransitionsMarshaling(b *testing.B) {
 
 func BenchmarkProjectTypesPousPouMarshaling(b *testing.B) {
 	obj := &ProjectTypesPousPou{
-		Name: "test_value",
+		Name:    "test_value",
 		PouType: PouType(""),
 	}
 
@@ -9668,8 +9549,7 @@ func BenchmarkProjectTypesPousPouMarshaling(b *testing.B) {
 }
 
 func BenchmarkProjectTypesPousMarshaling(b *testing.B) {
-	obj := &ProjectTypesPous{
-	}
+	obj := &ProjectTypesPous{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9683,7 +9563,7 @@ func BenchmarkProjectTypesPousMarshaling(b *testing.B) {
 func BenchmarkProjectTypesMarshaling(b *testing.B) {
 	obj := &ProjectTypes{
 		DataTypes: ProjectTypesDataTypes{},
-		Pous: ProjectTypesPous{},
+		Pous:      ProjectTypesPous{},
 	}
 
 	b.ResetTimer()
@@ -9697,7 +9577,7 @@ func BenchmarkProjectTypesMarshaling(b *testing.B) {
 
 func BenchmarkProjectInstancesConfigurationsConfigurationResourceTaskMarshaling(b *testing.B) {
 	obj := &ProjectInstancesConfigurationsConfigurationResourceTask{
-		Name: "test_value",
+		Name:     "test_value",
 		Priority: "test_value",
 	}
 
@@ -9739,8 +9619,7 @@ func BenchmarkProjectInstancesConfigurationsConfigurationMarshaling(b *testing.B
 }
 
 func BenchmarkProjectInstancesConfigurationsMarshaling(b *testing.B) {
-	obj := &ProjectInstancesConfigurations{
-	}
+	obj := &ProjectInstancesConfigurations{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -9767,10 +9646,10 @@ func BenchmarkProjectInstancesMarshaling(b *testing.B) {
 
 func BenchmarkProjectMarshaling(b *testing.B) {
 	obj := &Project{
-		FileHeader: ProjectFileHeader{},
+		FileHeader:    ProjectFileHeader{},
 		ContentHeader: ProjectContentHeader{},
-		Types: ProjectTypes{},
-		Instances: ProjectInstances{},
+		Types:         ProjectTypes{},
+		Instances:     ProjectInstances{},
 	}
 
 	b.ResetTimer()
@@ -9784,12 +9663,12 @@ func BenchmarkProjectMarshaling(b *testing.B) {
 
 // Helper functions for creating pointers
 
-func stringPtr(s string) *string { return &s }
-func intPtr(i int) *int { return &i }
-func uintPtr(u uint64) *uint64 { return &u }
-func floatPtr(f float64) *float64 { return &f }
-func boolPtr(b bool) *bool { return &b }
-func timePtr(t time.Time) *time.Time { return &t }
-func durationPtr(d time.Duration) *time.Duration { return &d }
-func edgeModifierTypePtr(e EdgeModifierType) *EdgeModifierType { return &e }
+func stringPtr(s string) *string                                        { return &s }
+func intPtr(i int) *int                                                 { return &i }
+func uintPtr(u uint64) *uint64                                          { return &u }
+func floatPtr(f float64) *float64                                       { return &f }
+func boolPtr(b bool) *bool                                              { return &b }
+func timePtr(t time.Time) *time.Time                                    { return &t }
+func durationPtr(d time.Duration) *time.Duration                        { return &d }
+func edgeModifierTypePtr(e EdgeModifierType) *EdgeModifierType          { return &e }
 func storageModifierTypePtr(s StorageModifierType) *StorageModifierType { return &s }

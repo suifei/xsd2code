@@ -1,11 +1,10 @@
-package test
+package models
 
 // Generated validation functions
 
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 	"time"
 )
 
