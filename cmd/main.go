@@ -41,11 +41,12 @@ type XSDConverterConfig struct {
 	GenerateBenchmarks   bool
 	TestOutputPath       string
 	ValidationOutputPath string
-	// 新增：多语言支持
-	TargetLanguage   string
-	ShowTypeMappings bool
-	ValidateXML      string
-	CreateSampleXML  bool
+	// 新增：多语言支持和类型映射
+	TargetLanguage    string
+	EnableCustomTypes bool // 启用PLC等自定义类型映射
+	ShowTypeMappings  bool
+	ValidateXML       string
+	CreateSampleXML   bool
 }
 
 // parseFlags 解析命令行参数
@@ -53,8 +54,8 @@ func parseFlags() *XSDConverterConfig {
 	config := &XSDConverterConfig{}
 
 	flag.StringVar(&config.XSDPath, "xsd", "", "XSD文件的路径 (必需)")
-	flag.StringVar(&config.OutputPath, "output", "", "输出Go代码的文件路径 (可选)")
-	flag.StringVar(&config.PackageName, "package", "models", "生成的Go代码包名 (默认: models)")
+	flag.StringVar(&config.OutputPath, "output", "", "输出代码的文件路径 (可选)")
+	flag.StringVar(&config.PackageName, "package", "models", "生成的代码包名 (默认: models)")
 	flag.BoolVar(&config.EnableJSON, "json", false, "生成JSON兼容的标签")
 	flag.BoolVar(&config.DebugMode, "debug", false, "启用调试模式")
 	flag.BoolVar(&config.StrictMode, "strict", false, "启用严格模式")
@@ -66,17 +67,18 @@ func parseFlags() *XSDConverterConfig {
 	flag.StringVar(&config.ValidationOutputPath, "validation-output", "", "验证代码输出路径")
 	// 新增多语言和实用功能
 	flag.StringVar(&config.TargetLanguage, "lang", "go", "目标语言 (go, java, csharp, python)")
+	flag.BoolVar(&config.EnableCustomTypes, "plc", false, "启用PLC/自定义类型映射")
 	flag.BoolVar(&config.ShowTypeMappings, "show-mappings", false, "显示XSD到目标语言的类型映射")
 	flag.StringVar(&config.ValidateXML, "validate", "", "验证XML文件是否符合XSD规范")
 	flag.BoolVar(&config.CreateSampleXML, "sample", false, "根据XSD生成示例XML")
 	help := flag.Bool("help", false, "显示帮助信息")
 	version := flag.Bool("version", false, "显示版本信息")
-
 	flag.Parse()
 	if *version {
-		fmt.Println("XSD到Go转换工具 v3.1 (增强版统一解析器)")
-		fmt.Println("支持完整 XML Schema 规范，兼容 XML/JSON")
-		fmt.Println("新增：验证代码生成、测试代码生成、基准测试生成")
+		fmt.Println("XSD到多语言转换工具 v3.1 (统一解析器)")
+		fmt.Println("支持完整 XML Schema 规范，多语言代码生成")
+		fmt.Println("支持: Go, Java, C#, Python")
+		fmt.Println("新增: 验证代码生成、测试代码生成、自定义类型映射")
 		os.Exit(0)
 	}
 	if *help {
@@ -97,24 +99,37 @@ func validateConfig(config *XSDConverterConfig) error {
 	if _, err := os.Stat(config.XSDPath); os.IsNotExist(err) {
 		return fmt.Errorf("XSD文件不存在: %s", config.XSDPath)
 	}
+	// 验证目标语言
+	validLanguages := []string{"go", "java", "csharp", "python"}
+	isValidLang := false
+	for _, lang := range validLanguages {
+		if config.TargetLanguage == lang {
+			isValidLang = true
+			break
+		}
+	}
+	if !isValidLang {
+		return fmt.Errorf("不支持的目标语言: %s (支持: %s)", config.TargetLanguage, strings.Join(validLanguages, ", "))
+	}
 
 	// 如果未提供输出路径，生成默认值
 	if config.OutputPath == "" {
-		ext := filepath.Ext(config.XSDPath)
-		baseName := strings.TrimSuffix(filepath.Base(config.XSDPath), ext)
-		config.OutputPath = baseName + ".go"
+		ext := getLanguageExtension(config.TargetLanguage)
+		baseName := strings.TrimSuffix(filepath.Base(config.XSDPath), filepath.Ext(config.XSDPath))
+		config.OutputPath = baseName + ext
 	}
+
 	// 为额外代码生成设置默认路径
 	if config.GenerateValidation && config.ValidationOutputPath == "" {
-		ext := filepath.Ext(config.OutputPath)
-		baseName := strings.TrimSuffix(filepath.Base(config.OutputPath), ext)
-		config.ValidationOutputPath = filepath.Join("test", baseName+"_validation.go")
+		ext := getLanguageExtension(config.TargetLanguage)
+		baseName := strings.TrimSuffix(filepath.Base(config.OutputPath), filepath.Ext(config.OutputPath))
+		config.ValidationOutputPath = filepath.Join("test", baseName+"_validation"+ext)
 	}
 
 	if config.GenerateTests && config.TestOutputPath == "" {
-		ext := filepath.Ext(config.OutputPath)
-		baseName := strings.TrimSuffix(filepath.Base(config.OutputPath), ext)
-		config.TestOutputPath = filepath.Join("test", baseName+"_test.go")
+		ext := getLanguageExtension(config.TargetLanguage)
+		baseName := strings.TrimSuffix(filepath.Base(config.OutputPath), filepath.Ext(config.OutputPath))
+		config.TestOutputPath = filepath.Join("test", baseName+"_test"+ext)
 	}
 
 	// 验证包名
@@ -125,8 +140,40 @@ func validateConfig(config *XSDConverterConfig) error {
 	return nil
 }
 
-// isValidPackageName 检查是否为有效的Go包名
+// getLanguageExtension 根据语言返回文件扩展名
+func getLanguageExtension(lang string) string {
+	switch lang {
+	case "go":
+		return ".go"
+	case "java":
+		return ".java"
+	case "csharp":
+		return ".cs"
+	case "python":
+		return ".py"
+	default:
+		return ".txt"
+	}
+}
+
+// isValidPackageName 检查是否为有效的包名（支持多语言）
 func isValidPackageName(name string) bool {
+	if name == "" {
+		return false
+	}
+
+	// 允许点号分隔的包名（适用于Java和C#）
+	parts := strings.Split(name, ".")
+	for _, part := range parts {
+		if !isValidIdentifier(part) {
+			return false
+		}
+	}
+	return true
+}
+
+// isValidIdentifier 检查是否为有效的标识符
+func isValidIdentifier(name string) bool {
 	if name == "" {
 		return false
 	}
@@ -156,7 +203,6 @@ func runConverter(config *XSDConverterConfig) error {
 	fmt.Printf("生成测试代码: %t\n", config.GenerateTests)
 	fmt.Printf("生成基准测试: %t\n", config.GenerateBenchmarks)
 	fmt.Printf("------------------------------------------------\n")
-
 	// 使用新的统一解析器（已合并标准和高级功能）
 	parser := xsdparser.NewUnifiedXSDParser(config.XSDPath, config.OutputPath, config.PackageName)
 
@@ -173,14 +219,33 @@ func runConverter(config *XSDConverterConfig) error {
 	}
 
 	fmt.Println("解析完成！")
+	// 创建代码生成器配置
+	genConfig := generator.NewGeneratorConfig().
+		SetLanguage(generator.TargetLanguage(config.TargetLanguage)).
+		SetPackage(config.PackageName).
+		SetOutput(config.OutputPath)
 
-	// 生成主要的Go代码
-	fmt.Println("生成Go代码...")
-	if err := parser.GenerateGoCode(); err != nil {
-		return fmt.Errorf("生成Go代码失败: %v", err)
+	if config.EnableJSON {
+		genConfig.JSONCompatible = true
+	}
+	if config.EnableCustomTypes {
+		genConfig.EnableCustomTypes = true
+	}
+	genConfig.IncludeComments = config.IncludeComments
+	genConfig.DebugMode = config.DebugMode
+	genConfig.EnableValidation = config.GenerateValidation
+	genConfig.EnableTestCode = config.GenerateTests
+
+	// 创建代码生成器工厂
+	factory := generator.NewCodeGeneratorFactory(genConfig)
+
+	// 生成代码
+	fmt.Printf("生成%s代码...\n", strings.ToUpper(config.TargetLanguage))
+	if err := factory.GenerateCode(parser.GetGoTypes()); err != nil {
+		return fmt.Errorf("生成代码失败: %v", err)
 	}
 
-	fmt.Printf("✓ 成功！Go结构已生成在: %s\n", config.OutputPath)
+	fmt.Printf("✓ 成功！%s结构已生成在: %s\n", strings.ToUpper(config.TargetLanguage), config.OutputPath)
 	// 如果启用了额外的代码生成功能，使用CodeGenerator
 	if config.GenerateValidation || config.GenerateTests || config.GenerateBenchmarks {
 		fmt.Println("------------------------------------------------")
@@ -311,7 +376,6 @@ func showTypeMappings(targetLang string) {
 	fmt.Println("====================")
 
 	var mapper generator.LanguageMapper
-
 	switch strings.ToLower(targetLang) {
 	case "go":
 		mapper = &generator.GoLanguageMapper{}
@@ -319,9 +383,11 @@ func showTypeMappings(targetLang string) {
 		mapper = &generator.JavaLanguageMapper{}
 	case "csharp", "c#":
 		mapper = &generator.CSharpLanguageMapper{}
+	case "python":
+		mapper = &generator.PythonLanguageMapper{}
 	default:
 		fmt.Printf("不支持的语言: %s\n", targetLang)
-		fmt.Println("支持的语言: go, java, csharp")
+		fmt.Println("支持的语言: go, java, csharp, python")
 		return
 	}
 

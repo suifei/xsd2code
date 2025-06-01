@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://example.com/advanced"
+           xmlns:tns="http://example.com/advanced"
+           elementFormDefault="qualified">
+
+    <!-- 简单类型 -->
+    <xs:simpleType name="EmailType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[^@]+@[^@]+\.[^@]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PriorityType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="low"/>
+            <xs:enumeration value="medium"/>
+            <xs:enumeration value="high"/>
+            <xs:enumeration value="urgent"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- 地址复杂类型 -->
+    <xs:complexType name="AddressType">
+        <xs:sequence>
+            <xs:element name="street" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="state" type="xs:string" minOccurs="0"/>
+            <xs:element name="zipCode" type="xs:string"/>
+            <xs:element name="country" type="xs:string" default="USA"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- 联系信息复杂类型 -->
+    <xs:complexType name="ContactType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="email" type="tns:EmailType"/>
+            <xs:element name="phone" type="xs:string" minOccurs="0" maxOccurs="3"/>
+            <xs:element name="address" type="tns:AddressType"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+        <xs:attribute name="priority" type="tns:PriorityType" default="medium"/>
+    </xs:complexType>
+
+    <!-- 项目复杂类型 -->
+    <xs:complexType name="ProjectType">
+        <xs:sequence>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="startDate" type="xs:date"/>
+            <xs:element name="endDate" type="xs:date" minOccurs="0"/>
+            <xs:element name="budget" type="xs:decimal" minOccurs="0"/>
+            <xs:element name="contacts" type="tns:ContactType" maxOccurs="unbounded"/>
+            <xs:element name="tags" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="projectId" type="xs:string" use="required"/>
+        <xs:attribute name="status" type="xs:string" default="active"/>
+    </xs:complexType>
+
+    <!-- 根元素 -->
+    <xs:element name="project" type="tns:ProjectType"/>
+
+    <!-- 项目列表 -->
+    <xs:complexType name="ProjectListType">
+        <xs:sequence>
+            <xs:element name="projects" type="tns:ProjectType" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="totalCount" type="xs:int"/>
+    </xs:complexType>
+
+    <xs:element name="projectList" type="tns:ProjectListType"/>
+
+</xs:schema>

@@ -2,7 +2,7 @@ package generator
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
@@ -28,13 +28,52 @@ type TypeMapping struct {
 // LanguageMapper defines the interface for language-specific type mappings
 type LanguageMapper interface {
 	GetBuiltinTypeMappings() []TypeMapping
+	GetCustomTypeMappings() []TypeMapping // 分离自定义类型映射
 	GetLanguage() TargetLanguage
 	FormatTypeName(typeName string) string
 	GetFileExtension() string
+	GetImportStatements() []string
+	GetStructTemplate() string
+	GetEnumTemplate() string
+}
+
+// BaseLanguageMapper provides common functionality for all language mappers
+type BaseLanguageMapper struct{}
+
+// FormatTypeName provides common type name formatting logic
+func (b *BaseLanguageMapper) FormatTypeName(typeName string) string {
+	// Remove namespace prefix
+	if colonIndex := strings.LastIndex(typeName, ":"); colonIndex != -1 {
+		typeName = typeName[colonIndex+1:]
+	}
+
+	// Convert to PascalCase
+	parts := strings.FieldsFunc(typeName, func(c rune) bool {
+		return c == '_' || c == '-' || c == '.'
+	})
+
+	var result strings.Builder
+	for _, part := range parts {
+		if len(part) > 0 {
+			result.WriteString(strings.ToUpper(part[:1]))
+			if len(part) > 1 {
+				result.WriteString(strings.ToLower(part[1:]))
+			}
+		}
+	}
+
+	formatted := result.String()
+	if formatted == "" {
+		formatted = "UnknownType"
+	}
+
+	return formatted
 }
 
 // GoLanguageMapper implements LanguageMapper for Go language
-type GoLanguageMapper struct{}
+type GoLanguageMapper struct {
+	BaseLanguageMapper
+}
 
 // GetBuiltinTypeMappings returns the mapping from XSD built-in types to Go types
 func (g *GoLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
@@ -89,7 +128,12 @@ func (g *GoLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
 		{"unsignedByte", "uint8"},
 		{"positiveInteger", "uint64"},
 		{"anyType", "interface{}"},
+	}
+}
 
+// GetCustomTypeMappings returns custom type mappings (e.g., PLC types)
+func (g *GoLanguageMapper) GetCustomTypeMappings() []TypeMapping {
+	return []TypeMapping{
 		// PLC Open IEC 61131-3 elementary types mapped to appropriate Go types
 		{"BOOL", "bool"},          // Boolean
 		{"BYTE", "uint8"},         // 8-bit unsigned integer (0-255)
@@ -118,43 +162,46 @@ func (g *GoLanguageMapper) GetLanguage() TargetLanguage {
 	return LanguageGo
 }
 
-// FormatTypeName formats a type name according to Go conventions
-func (g *GoLanguageMapper) FormatTypeName(typeName string) string {
-	// Remove namespace prefix
-	if colonIndex := strings.LastIndex(typeName, ":"); colonIndex != -1 {
-		typeName = typeName[colonIndex+1:]
-	}
-
-	// Convert to PascalCase for Go
-	parts := strings.FieldsFunc(typeName, func(c rune) bool {
-		return c == '_' || c == '-' || c == '.'
-	})
-
-	var result strings.Builder
-	for _, part := range parts {
-		if len(part) > 0 {
-			result.WriteString(strings.ToUpper(part[:1]))
-			if len(part) > 1 {
-				result.WriteString(strings.ToLower(part[1:]))
-			}
-		}
-	}
-
-	formatted := result.String()
-	if formatted == "" {
-		formatted = "UnknownType"
-	}
-
-	return formatted
-}
-
 // GetFileExtension returns the file extension for Go files
 func (g *GoLanguageMapper) GetFileExtension() string {
 	return ".go"
 }
 
+// GetImportStatements returns the import statements for Go
+func (g *GoLanguageMapper) GetImportStatements() []string {
+	return []string{
+		"\"encoding/xml\"",
+		"\"time\"",
+	}
+}
+
+// GetStructTemplate returns the struct template for Go
+func (g *GoLanguageMapper) GetStructTemplate() string {
+	return `type {{.Name}} struct {
+{{- if .XMLName}}
+	XMLName xml.Name ` + "`xml:\"{{.XMLName}}\"`" + `
+{{- end}}
+{{- range .Fields}}
+	{{.Name}} {{.Type}} ` + "`{{.Tags}}`" + `
+{{- end}}
+}`
+}
+
+// GetEnumTemplate returns the enum template for Go
+func (g *GoLanguageMapper) GetEnumTemplate() string {
+	return `type {{.Name}} {{.BaseType}}
+
+const (
+{{- range .Constants}}
+	{{.Name}} {{$.Name}} = {{.Value}}
+{{- end}}
+)`
+}
+
 // JavaLanguageMapper implements LanguageMapper for Java language
-type JavaLanguageMapper struct{}
+type JavaLanguageMapper struct {
+	BaseLanguageMapper
+}
 
 // GetBuiltinTypeMappings returns the mapping from XSD built-in types to Java types
 func (j *JavaLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
@@ -209,7 +256,12 @@ func (j *JavaLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
 		{"unsignedByte", "Short"},
 		{"positiveInteger", "BigInteger"},
 		{"anyType", "Object"},
+	}
+}
 
+// GetCustomTypeMappings returns custom type mappings for Java
+func (j *JavaLanguageMapper) GetCustomTypeMappings() []TypeMapping {
+	return []TypeMapping{
 		// PLC Open IEC 61131-3 elementary types mapped to appropriate Java types
 		{"BOOL", "Boolean"},     // Boolean
 		{"BYTE", "Byte"},        // 8-bit unsigned integer (0-255), closest Java equivalent
@@ -238,43 +290,64 @@ func (j *JavaLanguageMapper) GetLanguage() TargetLanguage {
 	return LanguageJava
 }
 
-// FormatTypeName formats a type name according to Java conventions
-func (j *JavaLanguageMapper) FormatTypeName(typeName string) string {
-	// Remove namespace prefix
-	if colonIndex := strings.LastIndex(typeName, ":"); colonIndex != -1 {
-		typeName = typeName[colonIndex+1:]
-	}
-
-	// Convert to PascalCase for Java classes
-	parts := strings.FieldsFunc(typeName, func(c rune) bool {
-		return c == '_' || c == '-' || c == '.'
-	})
-
-	var result strings.Builder
-	for _, part := range parts {
-		if len(part) > 0 {
-			result.WriteString(strings.ToUpper(part[:1]))
-			if len(part) > 1 {
-				result.WriteString(strings.ToLower(part[1:]))
-			}
-		}
-	}
-
-	formatted := result.String()
-	if formatted == "" {
-		formatted = "UnknownType"
-	}
-
-	return formatted
-}
-
 // GetFileExtension returns the file extension for Java files
 func (j *JavaLanguageMapper) GetFileExtension() string {
 	return ".java"
 }
 
+// GetImportStatements returns the import statements for Java
+func (j *JavaLanguageMapper) GetImportStatements() []string {
+	return []string{
+		"import java.util.*;",
+		"import java.time.*;",
+		"import java.math.*;",
+		"import javax.xml.bind.annotation.*;",
+	}
+}
+
+// GetStructTemplate returns the class template for Java
+func (j *JavaLanguageMapper) GetStructTemplate() string {
+	return `@XmlRootElement(name = "{{.XMLName}}")
+public class {{.Name}} {
+{{- range .Fields}}
+    private {{.Type}} {{.Name}};
+{{- end}}
+
+{{- range .Fields}}
+    public {{.Type}} get{{.Name}}() {
+        return {{.Name}};
+    }
+
+    public void set{{.Name}}({{.Type}} {{.Name}}) {
+        this.{{.Name}} = {{.Name}};
+    }
+{{- end}}
+}`
+}
+
+// GetEnumTemplate returns the enum template for Java
+func (j *JavaLanguageMapper) GetEnumTemplate() string {
+	return `public enum {{.Name}} {
+{{- range .Constants}}
+    {{.Name}}("{{.Value}}"),
+{{- end}};
+
+    private final String value;
+
+    {{.Name}}(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+}`
+}
+
 // CSharpLanguageMapper implements LanguageMapper for C# language
-type CSharpLanguageMapper struct{}
+type CSharpLanguageMapper struct {
+	BaseLanguageMapper
+}
 
 // GetBuiltinTypeMappings returns the mapping from XSD built-in types to C# types
 func (c *CSharpLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
@@ -330,7 +403,12 @@ func (c *CSharpLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
 		{"positiveInteger", "ulong"},
 
 		{"anyType", "object"},
+	}
+}
 
+// GetCustomTypeMappings returns custom type mappings for C#
+func (c *CSharpLanguageMapper) GetCustomTypeMappings() []TypeMapping {
+	return []TypeMapping{
 		// PLC Open IEC 61131-3 elementary types mapped to appropriate C# types
 		{"BOOL", "bool"},     // Boolean
 		{"BYTE", "byte"},     // 8-bit unsigned integer (0-255)
@@ -359,64 +437,198 @@ func (c *CSharpLanguageMapper) GetLanguage() TargetLanguage {
 	return LanguageCSharp
 }
 
-// FormatTypeName formats a type name according to C# conventions
-func (c *CSharpLanguageMapper) FormatTypeName(typeName string) string {
-	// Remove namespace prefix
-	if colonIndex := strings.LastIndex(typeName, ":"); colonIndex != -1 {
-		typeName = typeName[colonIndex+1:]
-	}
-
-	// Convert to PascalCase for C# classes
-	parts := strings.FieldsFunc(typeName, func(c rune) bool {
-		return c == '_' || c == '-' || c == '.'
-	})
-
-	var result strings.Builder
-	for _, part := range parts {
-		if len(part) > 0 {
-			result.WriteString(strings.ToUpper(part[:1]))
-			if len(part) > 1 {
-				result.WriteString(strings.ToLower(part[1:]))
-			}
-		}
-	}
-
-	formatted := result.String()
-	if formatted == "" {
-		formatted = "UnknownType"
-	}
-
-	return formatted
-}
-
 // GetFileExtension returns the file extension for C# files
 func (c *CSharpLanguageMapper) GetFileExtension() string {
 	return ".cs"
 }
 
+// GetImportStatements returns the import statements for C#
+func (c *CSharpLanguageMapper) GetImportStatements() []string {
+	return []string{
+		"using System;",
+		"using System.Collections.Generic;",
+		"using System.Xml.Serialization;",
+		"using System.Text.Json.Serialization;",
+	}
+}
+
+// GetStructTemplate returns the class template for C#
+func (c *CSharpLanguageMapper) GetStructTemplate() string {
+	return `[XmlRoot("{{.XMLName}}")]
+public class {{.Name}}
+{
+{{- range .Fields}}
+    [XmlElement("{{.XMLName}}")]
+    public {{.Type}} {{.Name}} { get; set; }
+{{- end}}
+}`
+}
+
+// GetEnumTemplate returns the enum template for C#
+func (c *CSharpLanguageMapper) GetEnumTemplate() string {
+	return `public enum {{.Name}}
+{
+{{- range .Constants}}
+    [XmlEnum("{{.Value}}")]
+    {{.Name}},
+{{- end}}
+}`
+}
+
+// PythonLanguageMapper implements LanguageMapper for Python
+type PythonLanguageMapper struct {
+	BaseLanguageMapper
+}
+
+// GetLanguage returns the language identifier
+func (p *PythonLanguageMapper) GetLanguage() TargetLanguage {
+	return LanguagePython
+}
+
+// GetBuiltinTypeMappings returns the builtin type mappings for Python
+func (p *PythonLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
+	return []TypeMapping{
+		{"xs:string", "str"},
+		{"xs:int", "int"},
+		{"xs:long", "int"},
+		{"xs:short", "int"},
+		{"xs:byte", "int"},
+		{"xs:unsignedInt", "int"},
+		{"xs:unsignedLong", "int"},
+		{"xs:unsignedShort", "int"},
+		{"xs:unsignedByte", "int"},
+		{"xs:boolean", "bool"},
+		{"xs:decimal", "float"},
+		{"xs:float", "float"},
+		{"xs:double", "float"},
+		{"xs:dateTime", "datetime"},
+		{"xs:date", "date"},
+		{"xs:time", "time"},
+		{"xs:duration", "timedelta"},
+		{"xs:base64Binary", "bytes"},
+		{"xs:hexBinary", "bytes"},
+		{"xs:anyURI", "str"},
+		{"xs:QName", "str"},
+		{"xs:NOTATION", "str"},
+		{"xs:normalizedString", "str"},
+		{"xs:token", "str"},
+		{"xs:language", "str"},
+		{"xs:NMTOKEN", "str"},
+		{"xs:NMTOKENS", "List[str]"},
+		{"xs:Name", "str"},
+		{"xs:NCName", "str"},
+		{"xs:ID", "str"},
+		{"xs:IDREF", "str"},
+		{"xs:IDREFS", "List[str]"},
+		{"xs:ENTITY", "str"},
+		{"xs:ENTITIES", "List[str]"},
+		{"xs:integer", "int"},
+		{"xs:nonPositiveInteger", "int"},
+		{"xs:negativeInteger", "int"},
+		{"xs:nonNegativeInteger", "int"},
+		{"xs:positiveInteger", "int"},
+		{"xs:gYearMonth", "str"},
+		{"xs:gYear", "str"},
+		{"xs:gMonthDay", "str"},
+		{"xs:gDay", "str"},
+		{"xs:gMonth", "str"},
+	}
+}
+
+// GetCustomTypeMappings returns custom type mappings for PLC/industrial types
+func (p *PythonLanguageMapper) GetCustomTypeMappings() []TypeMapping {
+	return []TypeMapping{
+		// PLC/工业自动化类型映射
+		{"BOOL", "bool"},
+		{"BYTE", "int"},
+		{"WORD", "int"},
+		{"DWORD", "int"},
+		{"LWORD", "int"},
+		{"SINT", "int"},
+		{"INT", "int"},
+		{"DINT", "int"},
+		{"LINT", "int"},
+		{"USINT", "int"},
+		{"UINT", "int"},
+		{"UDINT", "int"},
+		{"ULINT", "int"},
+		{"REAL", "float"},
+		{"LREAL", "float"},
+		{"STRING", "str"},
+		{"WSTRING", "str"},
+		{"TIME", "timedelta"},
+		{"LTIME", "timedelta"},
+		{"DATE", "date"},
+		{"TIME_OF_DAY", "time"},
+		{"TOD", "time"},
+		{"DATE_AND_TIME", "datetime"},
+		{"DT", "datetime"},
+		{"LTOD", "time"},
+		{"LDT", "datetime"},
+	}
+}
+
+// FormatTypeName formats type names according to Python conventions
+func (p *PythonLanguageMapper) FormatTypeName(typeName string) string {
+	return p.BaseLanguageMapper.FormatTypeName(typeName)
+}
+
+// GetFileExtension returns the file extension for Python
+func (p *PythonLanguageMapper) GetFileExtension() string {
+	return ".py"
+}
+
+// GetImportStatements returns the import statements for Python
+func (p *PythonLanguageMapper) GetImportStatements() []string {
+	return []string{
+		"from dataclasses import dataclass, field",
+		"from typing import List, Optional, Any",
+		"from datetime import datetime, date, time, timedelta",
+		"from enum import Enum",
+		"import xml.etree.ElementTree as ET",
+	}
+}
+
+// GetStructTemplate returns the class template for Python
+func (p *PythonLanguageMapper) GetStructTemplate() string {
+	return `@dataclass
+class {{.Name}}:
+    {{range .Fields}}{{.Name}}: {{.Type}}{{if .IsOptional}} = None{{end}}
+    {{end}}`
+}
+
+// GetEnumTemplate returns the enum template for Python
+func (p *PythonLanguageMapper) GetEnumTemplate() string {
+	return `class {{.Name}}(Enum):
+    {{range .Constants}}{{.Name}} = "{{.Value}}"
+    {{end}}`
+}
+
 // CodeGenerator generates code from parsed XSD types
 type CodeGenerator struct {
-	packageName     string
-	outputPath      string
-	goTypes         []types.GoType
-	jsonCompatible  bool
-	includeComments bool
-	debugMode       bool
-	languageMapper  LanguageMapper
-	typeMappings    map[string]string // Cache for type mappings
+	packageName       string
+	outputPath        string
+	goTypes           []types.GoType
+	jsonCompatible    bool
+	includeComments   bool
+	debugMode         bool
+	enableCustomTypes bool // 控制是否启用自定义类型映射
+	languageMapper    LanguageMapper
+	typeMappings      map[string]string // Cache for type mappings
 }
 
 // NewCodeGenerator creates a new code generator
 func NewCodeGenerator(packageName, outputPath string) *CodeGenerator {
 	generator := &CodeGenerator{
-		packageName:     packageName,
-		outputPath:      outputPath,
-		goTypes:         make([]types.GoType, 0),
-		jsonCompatible:  false,
-		includeComments: true,
-		debugMode:       false,
-		languageMapper:  &GoLanguageMapper{}, // Default to Go
-		typeMappings:    make(map[string]string),
+		packageName:       packageName,
+		outputPath:        outputPath,
+		goTypes:           make([]types.GoType, 0),
+		jsonCompatible:    false,
+		includeComments:   true,
+		debugMode:         false,
+		enableCustomTypes: false,               // 默认关闭自定义类型映射
+		languageMapper:    &GoLanguageMapper{}, // Default to Go
+		typeMappings:      make(map[string]string),
 	}
 	generator.initializeTypeMappings()
 	return generator
@@ -442,6 +654,12 @@ func (g *CodeGenerator) SetDebugMode(debug bool) {
 	g.debugMode = debug
 }
 
+// SetEnableCustomTypes enables or disables custom type mappings (e.g., PLC types)
+func (g *CodeGenerator) SetEnableCustomTypes(enable bool) {
+	g.enableCustomTypes = enable
+	g.initializeTypeMappings() // Reinitialize mappings
+}
+
 // SetLanguageMapper sets the language mapper for the code generator
 func (g *CodeGenerator) SetLanguageMapper(mapper LanguageMapper) {
 	g.languageMapper = mapper
@@ -451,9 +669,19 @@ func (g *CodeGenerator) SetLanguageMapper(mapper LanguageMapper) {
 // initializeTypeMappings initializes the type mapping cache
 func (g *CodeGenerator) initializeTypeMappings() {
 	g.typeMappings = make(map[string]string)
-	mappings := g.languageMapper.GetBuiltinTypeMappings()
-	for _, mapping := range mappings {
+
+	// Always include built-in mappings
+	builtinMappings := g.languageMapper.GetBuiltinTypeMappings()
+	for _, mapping := range builtinMappings {
 		g.typeMappings[mapping.XSDType] = mapping.TargetType
+	}
+
+	// Optionally include custom mappings
+	if g.enableCustomTypes {
+		customMappings := g.languageMapper.GetCustomTypeMappings()
+		for _, mapping := range customMappings {
+			g.typeMappings[mapping.XSDType] = mapping.TargetType
+		}
 	}
 }
 
@@ -468,15 +696,15 @@ func (g *CodeGenerator) GetBuiltinTypeMappings() []TypeMapping {
 	return g.languageMapper.GetBuiltinTypeMappings()
 }
 
-// Generate generates the Go code and writes it to the output file
+// Generate generates the code for the target language and writes it to the output file
 func (g *CodeGenerator) Generate() error {
 	if g.debugMode {
-		fmt.Printf("Generating Go code for %d types\n", len(g.goTypes))
+		fmt.Printf("Generating %s code for %d types\n", g.languageMapper.GetLanguage(), len(g.goTypes))
 	}
 
 	code := g.generateCode()
 
-	if err := ioutil.WriteFile(g.outputPath, []byte(code), 0644); err != nil {
+	if err := os.WriteFile(g.outputPath, []byte(code), 0644); err != nil {
 		return fmt.Errorf("failed to write output file: %v", err)
 	}
 
@@ -487,7 +715,7 @@ func (g *CodeGenerator) Generate() error {
 	return nil
 }
 
-// generateCode generates the complete Go code
+// generateCode generates the complete code for the target language
 func (g *CodeGenerator) generateCode() string {
 	var builder strings.Builder
 
@@ -500,31 +728,79 @@ func (g *CodeGenerator) generateCode() string {
 		builder.WriteString("\n")
 	}
 
+	// Close namespace for C#
+	if g.languageMapper.GetLanguage() == LanguageCSharp {
+		builder.WriteString("}\n")
+	}
+
 	return builder.String()
 }
 
-// writeHeader writes the package declaration and imports
+// writeHeader writes the package declaration and imports for the target language
 func (g *CodeGenerator) writeHeader(builder *strings.Builder) {
-	builder.WriteString(fmt.Sprintf("// Code generated by xsd2code v3.0; DO NOT EDIT.\n"))
-	builder.WriteString(fmt.Sprintf("// Generated on %s\n\n", time.Now().Format("2006-01-02 15:04:05")))
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
-	builder.WriteString(fmt.Sprintf("package %s\n\n", g.packageName))
+	switch g.languageMapper.GetLanguage() {
+	case LanguagePython:
+		builder.WriteString("# Code generated by xsd2code v3.0; DO NOT EDIT.\n")
+		builder.WriteString("# Generated on " + timestamp + "\n\n")
+		g.writePythonHeader(builder)
+	default:
+		builder.WriteString("// Code generated by xsd2code v3.0; DO NOT EDIT.\n")
+		builder.WriteString("// Generated on " + timestamp + "\n\n")
+		switch g.languageMapper.GetLanguage() {
+		case LanguageGo:
+			g.writeGoHeader(builder)
+		case LanguageJava:
+			g.writeJavaHeader(builder)
+		case LanguageCSharp:
+			g.writeCSharpHeader(builder)
+		default:
+			g.writeGoHeader(builder) // Fallback to Go
+		}
+	}
+}
+
+// writeGoHeader writes Go-specific package and imports
+func (g *CodeGenerator) writeGoHeader(builder *strings.Builder) {
+	builder.WriteString("package " + g.packageName + "\n\n")
 
 	// Imports
 	builder.WriteString("import (\n")
-	builder.WriteString("\t\"encoding/xml\"\n")
-
-	if g.jsonCompatible {
-		builder.WriteString("\t\"encoding/json\"\n")
+	for _, importStmt := range g.languageMapper.GetImportStatements() {
+		if importStmt == "\"encoding/json\"" && !g.jsonCompatible {
+			continue // Skip JSON import if not needed
+		}
+		builder.WriteString("\t" + importStmt + "\n")
 	}
-
-	// Check if we need time package
-	needsTime := g.needsTimePackage()
-	if needsTime {
-		builder.WriteString("\t\"time\"\n")
-	}
-
 	builder.WriteString(")\n\n")
+}
+
+// writeJavaHeader writes Java-specific package and imports
+func (g *CodeGenerator) writeJavaHeader(builder *strings.Builder) {
+	builder.WriteString("package " + g.packageName + ";\n\n")
+
+	for _, importStmt := range g.languageMapper.GetImportStatements() {
+		builder.WriteString(importStmt + "\n")
+	}
+	builder.WriteString("\n")
+}
+
+// writeCSharpHeader writes C#-specific namespace and using statements
+func (g *CodeGenerator) writeCSharpHeader(builder *strings.Builder) {
+	for _, importStmt := range g.languageMapper.GetImportStatements() {
+		builder.WriteString(importStmt + "\n")
+	}
+	builder.WriteString("\n")
+	builder.WriteString("namespace " + g.packageName + "\n{\n")
+}
+
+// writePythonHeader writes Python-specific imports
+func (g *CodeGenerator) writePythonHeader(builder *strings.Builder) {
+	for _, importStmt := range g.languageMapper.GetImportStatements() {
+		builder.WriteString(importStmt + "\n")
+	}
+	builder.WriteString("\n")
 }
 
 // needsTimePackage checks if the generated code needs the time package
@@ -539,17 +815,60 @@ func (g *CodeGenerator) needsTimePackage() bool {
 	return false
 }
 
-// writeType writes a single Go type
+// writeType writes a single type for the target language
 func (g *CodeGenerator) writeType(builder *strings.Builder, goType types.GoType) {
-	if goType.IsEnum {
-		g.writeEnumType(builder, goType)
-	} else {
-		g.writeStructType(builder, goType)
+	switch g.languageMapper.GetLanguage() {
+	case LanguageGo:
+		g.writeGoType(builder, goType)
+	case LanguageJava:
+		g.writeJavaType(builder, goType)
+	case LanguageCSharp:
+		g.writeCSharpType(builder, goType)
+	case LanguagePython:
+		g.writePythonType(builder, goType)
+	default:
+		g.writeGoType(builder, goType) // Fallback to Go
 	}
 }
 
-// writeStructType writes a struct type
-func (g *CodeGenerator) writeStructType(builder *strings.Builder, goType types.GoType) {
+// writeGoType writes a Go type
+func (g *CodeGenerator) writeGoType(builder *strings.Builder, goType types.GoType) {
+	if goType.IsEnum {
+		g.writeGoEnumType(builder, goType)
+	} else {
+		g.writeGoStructType(builder, goType)
+	}
+}
+
+// writeJavaType writes a Java type
+func (g *CodeGenerator) writeJavaType(builder *strings.Builder, goType types.GoType) {
+	if goType.IsEnum {
+		g.writeJavaEnumType(builder, goType)
+	} else {
+		g.writeJavaClassType(builder, goType)
+	}
+}
+
+// writeCSharpType writes a C# type
+func (g *CodeGenerator) writeCSharpType(builder *strings.Builder, goType types.GoType) {
+	if goType.IsEnum {
+		g.writeCSharpEnumType(builder, goType)
+	} else {
+		g.writeCSharpClassType(builder, goType)
+	}
+}
+
+// writePythonType writes a Python type
+func (g *CodeGenerator) writePythonType(builder *strings.Builder, goType types.GoType) {
+	if goType.IsEnum {
+		g.writePythonEnumType(builder, goType)
+	} else {
+		g.writePythonClassType(builder, goType)
+	}
+}
+
+// writeGoStructType writes a Go struct type
+func (g *CodeGenerator) writeGoStructType(builder *strings.Builder, goType types.GoType) {
 	// Write comment
 	if g.includeComments && goType.Comment != "" {
 		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
@@ -572,14 +891,14 @@ func (g *CodeGenerator) writeStructType(builder *strings.Builder, goType types.G
 
 	// Write fields
 	for _, field := range goType.Fields {
-		g.writeField(builder, field)
+		g.writeGoField(builder, field)
 	}
 
 	builder.WriteString("}\n")
 }
 
-// writeEnumType writes an enum type with constants
-func (g *CodeGenerator) writeEnumType(builder *strings.Builder, goType types.GoType) {
+// writeGoEnumType writes a Go enum type with constants
+func (g *CodeGenerator) writeGoEnumType(builder *strings.Builder, goType types.GoType) {
 	// Write comment
 	if g.includeComments && goType.Comment != "" {
 		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
@@ -612,8 +931,8 @@ func (g *CodeGenerator) writeEnumType(builder *strings.Builder, goType types.GoT
 	}
 }
 
-// writeField writes a struct field
-func (g *CodeGenerator) writeField(builder *strings.Builder, field types.GoField) {
+// writeGoField writes a Go struct field
+func (g *CodeGenerator) writeGoField(builder *strings.Builder, field types.GoField) {
 	// Write comment
 	if g.includeComments && field.Comment != "" {
 		g.writeComment(builder, field.Comment, "\t")
@@ -921,21 +1240,6 @@ func (g *CodeGenerator) generateTestFieldData(builder *strings.Builder, field *t
 	}
 }
 
-// isBasicGoType checks if a type is a basic Go type
-func isBasicGoType(typeName string) bool {
-	basicTypes := []string{
-		"bool", "int8", "uint8", "int16", "uint16", "int32", "uint32",
-		"int64", "uint64", "int", "uint", "float32", "float64", "string",
-		"byte", "rune",
-	}
-	for _, basicType := range basicTypes {
-		if typeName == basicType {
-			return true
-		}
-	}
-	return false
-}
-
 // generateSampleValue generates a sample value for a type
 func (g *CodeGenerator) generateSampleValue(builder *strings.Builder, typeName string) {
 	switch typeName {
@@ -1091,4 +1395,398 @@ func (g *CodeGenerator) generateBenchmarkTests(builder *strings.Builder) {
 	builder.WriteString("func durationPtr(d time.Duration) *time.Duration { return &d }\n")
 	builder.WriteString("func edgeModifierTypePtr(e EdgeModifierType) *EdgeModifierType { return &e }\n")
 	builder.WriteString("func storageModifierTypePtr(s StorageModifierType) *StorageModifierType { return &s }\n")
+}
+
+// Java type generation methods
+
+// writeJavaClassType writes a Java class type
+func (g *CodeGenerator) writeJavaClassType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	} else if g.includeComments {
+		g.writeComment(builder, fmt.Sprintf("%s represents %s", goType.Name, goType.XMLName), "")
+	}
+
+	// Write class declaration with XML annotations
+	if goType.XMLName != "" {
+		builder.WriteString(fmt.Sprintf("@XmlRootElement(name = \"%s\")\n", goType.XMLName))
+		if goType.Namespace != "" {
+			builder.WriteString(fmt.Sprintf("@XmlType(namespace = \"%s\")\n", goType.Namespace))
+		}
+	}
+	builder.WriteString(fmt.Sprintf("public class %s {\n", goType.Name))
+
+	// Write fields
+	for _, field := range goType.Fields {
+		g.writeJavaField(builder, field)
+	}
+
+	builder.WriteString("\n")
+
+	// Write getters and setters
+	for _, field := range goType.Fields {
+		g.writeJavaGetterSetter(builder, field)
+	}
+
+	builder.WriteString("}\n")
+}
+
+// writeJavaField writes a Java field
+func (g *CodeGenerator) writeJavaField(builder *strings.Builder, field types.GoField) {
+	// Convert Go type to Java type
+	javaType := g.convertToJavaType(field.Type)
+
+	// Write field with annotations
+	if field.XMLTag != "" {
+		if strings.Contains(field.XMLTag, ",attr") {
+			builder.WriteString(fmt.Sprintf("    @XmlAttribute\n"))
+		} else {
+			builder.WriteString(fmt.Sprintf("    @XmlElement\n"))
+		}
+	}
+
+	builder.WriteString(fmt.Sprintf("    private %s %s;\n", javaType, strings.ToLower(field.Name[:1])+field.Name[1:]))
+}
+
+// writeJavaGetterSetter writes getter and setter methods for a Java field
+func (g *CodeGenerator) writeJavaGetterSetter(builder *strings.Builder, field types.GoField) {
+	javaType := g.convertToJavaType(field.Type)
+	fieldName := strings.ToLower(field.Name[:1]) + field.Name[1:]
+	capitalizedName := field.Name
+
+	// Getter
+	builder.WriteString(fmt.Sprintf("    public %s get%s() {\n", javaType, capitalizedName))
+	builder.WriteString(fmt.Sprintf("        return %s;\n", fieldName))
+	builder.WriteString("    }\n\n")
+
+	// Setter
+	builder.WriteString(fmt.Sprintf("    public void set%s(%s %s) {\n", capitalizedName, javaType, fieldName))
+	builder.WriteString(fmt.Sprintf("        this.%s = %s;\n", fieldName, fieldName))
+	builder.WriteString("    }\n\n")
+}
+
+// writeJavaEnumType writes a Java enum type
+func (g *CodeGenerator) writeJavaEnumType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	}
+
+	builder.WriteString(fmt.Sprintf("public enum %s {\n", goType.Name)) // Write enum constants
+	for i, constant := range goType.Constants {
+		// Remove quotes from constant value if present
+		value := strings.Trim(constant.Value, `"`)
+		if i == len(goType.Constants)-1 {
+			builder.WriteString(fmt.Sprintf("    %s(\"%s\");\n\n", strings.ToUpper(constant.Name), value))
+		} else {
+			builder.WriteString(fmt.Sprintf("    %s(\"%s\"),\n", strings.ToUpper(constant.Name), value))
+		}
+	}
+
+	// Write enum constructor and methods
+	builder.WriteString("    private final String value;\n\n")
+	builder.WriteString(fmt.Sprintf("    %s(String value) {\n", goType.Name))
+	builder.WriteString("        this.value = value;\n")
+	builder.WriteString("    }\n\n")
+	builder.WriteString("    public String getValue() {\n")
+	builder.WriteString("        return value;\n")
+	builder.WriteString("    }\n")
+	builder.WriteString("}\n")
+}
+
+// C# type generation methods
+
+// writeCSharpClassType writes a C# class type
+func (g *CodeGenerator) writeCSharpClassType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	} else if g.includeComments {
+		g.writeComment(builder, fmt.Sprintf("%s represents %s", goType.Name, goType.XMLName), "")
+	}
+
+	// Write class declaration with XML attributes
+	if goType.XMLName != "" {
+		builder.WriteString(fmt.Sprintf("[XmlRoot(\"%s\"", goType.XMLName))
+		if goType.Namespace != "" {
+			builder.WriteString(fmt.Sprintf(", Namespace = \"%s\"", goType.Namespace))
+		}
+		builder.WriteString(")]\n")
+	}
+	builder.WriteString(fmt.Sprintf("public class %s\n{\n", goType.Name))
+
+	// Write properties
+	for _, field := range goType.Fields {
+		g.writeCSharpProperty(builder, field)
+	}
+
+	builder.WriteString("}\n")
+}
+
+// writeCSharpProperty writes a C# property
+func (g *CodeGenerator) writeCSharpProperty(builder *strings.Builder, field types.GoField) {
+	// Convert Go type to C# type
+	csharpType := g.convertToCSharpType(field.Type)
+
+	// Write property with XML attributes
+	if field.XMLTag != "" {
+		if strings.Contains(field.XMLTag, ",attr") {
+			builder.WriteString("    [XmlAttribute]\n")
+		} else {
+			builder.WriteString("    [XmlElement]\n")
+		}
+	}
+
+	if g.jsonCompatible && field.JSONTag != "" {
+		builder.WriteString(fmt.Sprintf("    [JsonPropertyName(\"%s\")]\n", field.JSONTag))
+	}
+
+	builder.WriteString(fmt.Sprintf("    public %s %s { get; set; }\n\n", csharpType, field.Name))
+}
+
+// writeCSharpEnumType writes a C# enum type
+func (g *CodeGenerator) writeCSharpEnumType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	}
+
+	builder.WriteString(fmt.Sprintf("public enum %s\n{\n", goType.Name))
+
+	// Write enum constants
+	for _, constant := range goType.Constants {
+		if g.includeComments && constant.Comment != "" {
+			g.writeComment(builder, constant.Comment, "    ")
+		}
+		builder.WriteString(fmt.Sprintf("    %s,\n", constant.Name))
+	}
+
+	builder.WriteString("}\n")
+}
+
+// Python type generation methods
+
+// writePythonClassType writes a Python dataclass type
+func (g *CodeGenerator) writePythonClassType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writePythonComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	} else if g.includeComments {
+		g.writePythonComment(builder, fmt.Sprintf("%s represents %s", goType.Name, goType.XMLName), "")
+	}
+
+	// Write dataclass decorator
+	builder.WriteString("@dataclass\n")
+	builder.WriteString(fmt.Sprintf("class %s:\n", goType.Name))
+
+	// Write fields
+	if len(goType.Fields) == 0 {
+		builder.WriteString("    pass\n")
+	} else {
+		for _, field := range goType.Fields {
+			g.writePythonField(builder, field)
+		}
+	}
+}
+
+// writePythonField writes a Python dataclass field
+func (g *CodeGenerator) writePythonField(builder *strings.Builder, field types.GoField) {
+	// Write comment
+	if g.includeComments && field.Comment != "" {
+		g.writePythonComment(builder, field.Comment, "    ")
+	}
+
+	// Convert Go type to Python type
+	pythonType := g.convertToPythonType(field.Type)
+
+	// Handle optional fields
+	isOptional := strings.Contains(field.XMLTag, "omitempty") || field.IsOptional
+	if isOptional && !strings.HasPrefix(pythonType, "Optional[") {
+		pythonType = fmt.Sprintf("Optional[%s]", pythonType)
+	}
+
+	// Write field with type annotation
+	if isOptional {
+		builder.WriteString(fmt.Sprintf("    %s: %s = None\n", field.Name, pythonType))
+	} else {
+		builder.WriteString(fmt.Sprintf("    %s: %s\n", field.Name, pythonType))
+	}
+}
+
+// writePythonEnumType writes a Python enum type
+func (g *CodeGenerator) writePythonEnumType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writePythonComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	}
+
+	builder.WriteString(fmt.Sprintf("class %s(Enum):\n", goType.Name))
+
+	// Write enum constants
+	if len(goType.Constants) == 0 {
+		builder.WriteString("    pass\n")
+	} else {
+		for _, constant := range goType.Constants {
+			// Remove quotes from constant value if present
+			value := strings.Trim(constant.Value, `"`)
+			builder.WriteString(fmt.Sprintf("    %s = \"%s\"\n", strings.ToUpper(constant.Name), value))
+		}
+	}
+}
+
+// writePythonComment writes a Python comment
+func (g *CodeGenerator) writePythonComment(builder *strings.Builder, comment, indent string) {
+	if comment == "" {
+		return
+	}
+
+	lines := strings.Split(comment, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			builder.WriteString(fmt.Sprintf("%s# %s\n", indent, line))
+		}
+	}
+}
+
+// convertToPythonType converts Go types to Python types
+func (g *CodeGenerator) convertToPythonType(goType string) string {
+	// Remove pointer markers
+	goType = strings.TrimPrefix(goType, "*")
+
+	// Handle array/slice types
+	if strings.HasPrefix(goType, "[]") {
+		elementType := goType[2:]
+		pythonElementType := g.convertToPythonType(elementType)
+		return fmt.Sprintf("List[%s]", pythonElementType)
+	}
+
+	// Check for mapped types first
+	if mapped, exists := g.GetTypeMapping(goType); exists {
+		return mapped
+	}
+
+	// Common Go to Python type conversions
+	conversions := map[string]string{
+		"string":        "str",
+		"int":           "int",
+		"int8":          "int",
+		"int16":         "int",
+		"int32":         "int",
+		"int64":         "int",
+		"uint":          "int",
+		"uint8":         "int",
+		"uint16":        "int",
+		"uint32":        "int",
+		"uint64":        "int",
+		"float32":       "float",
+		"float64":       "float",
+		"bool":          "bool",
+		"time.Time":     "datetime",
+		"time.Duration": "timedelta",
+		"[]byte":        "bytes",
+		"interface{}":   "Any",
+	}
+
+	if pythonType, exists := conversions[goType]; exists {
+		return pythonType
+	}
+
+	// Default to the type name (assume it's a custom type)
+	return goType
+}
+
+// convertToJavaType converts Go types to Java types
+func (g *CodeGenerator) convertToJavaType(goType string) string {
+	// Remove pointer markers
+	goType = strings.TrimPrefix(goType, "*")
+
+	// Handle array/slice types
+	if strings.HasPrefix(goType, "[]") {
+		elementType := goType[2:]
+		javaElementType := g.convertToJavaType(elementType)
+		return fmt.Sprintf("List<%s>", javaElementType)
+	}
+
+	// Check for mapped types first
+	if mapped, exists := g.GetTypeMapping(goType); exists {
+		return mapped
+	}
+
+	// Common Go to Java type conversions
+	conversions := map[string]string{
+		"string":        "String",
+		"int":           "Integer",
+		"int8":          "Byte",
+		"int16":         "Short",
+		"int32":         "Integer",
+		"int64":         "Long",
+		"uint":          "Integer",
+		"uint8":         "Integer",
+		"uint16":        "Integer",
+		"uint32":        "Integer",
+		"uint64":        "Long",
+		"float32":       "Float",
+		"float64":       "Double",
+		"bool":          "Boolean",
+		"time.Time":     "LocalDateTime",
+		"time.Duration": "Duration",
+		"[]byte":        "byte[]",
+		"interface{}":   "Object",
+	}
+
+	if javaType, exists := conversions[goType]; exists {
+		return javaType
+	}
+
+	// Default to the type name (assume it's a custom type)
+	return goType
+}
+
+// convertToCSharpType converts Go types to C# types
+func (g *CodeGenerator) convertToCSharpType(goType string) string {
+	// Remove pointer markers
+	goType = strings.TrimPrefix(goType, "*")
+
+	// Handle array/slice types
+	if strings.HasPrefix(goType, "[]") {
+		elementType := goType[2:]
+		csharpElementType := g.convertToCSharpType(elementType)
+		return fmt.Sprintf("List<%s>", csharpElementType)
+	}
+
+	// Check for mapped types first
+	if mapped, exists := g.GetTypeMapping(goType); exists {
+		return mapped
+	}
+
+	// Common Go to C# type conversions
+	conversions := map[string]string{
+		"string":        "string",
+		"int":           "int",
+		"int8":          "sbyte",
+		"int16":         "short",
+		"int32":         "int",
+		"int64":         "long",
+		"uint":          "uint",
+		"uint8":         "byte",
+		"uint16":        "ushort",
+		"uint32":        "uint",
+		"uint64":        "ulong",
+		"float32":       "float",
+		"float64":       "double",
+		"bool":          "bool",
+		"time.Time":     "DateTime",
+		"time.Duration": "TimeSpan",
+		"[]byte":        "byte[]",
+		"interface{}":   "object",
+	}
+
+	if csharpType, exists := conversions[goType]; exists {
+		return csharpType
+	}
+
+	// Default to the type name (assume it's a custom type)
+	return goType
 }
