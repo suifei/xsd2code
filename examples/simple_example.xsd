@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://example.com/simple"
+           xmlns:tns="http://example.com/simple"
+           elementFormDefault="qualified">
+
+    <!-- 简单类型示例 -->
+    <xs:simpleType name="StatusType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="active"/>
+            <xs:enumeration value="inactive"/>
+            <xs:enumeration value="pending"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- 复杂类型示例 -->
+    <xs:complexType name="PersonType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="age" type="xs:int"/>
+            <xs:element name="email" type="xs:string" minOccurs="0"/>
+            <xs:element name="status" type="tns:StatusType"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- 根元素 -->
+    <xs:element name="person" type="tns:PersonType"/>
+
+    <!-- 包含数组的复杂类型 -->
+    <xs:complexType name="TeamType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="members" type="tns:PersonType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="team" type="tns:TeamType"/>
+
+</xs:schema>
