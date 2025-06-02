@@ -96,7 +96,7 @@ func applyWhiteSpaceProcessing(value, whiteSpaceAction string) string {
 		value = strings.ReplaceAll(value, "\n", " ")
 		value = strings.ReplaceAll(value, "\r", " ")
 		// Then collapse sequences of spaces and trim
-		value = regexp.MustCompile(`\\s+`).ReplaceAllString(value, " ")
+		value = regexp.MustCompile(`\s+`).ReplaceAllString(value, " ")
 		value = strings.TrimSpace(value)
 		return value
 	case "preserve":

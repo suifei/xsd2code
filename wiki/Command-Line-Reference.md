@@ -36,7 +36,7 @@ xsd2code -xsd=https://example.com/schema.xsd
 ### -lang
 - **类型**: `string`
 - **默认值**: `go`
-- **可选值**: `go`, `java`, `csharp`, `typescript`, `python`
+- **可选值**: `go`, `java`, `csharp`, `python`
 - **描述**: 指定目标编程语言
 
 **示例**:
@@ -49,9 +49,6 @@ xsd2code -xsd=schema.xsd -lang=java
 
 # C#代码
 xsd2code -xsd=schema.xsd -lang=csharp
-
-# TypeScript代码
-xsd2code -xsd=schema.xsd -lang=typescript
 
 # Python代码
 xsd2code -xsd=schema.xsd -lang=python
@@ -66,7 +63,6 @@ xsd2code -xsd=schema.xsd -lang=python
 - Go: `{xsd_name}.go`
 - Java: `{XsdName}.java`
 - C#: `{XsdName}.cs`
-- TypeScript: `{xsd_name}.ts`
 - Python: `{xsd_name}.py`
 
 **示例**:
@@ -94,7 +90,6 @@ xsd2code -xsd=user.xsd -lang=java -output=UserTypes.java
 - **Go**: 包名（如 `models`, `api`）
 - **Java**: 完整包名（如 `com.example.models`）
 - **C#**: 命名空间（如 `Example.Models`）
-- **TypeScript**: 模块名或命名空间
 - **Python**: 模块名
 
 **示例**:
@@ -108,8 +103,8 @@ xsd2code -xsd=schema.xsd -lang=java -package=com.company.models
 # C#命名空间
 xsd2code -xsd=schema.xsd -lang=csharp -package=Company.Models
 
-# TypeScript命名空间
-xsd2code -xsd=schema.xsd -lang=typescript -package=Models
+# Python模块名
+xsd2code -xsd=schema.xsd -lang=python -package=models
 ```
 
 ## 🔧 代码生成选项
@@ -123,7 +118,7 @@ xsd2code -xsd=schema.xsd -lang=typescript -package=Models
 - **Go**: 添加 `json:"fieldname"` 标签
 - **C#**: 添加 `[JsonPropertyName("fieldname")]` 注解
 - **Java**: 添加Jackson注解
-- **TypeScript**: 生成接口而非类
+- **Python**: 添加装饰器
 
 **示例**:
 ```bash

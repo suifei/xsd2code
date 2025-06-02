@@ -43,8 +43,6 @@ type LanguageMapper interface {
 type TypeMapping struct {
     XSDType    string
     TargetType string
-    Imports    []string
-    Validation string
 }
 
 // 验证器接口
