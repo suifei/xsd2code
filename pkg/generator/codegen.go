@@ -835,6 +835,12 @@ func (g *CodeGenerator) writeType(builder *strings.Builder, goType types.GoType)
 func (g *CodeGenerator) writeGoType(builder *strings.Builder, goType types.GoType) {
 	if goType.IsEnum {
 		g.writeGoEnumType(builder, goType)
+	} else if goType.HasPattern || goType.HasMinLength || goType.HasMaxLength ||
+		goType.HasMinInclusive || goType.HasMaxInclusive ||
+		goType.HasMinExclusive || goType.HasMaxExclusive ||
+		goType.HasTotalDigits || goType.HasFractionDigits {
+		// This is a simple type with restrictions (like pattern)
+		g.writeGoRestrictedType(builder, goType)
 	} else {
 		g.writeGoStructType(builder, goType)
 	}
@@ -844,6 +850,12 @@ func (g *CodeGenerator) writeGoType(builder *strings.Builder, goType types.GoTyp
 func (g *CodeGenerator) writeJavaType(builder *strings.Builder, goType types.GoType) {
 	if goType.IsEnum {
 		g.writeJavaEnumType(builder, goType)
+	} else if goType.HasPattern || goType.HasMinLength || goType.HasMaxLength ||
+		goType.HasMinInclusive || goType.HasMaxInclusive ||
+		goType.HasMinExclusive || goType.HasMaxExclusive ||
+		goType.HasTotalDigits || goType.HasFractionDigits {
+		// This is a simple type with restrictions (like pattern)
+		g.writeJavaRestrictedType(builder, goType)
 	} else {
 		g.writeJavaClassType(builder, goType)
 	}
@@ -853,6 +865,12 @@ func (g *CodeGenerator) writeJavaType(builder *strings.Builder, goType types.GoT
 func (g *CodeGenerator) writeCSharpType(builder *strings.Builder, goType types.GoType) {
 	if goType.IsEnum {
 		g.writeCSharpEnumType(builder, goType)
+	} else if goType.HasPattern || goType.HasMinLength || goType.HasMaxLength ||
+		goType.HasMinInclusive || goType.HasMaxInclusive ||
+		goType.HasMinExclusive || goType.HasMaxExclusive ||
+		goType.HasTotalDigits || goType.HasFractionDigits {
+		// This is a simple type with restrictions (like pattern)
+		g.writeCSharpRestrictedType(builder, goType)
 	} else {
 		g.writeCSharpClassType(builder, goType)
 	}
@@ -862,6 +880,12 @@ func (g *CodeGenerator) writeCSharpType(builder *strings.Builder, goType types.G
 func (g *CodeGenerator) writePythonType(builder *strings.Builder, goType types.GoType) {
 	if goType.IsEnum {
 		g.writePythonEnumType(builder, goType)
+	} else if goType.HasPattern || goType.HasMinLength || goType.HasMaxLength ||
+		goType.HasMinInclusive || goType.HasMaxInclusive ||
+		goType.HasMinExclusive || goType.HasMaxExclusive ||
+		goType.HasTotalDigits || goType.HasFractionDigits {
+		// This is a simple type with restrictions (like pattern)
+		g.writePythonRestrictedType(builder, goType)
 	} else {
 		g.writePythonClassType(builder, goType)
 	}
@@ -1436,13 +1460,12 @@ func (g *CodeGenerator) writeJavaClassType(builder *strings.Builder, goType type
 func (g *CodeGenerator) writeJavaField(builder *strings.Builder, field types.GoField) {
 	// Convert Go type to Java type
 	javaType := g.convertToJavaType(field.Type)
-
 	// Write field with annotations
 	if field.XMLTag != "" {
 		if strings.Contains(field.XMLTag, ",attr") {
-			builder.WriteString(fmt.Sprintf("    @XmlAttribute\n"))
+			builder.WriteString("    @XmlAttribute\n")
 		} else {
-			builder.WriteString(fmt.Sprintf("    @XmlElement\n"))
+			builder.WriteString("    @XmlElement\n")
 		}
 	}
 
@@ -1789,4 +1812,315 @@ func (g *CodeGenerator) convertToCSharpType(goType string) string {
 
 	// Default to the type name (assume it's a custom type)
 	return goType
+}
+
+// writeGoRestrictedType writes a Go type with restrictions like pattern
+func (g *CodeGenerator) writeGoRestrictedType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	} else if g.includeComments {
+		commentText := fmt.Sprintf("%s represents a %s", goType.Name, goType.BaseType)
+		if goType.HasPattern {
+			commentText += " with pattern validation"
+		} else if goType.HasMinLength || goType.HasMaxLength {
+			commentText += " with length restrictions"
+		} else if goType.HasMinInclusive || goType.HasMaxInclusive || goType.HasMinExclusive || goType.HasMaxExclusive {
+			commentText += " with range restrictions"
+		}
+		g.writeComment(builder, commentText, "")
+	}
+
+	// Write type declaration - simple types with restrictions typically alias the base type
+	baseType := goType.BaseType
+	if baseType == "" {
+		baseType = "string" // Default to string if no base type specified
+	}
+	builder.WriteString(fmt.Sprintf("type %s %s\n\n", goType.Name, baseType))
+
+	// Add validation function
+	g.writeGoTypeValidation(builder, goType)
+}
+
+// writeGoTypeValidation writes Go validation function for a type
+func (g *CodeGenerator) writeGoTypeValidation(builder *strings.Builder, goType types.GoType) {
+	// Write comment for validation function
+	if g.includeComments {
+		g.writeComment(builder, fmt.Sprintf("Validate validates the %s format", goType.Name), "")
+	}
+
+	// Begin validation function
+	if goType.BaseType == "string" || goType.BaseType == "" {
+		builder.WriteString(fmt.Sprintf("func (v %s) Validate() bool {\n", goType.Name))
+	} else {
+		builder.WriteString(fmt.Sprintf("func (v %s) Validate() bool {\n", goType.Name))
+	}
+
+	// Add validation logic based on restriction type
+	if goType.HasPattern {
+		// For pattern validation, use regexp
+		builder.WriteString(fmt.Sprintf("\t// Validate against pattern: %s\n", goType.PatternValue))
+		builder.WriteString("\tpattern := regexp.MustCompile(`" + goType.PatternValue + "`)\n")
+		builder.WriteString("\treturn pattern.MatchString(string(v))\n")
+	} else if goType.HasMinLength || goType.HasMaxLength {
+		// For length validation
+		builder.WriteString("\tstrVal := string(v)\n\tlength := len(strVal)\n")
+		if goType.HasMinLength {
+			builder.WriteString(fmt.Sprintf("\tif length < %s {\n\t\treturn false\n\t}\n", goType.MinLength))
+		}
+		if goType.HasMaxLength {
+			builder.WriteString(fmt.Sprintf("\tif length > %s {\n\t\treturn false\n\t}\n", goType.MaxLength))
+		}
+		builder.WriteString("\treturn true\n")
+	} else if goType.HasMinInclusive || goType.HasMaxInclusive || goType.HasMinExclusive || goType.HasMaxExclusive {
+		// For numeric range validation
+		switch goType.BaseType {
+		case "int", "int8", "int16", "int32", "int64":
+			g.writeIntRangeValidation(builder, goType)
+		case "float32", "float64":
+			g.writeFloatRangeValidation(builder, goType)
+		default:
+			builder.WriteString("\t// Validation not supported for this type\n")
+			builder.WriteString("\treturn true\n")
+		}
+	} else if goType.HasTotalDigits || goType.HasFractionDigits {
+		// For digit validation
+		builder.WriteString("\t// Validate number of digits\n")
+		builder.WriteString("\t// Note: This is a simplified validation\n")
+		builder.WriteString("\t return true\n")
+	} else {
+		// Default case: no validation
+		builder.WriteString("\treturn true\n")
+	}
+
+	// Close function
+	builder.WriteString("}\n")
+}
+
+// writeIntRangeValidation writes validation for integer range constraints
+func (g *CodeGenerator) writeIntRangeValidation(builder *strings.Builder, goType types.GoType) {
+	builder.WriteString("\tval := int64(v)\n")
+	if goType.HasMinInclusive {
+		builder.WriteString(fmt.Sprintf("\tif val < %s {\n\t\treturn false\n\t}\n", goType.MinInclusive))
+	} else if goType.HasMinExclusive {
+		builder.WriteString(fmt.Sprintf("\tif val <= %s {\n\t\treturn false\n\t}\n", goType.MinExclusive))
+	}
+
+	if goType.HasMaxInclusive {
+		builder.WriteString(fmt.Sprintf("\tif val > %s {\n\t\treturn false\n\t}\n", goType.MaxInclusive))
+	} else if goType.HasMaxExclusive {
+		builder.WriteString(fmt.Sprintf("\tif val >= %s {\n\t\treturn false\n\t}\n", goType.MaxExclusive))
+	}
+
+	builder.WriteString("\treturn true\n")
+}
+
+// writeFloatRangeValidation writes validation for floating point range constraints
+func (g *CodeGenerator) writeFloatRangeValidation(builder *strings.Builder, goType types.GoType) {
+	builder.WriteString("\tval := float64(v)\n")
+	if goType.HasMinInclusive {
+		builder.WriteString(fmt.Sprintf("\tif val < %s {\n\t\treturn false\n\t}\n", goType.MinInclusive))
+	} else if goType.HasMinExclusive {
+		builder.WriteString(fmt.Sprintf("\tif val <= %s {\n\t\treturn false\n\t}\n", goType.MinExclusive))
+	}
+
+	if goType.HasMaxInclusive {
+		builder.WriteString(fmt.Sprintf("\tif val > %s {\n\t\treturn false\n\t}\n", goType.MaxInclusive))
+	} else if goType.HasMaxExclusive {
+		builder.WriteString(fmt.Sprintf("\tif val >= %s {\n\t\treturn false\n\t}\n", goType.MaxExclusive))
+	}
+
+	builder.WriteString("\treturn true\n")
+}
+
+// writeJavaRestrictedType writes a Java class with restriction validation
+func (g *CodeGenerator) writeJavaRestrictedType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	} else if g.includeComments {
+		g.writeComment(builder, fmt.Sprintf("%s represents %s", goType.Name, goType.XMLName), "")
+	}
+
+	// Write class declaration with XML annotations
+	if goType.XMLName != "" {
+		builder.WriteString(fmt.Sprintf("@XmlRootElement(name = \"%s\")\n", goType.XMLName))
+		if goType.Namespace != "" {
+			builder.WriteString(fmt.Sprintf("@XmlType(namespace = \"%s\")\n", goType.Namespace))
+		}
+	}
+	builder.WriteString(fmt.Sprintf("public class %s {\n", goType.Name))
+
+	// Write fields
+	for _, field := range goType.Fields {
+		g.writeJavaField(builder, field)
+	}
+
+	builder.WriteString("\n")
+
+	// Write getters and setters
+	for _, field := range goType.Fields {
+		g.writeJavaGetterSetter(builder, field)
+	}
+
+	// Add validation method
+	g.writeJavaTypeValidation(builder, goType)
+
+	builder.WriteString("}\n")
+}
+
+// writeCSharpRestrictedType writes a C# class with restriction validation
+func (g *CodeGenerator) writeCSharpRestrictedType(builder *strings.Builder, goType types.GoType) {
+	// Write comment
+	if g.includeComments && goType.Comment != "" {
+		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	} else if g.includeComments {
+		g.writeComment(builder, fmt.Sprintf("%s represents a restricted %s", goType.Name, goType.BaseType), "")
+	}
+
+	// Write class declaration
+	builder.WriteString(fmt.Sprintf("public class %s\n{\n", goType.Name))
+
+	// Write private field for the value
+	baseType := goType.BaseType
+	if baseType == "" {
+		baseType = "string"
+	}
+	csharpType := g.convertToCSharpType(baseType)
+	builder.WriteString(fmt.Sprintf("    private %s _value;\n\n", csharpType))
+
+	// Write constructor with validation
+	builder.WriteString(fmt.Sprintf("    public %s(%s value)\n", goType.Name, csharpType))
+	builder.WriteString("    {\n")
+
+	if goType.HasPattern {
+		builder.WriteString(fmt.Sprintf("        if (!System.Text.RegularExpressions.Regex.IsMatch(value, @\"%s\"))\n", goType.PatternValue))
+		builder.WriteString("            throw new ArgumentException(\"Invalid format\");\n")
+	}
+
+	if goType.HasMinLength || goType.HasMaxLength {
+		if goType.HasMinLength {
+			builder.WriteString(fmt.Sprintf("        if (value.Length < %s)\n", goType.MinLength))
+			builder.WriteString("            throw new ArgumentException(\"Value too short\");\n")
+		}
+		if goType.HasMaxLength {
+			builder.WriteString(fmt.Sprintf("        if (value.Length > %s)\n", goType.MaxLength))
+			builder.WriteString("            throw new ArgumentException(\"Value too long\");\n")
+		}
+	}
+
+	builder.WriteString("        _value = value;\n")
+	builder.WriteString("    }\n\n")
+
+	// Write Value property
+	builder.WriteString(fmt.Sprintf("    public %s Value => _value;\n\n", csharpType))
+
+	// Write ToString override
+	builder.WriteString("    public override string ToString() => _value.ToString();\n\n")
+
+	// Write implicit conversion operators
+	builder.WriteString(fmt.Sprintf("    public static implicit operator %s(%s obj) => obj._value;\n", csharpType, goType.Name))
+	builder.WriteString(fmt.Sprintf("    public static implicit operator %s(%s value) => new %s(value);\n", goType.Name, csharpType, goType.Name))
+
+	builder.WriteString("}\n")
+}
+
+// writePythonRestrictedType writes a Python class with restriction validation
+func (g *CodeGenerator) writePythonRestrictedType(builder *strings.Builder, goType types.GoType) {
+	// Add import for re module if there is a pattern restriction
+	if goType.HasPattern {
+		builder.WriteString("import re\n")
+	}
+
+	// Write class docstring comment
+	if g.includeComments && goType.Comment != "" {
+		builder.WriteString("class " + goType.Name + "(str):\n")
+		builder.WriteString("    \"\"\"\n    " + goType.Comment + "\n")
+	} else {
+		builder.WriteString("class " + goType.Name + "(str):\n")
+		builder.WriteString("    \"\"\"\n    Represents a string with ")
+		if goType.HasPattern {
+			builder.WriteString("pattern validation.\n    Pattern: " + goType.PatternValue)
+		} else if goType.HasMinLength || goType.HasMaxLength {
+			builder.WriteString("length validation.")
+		} else if goType.HasMinInclusive || goType.HasMaxInclusive || goType.HasMinExclusive || goType.HasMaxExclusive {
+			builder.WriteString("range validation.")
+		} else {
+			builder.WriteString("validation.")
+		}
+		builder.WriteString("\n")
+	}
+	builder.WriteString("    \"\"\"\n")
+
+	// Add static pattern for regex
+	if goType.HasPattern {
+		// Escape backslashes for Python strings
+		pyPattern := strings.Replace(goType.PatternValue, "\\", "\\\\", -1)
+		builder.WriteString("    _pattern = re.compile(r'" + pyPattern + "')\n")
+	}
+
+	// Add __new__ method with validation
+	builder.WriteString("    \n    def __new__(cls, value):\n")
+	if goType.HasPattern {
+		builder.WriteString("        if not cls._pattern.match(value):\n")
+		builder.WriteString("            raise ValueError(f\"Invalid " + strings.ToLower(goType.Name) + " format: {value}\")\n")
+	} else if goType.HasMinLength && goType.HasMaxLength {
+		builder.WriteString("        length = len(value)\n")
+		builder.WriteString("        if length < " + goType.MinLength + " or length > " + goType.MaxLength + ":\n")
+		builder.WriteString("            raise ValueError(f\"Length must be between " + goType.MinLength + " and " + goType.MaxLength + ", got {length}\")\n")
+	} else if goType.HasMinLength {
+		builder.WriteString("        if len(value) < " + goType.MinLength + ":\n")
+		builder.WriteString("            raise ValueError(f\"Length must be at least " + goType.MinLength + ", got {len(value)}\")\n")
+	} else if goType.HasMaxLength {
+		builder.WriteString("        if len(value) > " + goType.MaxLength + ":\n")
+		builder.WriteString("            raise ValueError(f\"Length must be at most " + goType.MaxLength + ", got {len(value)}\")\n")
+	}
+
+	builder.WriteString("        return super().__new__(cls, value)\n")
+
+	// Add validation method
+	builder.WriteString("    \n    def validate(self):\n")
+	builder.WriteString("        \"\"\"Validates the format.\"\"\"\n")
+	if goType.HasPattern {
+		builder.WriteString("        return bool(self._pattern.match(self))\n")
+	} else if goType.HasMinLength || goType.HasMaxLength {
+		builder.WriteString("        length = len(self)\n")
+		conditions := []string{}
+		if goType.HasMinLength {
+			conditions = append(conditions, "length >= "+goType.MinLength)
+		}
+		if goType.HasMaxLength {
+			conditions = append(conditions, "length <= "+goType.MaxLength)
+		}
+		builder.WriteString("        return " + strings.Join(conditions, " and ") + "\n")
+	} else {
+		builder.WriteString("        return True\n")
+	}
+}
+
+// writeJavaTypeValidation writes Java validation method for a type
+func (g *CodeGenerator) writeJavaTypeValidation(builder *strings.Builder, goType types.GoType) {
+	// Write validation method
+	builder.WriteString("    public boolean validate() {\n")
+
+	if goType.HasPattern {
+		builder.WriteString(fmt.Sprintf("        return value.matches(\"%s\");\n", goType.PatternValue))
+	} else if goType.HasMinLength || goType.HasMaxLength {
+		if goType.HasMinLength && goType.HasMaxLength {
+			builder.WriteString("        int length = value.length();\n")
+			builder.WriteString(fmt.Sprintf("        return length >= %s && length <= %s;\n", goType.MinLength, goType.MaxLength))
+		} else if goType.HasMinLength {
+			builder.WriteString(fmt.Sprintf("        return value.length() >= %s;\n", goType.MinLength))
+		} else if goType.HasMaxLength {
+			builder.WriteString(fmt.Sprintf("        return value.length() <= %s;\n", goType.MaxLength))
+		}
+	} else if goType.HasMinInclusive || goType.HasMaxInclusive || goType.HasMinExclusive || goType.HasMaxExclusive {
+		// For numeric validation
+		builder.WriteString("        // TODO: Add numeric range validation\n")
+		builder.WriteString("        return true;\n")
+	} else {
+		builder.WriteString("        return true;\n")
+	}
+
+	builder.WriteString("    }\n")
 }

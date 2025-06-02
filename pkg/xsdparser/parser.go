@@ -275,15 +275,21 @@ func (p *XSDParser) convertToGoTypes() error {
 		}
 		p.goTypes = append(p.goTypes, *goType)
 	}
-
 	// Convert simple types (enums, etc.)
 	for _, simpleType := range p.schema.SimpleTypes {
+		fmt.Printf("Converting simple type: %s\n", simpleType.Name)
+		if simpleType.Restriction != nil && simpleType.Restriction.Pattern != nil {
+			fmt.Printf("  Has pattern: %s\n", simpleType.Restriction.Pattern.Value)
+		}
 		goType, err := p.convertSimpleType(simpleType)
 		if err != nil {
 			return fmt.Errorf("failed to convert simple type %s: %v", simpleType.Name, err)
 		}
 		if goType != nil {
+			fmt.Printf("  Added type: %s (pattern: %v)\n", goType.Name, goType.HasPattern)
 			p.goTypes = append(p.goTypes, *goType)
+		} else {
+			fmt.Printf("  Type was nil\n")
 		}
 	}
 
@@ -360,18 +366,83 @@ func (p *XSDParser) convertComplexType(xsdType types.XSDComplexType) (*types.GoT
 	return goType, nil
 }
 
-// convertSimpleType converts an XSD simple type to a Go type (mainly for enums)
+// convertSimpleType converts an XSD simple type to a Go type
 func (p *XSDParser) convertSimpleType(xsdType types.XSDSimpleType) (*types.GoType, error) {
 	if xsdType.Restriction == nil {
 		return nil, nil // Skip non-restriction simple types
 	}
-
-	// Check if it's an enumeration
+	var goType *types.GoType
+	// Handle enumerations, which have precedence over other restrictions
 	if len(xsdType.Restriction.Enumerations) > 0 {
 		return p.convertEnumType(xsdType)
 	}
 
-	return nil, nil
+	// Create a base type for restrictions
+	baseType := p.mapXSDTypeToGo(xsdType.Restriction.Base)
+	goType = &types.GoType{
+		Name:            types.ToGoTypeName(xsdType.Name),
+		Package:         p.packageName,
+		BaseType:        baseType,
+		IsEnum:          false,
+		Comment:         types.GetDocumentation(xsdType.Annotation),
+		NeedsValidation: false, // Will be set to true if any restrictions are found
+	}
+
+	// Handle pattern restriction
+	if xsdType.Restriction.Pattern != nil {
+		goType.HasPattern = true
+		goType.PatternValue = xsdType.Restriction.Pattern.Value
+		goType.NeedsValidation = true
+	}
+
+	// Handle length restrictions
+	if xsdType.Restriction.MinLength != nil {
+		goType.HasMinLength = true
+		goType.MinLength = xsdType.Restriction.MinLength.Value
+		goType.NeedsValidation = true
+	}
+	if xsdType.Restriction.MaxLength != nil {
+		goType.HasMaxLength = true
+		goType.MaxLength = xsdType.Restriction.MaxLength.Value
+		goType.NeedsValidation = true
+	}
+
+	// Handle numeric restrictions
+	if xsdType.Restriction.MinInclusive != nil {
+		goType.HasMinInclusive = true
+		goType.MinInclusive = xsdType.Restriction.MinInclusive.Value
+		goType.NeedsValidation = true
+	}
+	if xsdType.Restriction.MaxInclusive != nil {
+		goType.HasMaxInclusive = true
+		goType.MaxInclusive = xsdType.Restriction.MaxInclusive.Value
+		goType.NeedsValidation = true
+	}
+	if xsdType.Restriction.MinExclusive != nil {
+		goType.HasMinExclusive = true
+		goType.MinExclusive = xsdType.Restriction.MinExclusive.Value
+		goType.NeedsValidation = true
+	}
+	if xsdType.Restriction.MaxExclusive != nil {
+		goType.HasMaxExclusive = true
+		goType.MaxExclusive = xsdType.Restriction.MaxExclusive.Value
+		goType.NeedsValidation = true
+	}
+
+	// Handle digit restrictions
+	if xsdType.Restriction.TotalDigits != nil {
+		goType.HasTotalDigits = true
+		goType.TotalDigits = xsdType.Restriction.TotalDigits.Value
+		goType.NeedsValidation = true
+	}
+	if xsdType.Restriction.FractionDigits != nil {
+		goType.HasFractionDigits = true
+		goType.FractionDigits = xsdType.Restriction.FractionDigits.Value
+		goType.NeedsValidation = true
+	}
+	// Even if no validation is explicitly needed, we still return the type
+	// so it can be used in references
+	return goType, nil
 }
 
 // convertEnumType converts an XSD enumeration to a Go type with constants
@@ -397,7 +468,6 @@ func (p *XSDParser) convertEnumType(xsdType types.XSDSimpleType) (*types.GoType,
 		}
 		goType.Constants = append(goType.Constants, constant)
 	}
-
 	return goType, nil
 }
 

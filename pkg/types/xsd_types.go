@@ -336,6 +336,35 @@ type GoType struct {
 	Comment   string
 	IsEnum    bool
 	BaseType  string
+
+	// Validation properties
+	NeedsValidation bool // Flag indicating if the type needs validation
+
+	// Pattern restriction
+	HasPattern   bool
+	PatternValue string
+
+	// Length restrictions
+	HasMinLength bool
+	MinLength    string
+	HasMaxLength bool
+	MaxLength    string
+
+	// Numeric range restrictions
+	HasMinInclusive bool
+	MinInclusive    string
+	HasMaxInclusive bool
+	MaxInclusive    string
+	HasMinExclusive bool
+	MinExclusive    string
+	HasMaxExclusive bool
+	MaxExclusive    string
+
+	// Digit restrictions
+	HasTotalDigits    bool
+	TotalDigits       string
+	HasFractionDigits bool
+	FractionDigits    string
 }
 
 // GoField represents a field in a Go struct
