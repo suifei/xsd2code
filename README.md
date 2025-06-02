@@ -354,6 +354,18 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 - ✨ 新增测试代码生成
 - 🔧 改进XSD特性支持
 
+## 📚 文档和Wiki
+
+详细的文档和教程请访问我们的 [GitHub Wiki](https://github.com/suifei/xsd2code/wiki)：
+
+- **[快速开始](https://github.com/suifei/xsd2code/wiki/Quick-Start)** - 5分钟上手指南
+- **[安装指南](https://github.com/suifei/xsd2code/wiki/Installation)** - 详细安装步骤
+- **[基本用法](https://github.com/suifei/xsd2code/wiki/Basic-Usage)** - 基本命令和参数
+- **[XSD特性支持](https://github.com/suifei/xsd2code/wiki/XSD-Features)** - 支持的XSD特性详解
+- **[命令行参考](https://github.com/suifei/xsd2code/wiki/Command-Line-Reference)** - 完整的命令行参数说明
+- **[高级示例](https://github.com/suifei/xsd2code/wiki/Advanced-Examples)** - 复杂场景和高级用法
+- **[常见问题](https://github.com/suifei/xsd2code/wiki/FAQ)** - 常见问题和解答
+
 ## 支持和反馈
 
 如果您遇到问题或有功能建议，请：
