@@ -7,6 +7,11 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# 明确定义权限
+permissions:
+  contents: write  # 这允许推送到存储库，包括创建releases
+  pull-requests: write  # 如果需要评论PR等
+  
 jobs:
   test:
     runs-on: ubuntu-latest
