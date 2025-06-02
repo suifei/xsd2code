@@ -155,6 +155,7 @@ type XSDRestriction struct {
 	Base            string                 `xml:"base,attr"`
 	Enumerations    []XSDEnumeration       `xml:"enumeration"`
 	Pattern         *XSDPattern            `xml:"pattern"`
+	Length          *XSDLength             `xml:"length"`
 	MinLength       *XSDMinLength          `xml:"minLength"`
 	MaxLength       *XSDMaxLength          `xml:"maxLength"`
 	MinInclusive    *XSDMinInclusive       `xml:"minInclusive"`
@@ -163,6 +164,7 @@ type XSDRestriction struct {
 	MaxExclusive    *XSDMaxExclusive       `xml:"maxExclusive"`
 	TotalDigits     *XSDTotalDigits        `xml:"totalDigits"`
 	FractionDigits  *XSDFractionDigits     `xml:"fractionDigits"`
+	WhiteSpace      *XSDWhiteSpace         `xml:"whiteSpace"`
 	Attributes      []XSDAttribute         `xml:"attribute"`
 	AttributeGroups []XSDAttributeGroupRef `xml:"attributeGroup"`
 	Sequence        *XSDSequence           `xml:"sequence"`
@@ -238,6 +240,20 @@ type XSDTotalDigits struct {
 // XSDFractionDigits represents an XSD fractionDigits
 type XSDFractionDigits struct {
 	XMLName    xml.Name       `xml:"fractionDigits"`
+	Value      string         `xml:"value,attr"`
+	Annotation *XSDAnnotation `xml:"annotation"`
+}
+
+// XSDWhiteSpace represents an XSD whiteSpace
+type XSDWhiteSpace struct {
+	XMLName    xml.Name       `xml:"whiteSpace"`
+	Value      string         `xml:"value,attr"` // preserve, replace, collapse
+	Annotation *XSDAnnotation `xml:"annotation"`
+}
+
+// XSDLength represents an XSD length (exact length)
+type XSDLength struct {
+	XMLName    xml.Name       `xml:"length"`
 	Value      string         `xml:"value,attr"`
 	Annotation *XSDAnnotation `xml:"annotation"`
 }
@@ -359,12 +375,23 @@ type GoType struct {
 	MinExclusive    string
 	HasMaxExclusive bool
 	MaxExclusive    string
-
 	// Digit restrictions
 	HasTotalDigits    bool
 	TotalDigits       string
 	HasFractionDigits bool
 	FractionDigits    string
+
+	// WhiteSpace restriction
+	HasWhiteSpace bool
+	WhiteSpace    string // preserve, replace, collapse
+
+	// Exact length restriction
+	HasLength bool
+	Length    string
+
+	// Fixed value
+	HasFixedValue bool
+	FixedValue    string
 }
 
 // GoField represents a field in a Go struct
@@ -380,6 +407,10 @@ type GoField struct {
 	IsArray     bool
 	MinOccurs   int
 	MaxOccurs   int // -1 for unbounded
+
+	// Fixed value support
+	HasFixedValue bool
+	FixedValue    string
 }
 
 // GoConstant represents a Go constant (for enums)

@@ -728,6 +728,11 @@ func (g *CodeGenerator) generateCode() string {
 		builder.WriteString("\n")
 	}
 
+	// Generate helper functions for Go if needed
+	if g.languageMapper.GetLanguage() == LanguageGo {
+		g.writeGoHelperFunctions(&builder)
+	}
+
 	// Close namespace for C#
 	if g.languageMapper.GetLanguage() == LanguageCSharp {
 		builder.WriteString("}\n")
@@ -765,12 +770,12 @@ func (g *CodeGenerator) writeHeader(builder *strings.Builder) {
 func (g *CodeGenerator) writeGoHeader(builder *strings.Builder) {
 	builder.WriteString("package " + g.packageName + "\n\n")
 
+	// Determine needed imports dynamically
+	neededImports := g.determineNeededImports()
+
 	// Imports
 	builder.WriteString("import (\n")
-	for _, importStmt := range g.languageMapper.GetImportStatements() {
-		if importStmt == "\"encoding/json\"" && !g.jsonCompatible {
-			continue // Skip JSON import if not needed
-		}
+	for _, importStmt := range neededImports {
 		builder.WriteString("\t" + importStmt + "\n")
 	}
 	builder.WriteString(")\n\n")
@@ -815,6 +820,56 @@ func (g *CodeGenerator) needsTimePackage() bool {
 	return false
 }
 
+// determineNeededImports determines which imports are needed based on the generated types
+func (g *CodeGenerator) determineNeededImports() []string {
+	imports := make(map[string]bool)
+
+	// Always include basic imports
+	imports["\"encoding/xml\""] = true
+
+	// Check if JSON compatibility is needed
+	if g.jsonCompatible {
+		imports["\"encoding/json\""] = true
+	}
+
+	// Check if time package is needed
+	if g.needsTimePackage() {
+		imports["\"time\""] = true
+	}
+
+	// Check if regexp package is needed (for pattern validation)
+	needsRegexp := false
+	for _, goType := range g.goTypes {
+		if goType.HasPattern {
+			needsRegexp = true
+			break
+		}
+	}
+	if needsRegexp {
+		imports["\"regexp\""] = true
+	}
+
+	// Check if strings package is needed (for whiteSpace processing)
+	needsStrings := false
+	for _, goType := range g.goTypes {
+		if goType.HasWhiteSpace || goType.HasMinLength || goType.HasMaxLength || goType.HasLength {
+			needsStrings = true
+			break
+		}
+	}
+	if needsStrings {
+		imports["\"strings\""] = true
+	}
+
+	// Convert map to sorted slice
+	result := make([]string, 0, len(imports))
+	for imp := range imports {
+		result = append(result, imp)
+	}
+
+	return result
+}
+
 // writeType writes a single type for the target language
 func (g *CodeGenerator) writeType(builder *strings.Builder, goType types.GoType) {
 	switch g.languageMapper.GetLanguage() {
@@ -838,8 +893,9 @@ func (g *CodeGenerator) writeGoType(builder *strings.Builder, goType types.GoTyp
 	} else if goType.HasPattern || goType.HasMinLength || goType.HasMaxLength ||
 		goType.HasMinInclusive || goType.HasMaxInclusive ||
 		goType.HasMinExclusive || goType.HasMaxExclusive ||
-		goType.HasTotalDigits || goType.HasFractionDigits {
-		// This is a simple type with restrictions (like pattern)
+		goType.HasTotalDigits || goType.HasFractionDigits ||
+		goType.HasWhiteSpace || goType.HasLength || goType.HasFixedValue {
+		// This is a simple type with restrictions (like pattern, whiteSpace, length, or fixed value)
 		g.writeGoRestrictedType(builder, goType)
 	} else {
 		g.writeGoStructType(builder, goType)
@@ -864,7 +920,9 @@ func (g *CodeGenerator) writeJavaType(builder *strings.Builder, goType types.GoT
 // writeCSharpType writes a C# type
 func (g *CodeGenerator) writeCSharpType(builder *strings.Builder, goType types.GoType) {
 	if goType.IsEnum {
-		g.writeCSharpEnumType(builder, goType)
+		if csharpMapper, ok := g.languageMapper.(*CSharpLanguageMapper); ok {
+			csharpMapper.writeCSharpEnumType(builder, goType, g)
+		}
 	} else if goType.HasPattern || goType.HasMinLength || goType.HasMaxLength ||
 		goType.HasMinInclusive || goType.HasMaxInclusive ||
 		goType.HasMinExclusive || goType.HasMaxExclusive ||
@@ -1170,6 +1228,41 @@ func (g *CodeGenerator) generateValidationHelpers(builder *strings.Builder) {
 	builder.WriteString("\t\treturn fmt.Errorf(\"value %d is out of range [%d, %d]\", value, min, max)\n")
 	builder.WriteString("\t}\n")
 	builder.WriteString("\treturn nil\n")
+	builder.WriteString("}\n\n")
+
+	// WhiteSpace processing helper
+	builder.WriteString("// applyWhiteSpaceProcessing applies XSD whiteSpace facet processing\n")
+	builder.WriteString("func applyWhiteSpaceProcessing(value, whiteSpaceAction string) string {\n")
+	builder.WriteString("\tswitch whiteSpaceAction {\n")
+	builder.WriteString("\tcase \"replace\":\n")
+	builder.WriteString("\t\t// Replace tab, newline, and carriage return with space\n")
+	builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\t\", \" \")\n")
+	builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\n\", \" \")\n")
+	builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\r\", \" \")\n")
+	builder.WriteString("\t\treturn value\n")
+	builder.WriteString("\tcase \"collapse\":\n")
+	builder.WriteString("\t\t// First apply replace processing\n")
+	builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\t\", \" \")\n")
+	builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\n\", \" \")\n")
+	builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\r\", \" \")\n")
+	builder.WriteString("\t\t// Then collapse sequences of spaces and trim\n")
+	builder.WriteString("\t\tvalue = regexp.MustCompile(`\\\\s+`).ReplaceAllString(value, \" \")\n")
+	builder.WriteString("\t\tvalue = strings.TrimSpace(value)\n")
+	builder.WriteString("\t\treturn value\n")
+	builder.WriteString("\tcase \"preserve\":\n")
+	builder.WriteString("\t\tfallthrough\n")
+	builder.WriteString("\tdefault:\n")
+	builder.WriteString("\t\t// Preserve all whitespace as-is\n")
+	builder.WriteString("\t\treturn value\n")
+	builder.WriteString("\t}\n")
+	builder.WriteString("}\n\n")
+
+	// Fixed value validation
+	builder.WriteString("func validateFixedValue(value, expectedValue string) error {\n")
+	builder.WriteString("\tif value != expectedValue {\n")
+	builder.WriteString("\t\treturn fmt.Errorf(\"value '%s' does not match fixed value '%s'\", value, expectedValue)\n")
+	builder.WriteString("\t}\n")
+	builder.WriteString("\treturn nil\n")
 	builder.WriteString("}\n")
 }
 
@@ -1459,8 +1552,7 @@ func (g *CodeGenerator) writeJavaClassType(builder *strings.Builder, goType type
 // writeJavaField writes a Java field
 func (g *CodeGenerator) writeJavaField(builder *strings.Builder, field types.GoField) {
 	// Convert Go type to Java type
-	javaType := g.convertToJavaType(field.Type)
-	// Write field with annotations
+	javaType := g.convertToJavaType(field.Type) // Write field with annotations
 	if field.XMLTag != "" {
 		if strings.Contains(field.XMLTag, ",attr") {
 			builder.WriteString("    @XmlAttribute\n")
@@ -1569,18 +1661,18 @@ func (g *CodeGenerator) writeCSharpProperty(builder *strings.Builder, field type
 }
 
 // writeCSharpEnumType writes a C# enum type
-func (g *CodeGenerator) writeCSharpEnumType(builder *strings.Builder, goType types.GoType) {
+func (cs *CSharpLanguageMapper) writeCSharpEnumType(builder *strings.Builder, goType types.GoType, generator *CodeGenerator) {
 	// Write comment
-	if g.includeComments && goType.Comment != "" {
-		g.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
+	if generator.includeComments && goType.Comment != "" {
+		generator.writeComment(builder, fmt.Sprintf("%s %s", goType.Name, goType.Comment), "")
 	}
 
 	builder.WriteString(fmt.Sprintf("public enum %s\n{\n", goType.Name))
 
 	// Write enum constants
 	for _, constant := range goType.Constants {
-		if g.includeComments && constant.Comment != "" {
-			g.writeComment(builder, constant.Comment, "    ")
+		if generator.includeComments && constant.Comment != "" {
+			generator.writeComment(builder, constant.Comment, "    ")
 		}
 		builder.WriteString(fmt.Sprintf("    %s,\n", constant.Name))
 	}
@@ -1825,6 +1917,12 @@ func (g *CodeGenerator) writeGoRestrictedType(builder *strings.Builder, goType t
 			commentText += " with pattern validation"
 		} else if goType.HasMinLength || goType.HasMaxLength {
 			commentText += " with length restrictions"
+		} else if goType.HasLength {
+			commentText += " with exact length restriction"
+		} else if goType.HasWhiteSpace {
+			commentText += " with whiteSpace processing"
+		} else if goType.HasFixedValue {
+			commentText += " with fixed value constraint"
 		} else if goType.HasMinInclusive || goType.HasMaxInclusive || goType.HasMinExclusive || goType.HasMaxExclusive {
 			commentText += " with range restrictions"
 		}
@@ -1862,9 +1960,22 @@ func (g *CodeGenerator) writeGoTypeValidation(builder *strings.Builder, goType t
 		builder.WriteString(fmt.Sprintf("\t// Validate against pattern: %s\n", goType.PatternValue))
 		builder.WriteString("\tpattern := regexp.MustCompile(`" + goType.PatternValue + "`)\n")
 		builder.WriteString("\treturn pattern.MatchString(string(v))\n")
+	} else if goType.HasLength {
+		// For exact length validation
+		builder.WriteString("\tstrVal := string(v)\n")
+		// Apply whiteSpace processing if needed
+		if goType.HasWhiteSpace {
+			builder.WriteString(fmt.Sprintf("\tstrVal = applyWhiteSpaceProcessing(strVal, \"%s\")\n", goType.WhiteSpace))
+		}
+		builder.WriteString(fmt.Sprintf("\treturn len(strVal) == %s\n", goType.Length))
 	} else if goType.HasMinLength || goType.HasMaxLength {
 		// For length validation
-		builder.WriteString("\tstrVal := string(v)\n\tlength := len(strVal)\n")
+		builder.WriteString("\tstrVal := string(v)\n")
+		// Apply whiteSpace processing if needed
+		if goType.HasWhiteSpace {
+			builder.WriteString(fmt.Sprintf("\tstrVal = applyWhiteSpaceProcessing(strVal, \"%s\")\n", goType.WhiteSpace))
+		}
+		builder.WriteString("\tlength := len(strVal)\n")
 		if goType.HasMinLength {
 			builder.WriteString(fmt.Sprintf("\tif length < %s {\n\t\treturn false\n\t}\n", goType.MinLength))
 		}
@@ -1872,6 +1983,9 @@ func (g *CodeGenerator) writeGoTypeValidation(builder *strings.Builder, goType t
 			builder.WriteString(fmt.Sprintf("\tif length > %s {\n\t\treturn false\n\t}\n", goType.MaxLength))
 		}
 		builder.WriteString("\treturn true\n")
+	} else if goType.HasFixedValue {
+		// For fixed value validation
+		builder.WriteString(fmt.Sprintf("\treturn string(v) == \"%s\"\n", goType.FixedValue))
 	} else if goType.HasMinInclusive || goType.HasMaxInclusive || goType.HasMinExclusive || goType.HasMaxExclusive {
 		// For numeric range validation
 		switch goType.BaseType {
@@ -2123,4 +2237,54 @@ func (g *CodeGenerator) writeJavaTypeValidation(builder *strings.Builder, goType
 	}
 
 	builder.WriteString("    }\n")
+}
+
+// writeGoHelperFunctions writes helper functions needed by the generated Go code
+func (g *CodeGenerator) writeGoHelperFunctions(builder *strings.Builder) {
+	// Check if we need any helper functions
+	needsWhiteSpaceHelper := false
+	needsRegexpHelper := false
+
+	for _, goType := range g.goTypes {
+		if goType.HasWhiteSpace {
+			needsWhiteSpaceHelper = true
+		}
+		if goType.HasPattern {
+			needsRegexpHelper = true
+		}
+	}
+
+	// Write whiteSpace processing helper if needed
+	if needsWhiteSpaceHelper {
+		builder.WriteString("// applyWhiteSpaceProcessing applies XSD whiteSpace facet processing\n")
+		builder.WriteString("func applyWhiteSpaceProcessing(value, whiteSpaceAction string) string {\n")
+		builder.WriteString("\tswitch whiteSpaceAction {\n")
+		builder.WriteString("\tcase \"replace\":\n")
+		builder.WriteString("\t\t// Replace tab, newline, and carriage return with space\n")
+		builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\t\", \" \")\n")
+		builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\n\", \" \")\n")
+		builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\r\", \" \")\n")
+		builder.WriteString("\t\treturn value\n")
+		builder.WriteString("\tcase \"collapse\":\n")
+		builder.WriteString("\t\t// First apply replace processing\n")
+		builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\t\", \" \")\n")
+		builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\n\", \" \")\n")
+		builder.WriteString("\t\tvalue = strings.ReplaceAll(value, \"\\r\", \" \")\n")
+		builder.WriteString("\t\t// Then collapse sequences of spaces and trim\n")
+		if needsRegexpHelper {
+			builder.WriteString("\t\tvalue = regexp.MustCompile(`\\\\s+`).ReplaceAllString(value, \" \")\n")
+		} else {
+			// Use simpler approach without regexp if not already needed
+			builder.WriteString("\t\t// Simplified collapse: just trim spaces\n")
+		}
+		builder.WriteString("\t\tvalue = strings.TrimSpace(value)\n")
+		builder.WriteString("\t\treturn value\n")
+		builder.WriteString("\tcase \"preserve\":\n")
+		builder.WriteString("\t\tfallthrough\n")
+		builder.WriteString("\tdefault:\n")
+		builder.WriteString("\t\t// Preserve all whitespace as-is\n")
+		builder.WriteString("\t\treturn value\n")
+		builder.WriteString("\t}\n")
+		builder.WriteString("}\n\n")
+	}
 }

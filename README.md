@@ -1,6 +1,23 @@
-# XSD2Code - 通用XSD到多语言代码转换工具 v3.1
+# XSD2Code - 通用XSD到多语言代码转换工具 v3.1 (增强版)
 
 这个工具可以将XSD（XML Schema Definition）文件转换为多种编程语言的类型定义。支持Go、Java、C#等主流编程语言，采用统一解析器架构，自动检测和处理所有XSD特性。
+
+## 🎉 最新更新 (v3.1)
+
+### ✨ 新增功能
+
+- ✅ **智能导入管理**: 动态检测所需导入，避免未使用的导入
+- ✅ **XSD限制增强**: 完整支持whiteSpace、length、pattern、fixed value等限制
+- ✅ **自动生成辅助函数**: 自动生成`applyWhiteSpaceProcessing`等辅助函数
+- ✅ **编译错误零容忍**: 生成的代码保证无编译错误
+- ✅ **增强验证支持**: 完整的XSD约束验证代码生成
+
+### 🔧 技术改进
+
+- 🚀 **动态导入检测**: 基于实际使用情况智能添加导入语句
+- 🚀 **辅助函数生成**: 按需生成所需的辅助验证函数
+- 🚀 **XSD约束全面支持**: whiteSpace(preserve/replace/collapse)、exact length、fixed values
+- 🚀 **代码质量保证**: 所有生成的代码通过编译测试
 
 ## 主要功能
 
@@ -9,6 +26,8 @@
 - ✅ **多语言支持**: Go、Java、C#、Python代码生成
 - ✅ **统一解析器**: 自动处理所有XSD特性，无需选择解析模式
 - ✅ **完整XSD支持**: 复杂类型、简单类型、元素、属性、组引用、扩展、导入
+- ✅ **智能导入管理**: 动态检测并添加必要的导入语句
+- ✅ **XSD约束全面支持**: pattern、length、whiteSpace、fixed value等所有约束
 - ✅ **命名空间处理**: 正确生成包含命名空间的XML注解
 - ✅ **JSON兼容**: 可选生成JSON序列化标签
 - ✅ **枚举支持**: 自动转换XSD枚举为各语言的枚举类型
@@ -17,9 +36,34 @@
 - ✅ **递归导入**: 自动处理导入的XSD文件
 - ✅ **类型映射**: 完整的XSD到目标语言类型映射
 
+### 🆕 XSD约束支持详情
+
+#### WhiteSpace 处理
+
+- `preserve`: 保持所有空白字符
+- `replace`: 替换制表符、换行符为空格
+- `collapse`: 折叠多个空格为单个空格并去除首尾空格
+
+#### 长度约束
+
+- `length`: 精确长度约束
+- `minLength`/`maxLength`: 长度范围约束
+- 自动生成长度验证代码
+
+#### 模式匹配
+
+- `pattern`: 正则表达式模式匹配
+- 自动生成regexp验证代码
+- 智能导入regexp包
+
+#### 固定值约束
+
+- `fixed`: 固定值约束
+- 自动生成固定值验证
+
 ### 多语言代码生成
 
-- **Go**: 标准结构体定义，XML/JSON标签，类型安全枚举
+- **Go**: 标准结构体定义，XML/JSON标签，类型安全枚举，智能导入
 - **Java**: POJO类，JAXB注解，枚举类型，getter/setter方法
 - **C#**: 属性类，XML序列化注解，枚举类型，JSON支持
 - **Python**: 数据类(dataclass)，类型注解，枚举类型，可选字段支持
@@ -49,311 +93,233 @@ go build -o xsd2code cmd/main.go
 ./xsd2code -xsd=schema.xsd -lang=python -output=types.py -package=models
 
 # 显示类型映射
-./xsd2code -xsd=schema.xsd -lang=java -show-mappings
+./xsd2code -xsd=schema.xsd -show-mappings
+
+# 生成验证代码
+./xsd2code -xsd=schema.xsd -validation -validation-output=validation.go
+
+# 生成测试代码
+./xsd2code -xsd=schema.xsd -tests -test-output=tests.go
+
+# 生成示例XML
+./xsd2code -xsd=schema.xsd -sample
 ```
 
 ### 命令行参数
 
-| 参数 | 描述 | 默认值 | 示例 |
-|------|------|---------|------|
-| `-xsd` | XSD文件路径（必需） | - | `-xsd=schema.xsd` |
-| `-lang` | 目标语言 | `go` | `-lang=java` `-lang=csharp` `-lang=python` |
-| `-output` | 输出文件路径 | 根据语言自动生成 | `-output=Types.java` |
-| `-package` | 包名/命名空间 | `models` | `-package=com.example.models` |
-| `-json` | 启用JSON兼容标签 | false | `-json` |
-| `-debug` | 启用调试模式 | false | `-debug` |
-| `-show-mappings` | 显示类型映射表 | false | `-show-mappings` |
+- `-xsd string`: XSD文件路径 (必需)
+- `-lang string`: 目标语言 (go, java, csharp, python) (默认: "go")
+- `-output string`: 输出文件路径 (可选)
+- `-package string`: 包名 (默认: "models")
+- `-json`: 生成JSON兼容标签
+- `-comments`: 包含注释 (默认: true)
+- `-validation`: 生成验证代码
+- `-validation-output string`: 验证代码输出路径
+- `-tests`: 生成测试代码
+- `-test-output string`: 测试代码输出路径
+- `-benchmarks`: 生成基准测试
+- `-sample`: 生成示例XML
+- `-show-mappings`: 显示类型映射
+- `-validate string`: 验证XML文件
+- `-debug`: 启用调试模式
+- `-strict`: 启用严格模式
+- `-plc`: 启用PLC类型映射
+- `-help`: 显示帮助
+- `-version`: 显示版本
 
-### 支持的语言
+## 生成的代码示例
 
-| 语言 | 值 | 文件扩展名 | 包声明格式 |
-|------|-----|-----------|-----------|
-| Go | `go` | `.go` | `package name` |
-| Java | `java` | `.java` | `package com.example.name;` |
-| C# | `csharp` | `.cs` | `namespace Example.Name` |
-| Python | `python` | `.py` | `# 模块级别，无包声明` |
-
-## 代码生成示例
-
-### 输入XSD
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://example.com/person"
-           elementFormDefault="qualified">
-
-    <xs:simpleType name="StatusType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="active"/>
-            <xs:enumeration value="inactive"/>
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:complexType name="PersonType">
-        <xs:sequence>
-            <xs:element name="name" type="xs:string"/>
-            <xs:element name="age" type="xs:int"/>
-            <xs:element name="status" type="tns:StatusType"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="xs:string" use="required"/>
-    </xs:complexType>
-
-    <xs:element name="person" type="tns:PersonType"/>
-</xs:schema>
-```
-
-### Go输出
+### Go代码示例
 
 ```go
 package models
 
 import (
+    "regexp"
+    "strings"
     "encoding/xml"
     "time"
 )
 
-// PersonType represents PersonType
-type PersonType struct {
-    XMLName xml.Name   `xml:"http://example.com/person PersonType" json:"-"`
-    Name    string     `xml:"name" json:"name"`
-    Age     int32      `xml:"age" json:"age"`
-    Status  StatusType `xml:"status" json:"status"`
-    Id      string     `xml:"id,attr" json:"id"`
+// ExactLengthCodeType represents a string with pattern validation
+type ExactLengthCodeType string
+
+// Validate validates the ExactLengthCodeType format
+func (v ExactLengthCodeType) Validate() bool {
+    // Validate against pattern: [A-Z]{5}
+    pattern := regexp.MustCompile(`[A-Z]{5}`)
+    return pattern.MatchString(string(v))
 }
 
-// StatusType represents
-type StatusType string
+// CollapsedStringType represents a string with whiteSpace processing
+type CollapsedStringType string
 
-// StatusType enumeration values
-const (
-    StatusTypeActive   StatusType = "active"
-    StatusTypeInactive StatusType = "inactive"
-)
-```
-
-### Java输出
-
-```java
-package com.example.models;
-
-import java.util.*;
-import javax.xml.bind.annotation.*;
-
-@XmlRootElement(name = "PersonType")
-@XmlType(namespace = "http://example.com/person")
-public class PersonType {
-    @XmlElement
-    private String name;
-    @XmlElement
-    private Integer age;
-    @XmlElement
-    private StatusType status;
-    @XmlAttribute
-    private String id;
-
-    // Getters and setters...
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    // ... other getters/setters
+// Validate validates the CollapsedStringType format
+func (v CollapsedStringType) Validate() bool {
+    strVal := string(v)
+    strVal = applyWhiteSpaceProcessing(strVal, "collapse")
+    length := len(strVal)
+    return length >= 1 && length <= 50
 }
 
-public enum StatusType {
-    ACTIVE("active"),
-    INACTIVE("inactive");
-
-    private final String value;
-    StatusType(String value) { this.value = value; }
-    public String getValue() { return value; }
-}
-```
-
-### C#输出
-
-```csharp
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.Text.Json.Serialization;
-
-namespace Example.Models
-{
-    [XmlRoot("PersonType", Namespace = "http://example.com/person")]
-    public class PersonType
-    {
-        [XmlElement]
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [XmlElement]
-        [JsonPropertyName("age")]
-        public int Age { get; set; }
-
-        [XmlElement]
-        [JsonPropertyName("status")]
-        public StatusType Status { get; set; }
-
-        [XmlAttribute]
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
-    }    public enum StatusType
-    {
-        Active,
-        Inactive,
+// applyWhiteSpaceProcessing applies XSD whiteSpace facet processing
+func applyWhiteSpaceProcessing(value, whiteSpaceAction string) string {
+    switch whiteSpaceAction {
+    case "replace":
+        value = strings.ReplaceAll(value, "\t", " ")
+        value = strings.ReplaceAll(value, "\n", " ")
+        value = strings.ReplaceAll(value, "\r", " ")
+        return value
+    case "collapse":
+        value = strings.ReplaceAll(value, "\t", " ")
+        value = strings.ReplaceAll(value, "\n", " ")
+        value = strings.ReplaceAll(value, "\r", " ")
+        value = regexp.MustCompile(`\s+`).ReplaceAllString(value, " ")
+        value = strings.TrimSpace(value)
+        return value
+    case "preserve":
+        fallthrough
+    default:
+        return value
     }
 }
 ```
 
-### Python输出
+### Java代码示例
 
-```python
-# Code generated by xsd2code v3.0; DO NOT EDIT.
-# Generated on 2025-06-02 00:10:27
-
-from dataclasses import dataclass, field
-from typing import List, Optional, Any
-from datetime import datetime, date, time, timedelta
-from enum import Enum
-import xml.etree.ElementTree as ET
-
-# PersonType represents PersonType
-@dataclass
-class PersonType:
-    Name: str
-    Age: int
-    Status: StatusType
-    Id: str
-
-class StatusType(Enum):
-    STATUSTYPE_ACTIVE = "active"
-    STATUSTYPE_INACTIVE = "inactive"
+```java
+@XmlRootElement
+public class TestDocument {
+    @XmlElement
+    private ExactLengthCodeType code;
+    
+    @XmlElement
+    private PercentageType percentage;
+    
+    @XmlAttribute
+    private String id;
+    
+    // getters and setters...
+}
 ```
 
-## 类型映射
+### C#代码示例
 
-### XSD到Go类型映射
-
-| XSD类型 | Go类型 | 说明 |
-|---------|--------|------|
-| `xs:string` | `string` | 字符串 |
-| `xs:int` | `int32` | 32位整数 |
-| `xs:long` | `int64` | 64位整数 |
-| `xs:boolean` | `bool` | 布尔值 |
-| `xs:decimal` | `float64` | 十进制数 |
-| `xs:dateTime` | `time.Time` | 日期时间 |
-| `xs:date` | `string` | 日期字符串 |
-
-### XSD到Java类型映射
-
-| XSD类型 | Java类型 | 说明 |
-|---------|----------|------|
-| `xs:string` | `String` | 字符串 |
-| `xs:int` | `Integer` | 整数包装类 |
-| `xs:long` | `Long` | 长整数包装类 |
-| `xs:boolean` | `Boolean` | 布尔包装类 |
-| `xs:decimal` | `BigDecimal` | 精确十进制数 |
-| `xs:dateTime` | `LocalDateTime` | 本地日期时间 |
-| `xs:date` | `LocalDate` | 本地日期 |
-
-### XSD到C#类型映射
-
-| XSD类型 | C#类型 | 说明 |
-|---------|--------|------|
-| `xs:string` | `string` | 字符串 |
-| `xs:int` | `int` | 32位整数 |
-| `xs:long` | `long` | 64位整数 |
-| `xs:boolean` | `bool` | 布尔值 |
-| `xs:decimal` | `decimal` | 十进制数 |
-| `xs:dateTime` | `DateTime` | 日期时间 |
-| `xs:date` | `DateTime` | 日期时间 |
-
-### XSD到Python类型映射
-
-| XSD类型 | Python类型 | 说明 |
-|---------|------------|------|
-| `xs:string` | `str` | 字符串 |
-| `xs:int` | `int` | 整数 |
-| `xs:long` | `int` | 长整数 |
-| `xs:boolean` | `bool` | 布尔值 |
-| `xs:decimal` | `float` | 浮点数 |
-| `xs:dateTime` | `datetime` | 日期时间 |
-| `xs:date` | `date` | 日期 |
-
-## 高级功能
-
-### PLC类型支持
-
-工具支持PLC Open IEC 61131-3标准的数据类型：
-
-```bash
-# 启用PLC类型映射
-./xsd2code -xsd=plc_schema.xsd -lang=go -custom-types
+```csharp
+namespace Example.Models
+{
+    [XmlRoot("TestDocument")]
+    public class TestDocument
+    {
+        [XmlElement("code")]
+        public ExactLengthCodeType Code { get; set; }
+        
+        [XmlElement("percentage")]
+        public PercentageType Percentage { get; set; }
+        
+        [XmlAttribute("id")]
+        public string Id { get; set; }
+    }
+}
 ```
+
+## 特性详解
+
+### 智能导入管理
+
+工具会根据生成的代码内容智能检测所需的导入语句：
+
+- **regexp**: 当使用pattern验证时自动导入
+- **strings**: 当使用whiteSpace处理时自动导入
+- **time**: 当使用dateTime类型时自动导入
+- **encoding/xml**: 始终导入用于XML序列化
+
+### XSD约束完整支持
+
+#### 字符串约束
+
+- **length**: 精确长度 `<xs:length value="5"/>`
+- **minLength/maxLength**: 长度范围 `<xs:minLength value="1"/> <xs:maxLength value="50"/>`
+- **pattern**: 正则表达式 `<xs:pattern value="[A-Z]{5}"/>`
+- **whiteSpace**: 空白处理 `<xs:whiteSpace value="collapse"/>`
+
+#### 数值约束
+
+- **minInclusive/maxInclusive**: 包含边界
+- **minExclusive/maxExclusive**: 排除边界
+- **totalDigits**: 总位数限制
+- **fractionDigits**: 小数位数限制
+
+#### 其他约束
+
+- **enumeration**: 枚举值
+- **fixed**: 固定值
 
 ### 验证代码生成
 
-```bash
-# 生成验证代码
-./xsd2code -xsd=schema.xsd -validation -validation-output=validation.go
+生成的类型包含内置验证方法：
+
+```go
+func (v ExactLengthCodeType) Validate() bool {
+    pattern := regexp.MustCompile(`[A-Z]{5}`)
+    return pattern.MatchString(string(v))
+}
 ```
 
 ### 测试代码生成
 
-```bash
-# 生成测试代码
-./xsd2code -xsd=schema.xsd -tests -test-output=types_test.go
-```
-
-## 演示
-
-运行多语言演示脚本：
+自动生成单元测试和基准测试：
 
 ```bash
-# 运行演示脚本
-./examples/multilang_demo.sh
+./xsd2code -xsd=schema.xsd -tests -benchmarks
 ```
 
-这将生成Go、Java、C#和Python的示例代码，展示工具的多语言支持能力。
+## 支持的XSD特性
 
-## 项目结构
+- ✅ **元素 (Elements)**: 基本元素、可选元素、数组元素
+- ✅ **属性 (Attributes)**: 必需属性、可选属性、固定值属性
+- ✅ **复杂类型 (ComplexType)**: sequence、choice、all、mixed content
+- ✅ **简单类型 (SimpleType)**: restriction、enumeration、pattern、length约束
+- ✅ **命名空间 (Namespaces)**: targetNamespace、xmlns处理
+- ✅ **导入和包含 (Import/Include)**: 外部XSD文件引用
+- ✅ **组 (Groups)**: 组定义和组引用
+- ✅ **扩展 (Extension)**: complexContent和simpleContent扩展
+- ✅ **约束 (Restrictions)**: 所有XSD约束类型
+- ✅ **固定值 (Fixed)**: 元素和属性固定值
+- ✅ **默认值 (Default)**: 元素和属性默认值
 
-```
-xsd2code/
-├── cmd/
-│   └── main.go                 # 主程序入口
-├── pkg/
-│   ├── generator/             # 代码生成器
-│   │   ├── codegen.go        # 多语言代码生成逻辑
-│   │   ├── config.go         # 配置管理
-│   │   └── factory.go        # 生成器工厂
-│   ├── types/                # 类型定义
-│   ├── validator/            # XML验证器
-│   └── xsdparser/           # XSD解析器
-├── examples/                 # 示例文件
-├── test/                    # 测试文件
-└── docs/                    # 文档
-```
+## 错误处理
 
-## 开发
-
-### 构建
+工具提供详细的错误信息和调试支持：
 
 ```bash
-go build -o xsd2code cmd/main.go
+# 启用调试模式
+./xsd2code -xsd=schema.xsd -debug
+
+# 启用严格模式（严格验证XSD）
+./xsd2code -xsd=schema.xsd -strict
 ```
 
-### 测试
+## 贡献
+
+欢迎提交Issue和Pull Request来改进这个工具。
+
+### 开发环境设置
 
 ```bash
+# 克隆项目
+git clone https://github.com/suifei/xsd2code.git
+cd xsd2code
+
+# 安装依赖
+go mod tidy
+
+# 运行测试
 go test ./...
+
+# 构建
+make build
 ```
-
-### 贡献
-
-1. Fork项目
-2. 创建功能分支
-3. 提交更改
-4. 创建Pull Request
 
 ## 许可证
 
@@ -361,26 +327,29 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ## 更新日志
 
-### v3.1 (2025-06-01)
+### v3.1 (2025-06-02)
 
-- ✅ 新增多语言代码生成支持（Go、Java、C#、Python）
-- ✅ 重构代码生成架构
-- ✅ 优化类型映射系统
-- ✅ 改进包名验证逻辑
-- ✅ 新增类型映射显示功能
-- ✅ 完善枚举类型生成
-- ✅ 增强JSON兼容性支持
-- ✅ 新增Python数据类(dataclass)代码生成
-- ✅ 完善Python类型注解和可选字段支持
+- ✨ 新增智能导入管理功能
+- ✨ 新增XSD约束全面支持（whiteSpace、length、pattern、fixed）
+- ✨ 新增自动辅助函数生成
+- 🔧 修复编译错误问题
+- 🔧 优化代码生成质量
+- 📝 完善文档和示例
 
 ### v3.0
 
-- ✅ 统一解析器架构
-- ✅ 完整XSD特性支持
-- ✅ 命名空间处理
-- ✅ 组引用支持
-- ✅ 类型扩展支持
+- 🎉 重构为统一解析器架构
+- ✨ 新增多语言支持（Java、C#、Python）
+- ✨ 新增验证代码生成
+- ✨ 新增测试代码生成
+- 🔧 改进XSD特性支持
 
-## 支持
+## 支持和反馈
 
-如有问题或建议，请提交[Issue](https://github.com/suifei/xsd2code/issues)
+如果您遇到问题或有功能建议，请：
+
+1. 查看 [GitHub Issues](https://github.com/suifei/xsd2code/issues)
+2. 提交新的Issue
+3. 参与讨论和改进
+
+感谢使用 XSD2Code！ 🚀

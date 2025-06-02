@@ -428,7 +428,6 @@ func (p *XSDParser) convertSimpleType(xsdType types.XSDSimpleType) (*types.GoTyp
 		goType.MaxExclusive = xsdType.Restriction.MaxExclusive.Value
 		goType.NeedsValidation = true
 	}
-
 	// Handle digit restrictions
 	if xsdType.Restriction.TotalDigits != nil {
 		goType.HasTotalDigits = true
@@ -440,6 +439,21 @@ func (p *XSDParser) convertSimpleType(xsdType types.XSDSimpleType) (*types.GoTyp
 		goType.FractionDigits = xsdType.Restriction.FractionDigits.Value
 		goType.NeedsValidation = true
 	}
+
+	// Handle whiteSpace restriction
+	if xsdType.Restriction.WhiteSpace != nil {
+		goType.HasWhiteSpace = true
+		goType.WhiteSpace = xsdType.Restriction.WhiteSpace.Value
+		goType.NeedsValidation = true
+	}
+
+	// Handle exact length restriction
+	if xsdType.Restriction.Length != nil {
+		goType.HasLength = true
+		goType.Length = xsdType.Restriction.Length.Value
+		goType.NeedsValidation = true
+	}
+
 	// Even if no validation is explicitly needed, we still return the type
 	// so it can be used in references
 	return goType, nil
@@ -772,7 +786,6 @@ func (p *XSDParser) convertElementWithContext(element types.XSDElement, contextP
 			jsonTag += ",omitempty"
 		}
 	}
-
 	field := &types.GoField{
 		Name:       fieldName,
 		Type:       fieldType,
@@ -784,6 +797,15 @@ func (p *XSDParser) convertElementWithContext(element types.XSDElement, contextP
 		IsArray:    isArray,
 		MinOccurs:  min,
 		MaxOccurs:  max,
+	}
+
+	// Handle fixed value for elements
+	if element.Fixed != "" {
+		field.Comment += fmt.Sprintf(" (Fixed value: %s)", element.Fixed)
+		// Store fixed value information in the field
+		if field.Comment == "" {
+			field.Comment = fmt.Sprintf("Fixed value: %s", element.Fixed)
+		}
 	}
 
 	return field, nil
@@ -809,7 +831,6 @@ func (p *XSDParser) convertAttribute(attr types.XSDAttribute) (*types.GoField, e
 			jsonTag += ",omitempty"
 		}
 	}
-
 	field := &types.GoField{
 		Name:        fieldName,
 		Type:        fieldType,
@@ -818,6 +839,15 @@ func (p *XSDParser) convertAttribute(attr types.XSDAttribute) (*types.GoField, e
 		Comment:     types.GetDocumentation(attr.Annotation),
 		IsAttribute: true,
 		IsOptional:  isOptional,
+	}
+
+	// Handle fixed value for attributes
+	if attr.Fixed != "" {
+		field.Comment += fmt.Sprintf(" (Fixed value: %s)", attr.Fixed)
+		// Store fixed value information in the field
+		if field.Comment == "" {
+			field.Comment = fmt.Sprintf("Fixed value: %s", attr.Fixed)
+		}
 	}
 
 	return field, nil

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           targetNamespace="http://example.com/test"
+           xmlns:tns="http://example.com/test"
+           elementFormDefault="qualified">
+
+  <!-- Test whiteSpace restriction -->
+  <xs:simpleType name="CollapsedStringType">
+    <xs:restriction base="xs:string">
+      <xs:whiteSpace value="collapse"/>
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Test exact length restriction -->
+  <xs:simpleType name="ExactLengthCodeType">
+    <xs:restriction base="xs:string">
+      <xs:length value="5"/>
+      <xs:pattern value="[A-Z]{5}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Test multiple numeric restrictions -->
+  <xs:simpleType name="PercentageType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0"/>
+      <xs:maxInclusive value="100.0"/>
+      <xs:fractionDigits value="2"/>
+      <xs:totalDigits value="5"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Test whiteSpace preserve -->
+  <xs:simpleType name="PreservedStringType">
+    <xs:restriction base="xs:string">
+      <xs:whiteSpace value="preserve"/>
+      <xs:maxLength value="255"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Test complex element with fixed value -->
+  <xs:element name="TestDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="code" type="tns:ExactLengthCodeType"/>
+        <xs:element name="percentage" type="tns:PercentageType"/>
+        <xs:element name="description" type="tns:CollapsedStringType"/>
+        <xs:element name="comment" type="tns:PreservedStringType" minOccurs="0"/>
+        <xs:element name="version" type="xs:string" fixed="1.0"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="required"/>
+      <xs:attribute name="created" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="status" fixed="active"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

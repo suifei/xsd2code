@@ -606,87 +606,401 @@ func (v *XSDValidator) validateSimpleTypeContent(simpleType *types.XSDSimpleType
 
 // validateRestrictions validates XSD restrictions
 func (v *XSDValidator) validateRestrictions(restriction *types.XSDRestriction, ctx *ValidationContext) error {
-	// Check if XSDRestriction has Pattern field
-	// Since we're getting a compile error about Patterns not existing,
-	// let's comment this out for now
-
-	// TODO: Implement pattern validation when XSDRestriction structure is complete
-	// for _, pattern := range restriction.Patterns {
-	//     if _, err := regexp.Compile(pattern.Value); err != nil {
-	//         ctx.errors = append(ctx.errors, ValidationError{
-	//             Message: fmt.Sprintf("invalid regex pattern '%s': %v", pattern.Value, err),
-	//             Line:    ctx.line,
-	//             Column:  ctx.column,
-	//         })
-	//     }
-	// }
+	// Validate pattern restriction
+	if restriction.Pattern != nil {
+		if _, err := regexp.Compile(restriction.Pattern.Value); err != nil {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid regex pattern '%s': %v", restriction.Pattern.Value, err),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
 
 	// Validate enumeration restrictions
-	// Validate min/max value restrictions
-	// etc.
+	if len(restriction.Enumerations) > 0 {
+		// Pattern compilation check for enumerations can be added here if needed
+	}
+
+	// Validate length restrictions
+	if restriction.Length != nil {
+		if length, err := strconv.Atoi(restriction.Length.Value); err != nil || length < 0 {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid length value '%s': must be a non-negative integer", restriction.Length.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	// Validate minLength restrictions
+	if restriction.MinLength != nil {
+		if minLength, err := strconv.Atoi(restriction.MinLength.Value); err != nil || minLength < 0 {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid minLength value '%s': must be a non-negative integer", restriction.MinLength.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	// Validate maxLength restrictions
+	if restriction.MaxLength != nil {
+		if maxLength, err := strconv.Atoi(restriction.MaxLength.Value); err != nil || maxLength < 0 {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid maxLength value '%s': must be a non-negative integer", restriction.MaxLength.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	// Validate whiteSpace restriction
+	if restriction.WhiteSpace != nil {
+		validWhiteSpaceValues := []string{"preserve", "replace", "collapse"}
+		isValid := false
+		for _, valid := range validWhiteSpaceValues {
+			if restriction.WhiteSpace.Value == valid {
+				isValid = true
+				break
+			}
+		}
+		if !isValid {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid whiteSpace value '%s': must be one of preserve, replace, collapse", restriction.WhiteSpace.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	// Validate numeric range restrictions
+	if restriction.MinInclusive != nil {
+		if _, err := strconv.ParseFloat(restriction.MinInclusive.Value, 64); err != nil {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid minInclusive value '%s': must be a valid number", restriction.MinInclusive.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	if restriction.MaxInclusive != nil {
+		if _, err := strconv.ParseFloat(restriction.MaxInclusive.Value, 64); err != nil {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid maxInclusive value '%s': must be a valid number", restriction.MaxInclusive.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	if restriction.MinExclusive != nil {
+		if _, err := strconv.ParseFloat(restriction.MinExclusive.Value, 64); err != nil {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid minExclusive value '%s': must be a valid number", restriction.MinExclusive.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	if restriction.MaxExclusive != nil {
+		if _, err := strconv.ParseFloat(restriction.MaxExclusive.Value, 64); err != nil {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid maxExclusive value '%s': must be a valid number", restriction.MaxExclusive.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	// Validate digit restrictions
+	if restriction.TotalDigits != nil {
+		if totalDigits, err := strconv.Atoi(restriction.TotalDigits.Value); err != nil || totalDigits <= 0 {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid totalDigits value '%s': must be a positive integer", restriction.TotalDigits.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	if restriction.FractionDigits != nil {
+		if fractionDigits, err := strconv.Atoi(restriction.FractionDigits.Value); err != nil || fractionDigits < 0 {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid fractionDigits value '%s': must be a non-negative integer", restriction.FractionDigits.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	// Cross-validation between restrictions
+	if restriction.MinLength != nil && restriction.MaxLength != nil {
+		minLength, _ := strconv.Atoi(restriction.MinLength.Value)
+		maxLength, _ := strconv.Atoi(restriction.MaxLength.Value)
+		if minLength > maxLength {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("minLength (%d) cannot be greater than maxLength (%d)", minLength, maxLength),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
+
+	if restriction.MinInclusive != nil && restriction.MaxInclusive != nil {
+		minValue, _ := strconv.ParseFloat(restriction.MinInclusive.Value, 64)
+		maxValue, _ := strconv.ParseFloat(restriction.MaxInclusive.Value, 64)
+		if minValue > maxValue {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("minInclusive (%s) cannot be greater than maxInclusive (%s)", restriction.MinInclusive.Value, restriction.MaxInclusive.Value),
+				Line:    ctx.line,
+				Column:  ctx.column,
+			})
+		}
+	}
 
 	return nil
 }
 
-// validateOccurrenceConstraints validates minOccurs and maxOccurs constraints
-func (v *XSDValidator) validateOccurrenceConstraints(elementDef *types.XSDElement, ctx *ValidationContext) error {
-	min, max := types.ParseOccurs(elementDef.MinOccurs, elementDef.MaxOccurs)
-
-	// Basic sanity checks
-	if min < 0 {
-		ctx.errors = append(ctx.errors, ValidationError{
-			Message: fmt.Sprintf("invalid minOccurs value %d for element '%s'", min, elementDef.Name),
-			Line:    ctx.line,
-			Column:  ctx.column,
-			Element: elementDef.Name,
-		})
+// validateStringValue validates a string value against XSD restrictions
+func (v *XSDValidator) validateStringValue(value string, restriction *types.XSDRestriction, fieldName string, ctx *ValidationContext) error {
+	if restriction == nil {
+		return nil
 	}
 
-	if max != -1 && max < min {
-		ctx.errors = append(ctx.errors, ValidationError{
-			Message: fmt.Sprintf("maxOccurs (%d) is less than minOccurs (%d) for element '%s'", max, min, elementDef.Name),
-			Line:    ctx.line,
-			Column:  ctx.column,
-			Element: elementDef.Name,
-		})
+	// Validate against pattern restriction
+	if restriction.Pattern != nil {
+		matched, err := regexp.MatchString(restriction.Pattern.Value, value)
+		if err != nil {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("invalid pattern '%s' for field '%s'", restriction.Pattern.Value, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		} else if !matched {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' does not match pattern '%s' for field '%s'", value, restriction.Pattern.Value, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		}
+	}
+
+	// Validate against enumeration restriction
+	if len(restriction.Enumerations) > 0 {
+		found := false
+		for _, enum := range restriction.Enumerations {
+			if enum.Value == value {
+				found = true
+				break
+			}
+		}
+		if !found {
+			validValues := make([]string, len(restriction.Enumerations))
+			for i, enum := range restriction.Enumerations {
+				validValues[i] = enum.Value
+			}
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' is not in enumeration [%s] for field '%s'", value, strings.Join(validValues, ", "), fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		}
+	}
+
+	// Apply whiteSpace processing before length validation
+	processedValue := v.applyWhiteSpaceProcessing(value, restriction)
+
+	// Validate exact length restriction
+	if restriction.Length != nil {
+		expectedLength, _ := strconv.Atoi(restriction.Length.Value)
+		if len(processedValue) != expectedLength {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' length (%d) does not match required length (%d) for field '%s'", value, len(processedValue), expectedLength, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		}
+	}
+
+	// Validate minLength restriction
+	if restriction.MinLength != nil {
+		minLength, _ := strconv.Atoi(restriction.MinLength.Value)
+		if len(processedValue) < minLength {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' length (%d) is less than minimum length (%d) for field '%s'", value, len(processedValue), minLength, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		}
+	}
+
+	// Validate maxLength restriction
+	if restriction.MaxLength != nil {
+		maxLength, _ := strconv.Atoi(restriction.MaxLength.Value)
+		if len(processedValue) > maxLength {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' length (%d) exceeds maximum length (%d) for field '%s'", value, len(processedValue), maxLength, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		}
 	}
 
 	return nil
 }
 
-// isValidType checks if a type is valid (built-in or defined in schema)
-func (v *XSDValidator) isValidType(typeName string) bool {
-	// Check built-in types
-	builtinTypes := []string{
-		"string", "int", "integer", "decimal", "float", "double", "boolean",
-		"date", "dateTime", "time", "duration", "base64Binary", "hexBinary",
-		"anyURI", "QName", "NOTATION", "normalizedString", "token", "language",
-		"NMTOKEN", "NMTOKENS", "Name", "NCName", "ID", "IDREF", "IDREFS", "ENTITY", "ENTITIES",
-		"byte", "unsignedByte", "short", "unsignedShort", "long", "unsignedLong",
-		"positiveInteger", "nonPositiveInteger", "negativeInteger", "nonNegativeInteger",
-		"gYear", "gYearMonth", "gMonth", "gMonthDay", "gDay",
+// validateNumericValue validates a numeric value against XSD restrictions
+func (v *XSDValidator) validateNumericValue(value string, restriction *types.XSDRestriction, fieldName string, ctx *ValidationContext) error {
+	if restriction == nil {
+		return nil
 	}
 
-	for _, builtin := range builtinTypes {
-		if typeName == builtin || typeName == "xs:"+builtin || typeName == "xsd:"+builtin {
-			return true
+	numValue, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		ctx.errors = append(ctx.errors, ValidationError{
+			Message: fmt.Sprintf("value '%s' is not a valid number for field '%s'", value, fieldName),
+			Line:    ctx.line,
+			Column:  ctx.column,
+			Element: fieldName,
+		})
+		return nil
+	}
+
+	// Validate minInclusive restriction
+	if restriction.MinInclusive != nil {
+		minValue, _ := strconv.ParseFloat(restriction.MinInclusive.Value, 64)
+		if numValue < minValue {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' (%f) is less than minimum inclusive value (%f) for field '%s'", value, numValue, minValue, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
 		}
 	}
 
-	// Check schema-defined types
-	for _, complexType := range v.schema.ComplexTypes {
-		if complexType.Name == typeName {
-			return true
+	// Validate maxInclusive restriction
+	if restriction.MaxInclusive != nil {
+		maxValue, _ := strconv.ParseFloat(restriction.MaxInclusive.Value, 64)
+		if numValue > maxValue {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' (%f) exceeds maximum inclusive value (%f) for field '%s'", value, numValue, maxValue, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
 		}
 	}
 
-	for _, simpleType := range v.schema.SimpleTypes {
-		if simpleType.Name == typeName {
-			return true
+	// Validate minExclusive restriction
+	if restriction.MinExclusive != nil {
+		minValue, _ := strconv.ParseFloat(restriction.MinExclusive.Value, 64)
+		if numValue <= minValue {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' (%f) is not greater than minimum exclusive value (%f) for field '%s'", value, numValue, minValue, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
 		}
 	}
 
-	return false
+	// Validate maxExclusive restriction
+	if restriction.MaxExclusive != nil {
+		maxValue, _ := strconv.ParseFloat(restriction.MaxExclusive.Value, 64)
+		if numValue >= maxValue {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' (%f) is not less than maximum exclusive value (%f) for field '%s'", value, numValue, maxValue, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		}
+	}
+
+	// Validate totalDigits restriction
+	if restriction.TotalDigits != nil {
+		totalDigits, _ := strconv.Atoi(restriction.TotalDigits.Value)
+		digitStr := strings.ReplaceAll(strings.ReplaceAll(value, ".", ""), "-", "")
+		if len(digitStr) > totalDigits {
+			ctx.errors = append(ctx.errors, ValidationError{
+				Message: fmt.Sprintf("value '%s' has %d total digits, maximum allowed is %d for field '%s'", value, len(digitStr), totalDigits, fieldName),
+				Line:    ctx.line,
+				Column:  ctx.column,
+				Element: fieldName,
+			})
+		}
+	}
+
+	// Validate fractionDigits restriction
+	if restriction.FractionDigits != nil {
+		fractionDigits, _ := strconv.Atoi(restriction.FractionDigits.Value)
+		if dotIndex := strings.Index(value, "."); dotIndex != -1 {
+			actualFractionDigits := len(value) - dotIndex - 1
+			if actualFractionDigits > fractionDigits {
+				ctx.errors = append(ctx.errors, ValidationError{
+					Message: fmt.Sprintf("value '%s' has %d fraction digits, maximum allowed is %d for field '%s'", value, actualFractionDigits, fractionDigits, fieldName),
+					Line:    ctx.line,
+					Column:  ctx.column,
+					Element: fieldName,
+				})
+			}
+		}
+	}
+
+	return nil
+}
+
+// validateFixedValue validates that a value matches a fixed value constraint
+func (v *XSDValidator) validateFixedValue(value, fixedValue, fieldName string, ctx *ValidationContext) error {
+	if fixedValue != "" && value != fixedValue {
+		ctx.errors = append(ctx.errors, ValidationError{
+			Message: fmt.Sprintf("value '%s' does not match fixed value '%s' for field '%s'", value, fixedValue, fieldName),
+			Line:    ctx.line,
+			Column:  ctx.column,
+			Element: fieldName,
+		})
+	}
+	return nil
+}
+
+// applyWhiteSpaceProcessing applies whiteSpace facet processing to a value
+func (v *XSDValidator) applyWhiteSpaceProcessing(value string, restriction *types.XSDRestriction) string {
+	if restriction == nil || restriction.WhiteSpace == nil {
+		return value
+	}
+
+	switch restriction.WhiteSpace.Value {
+	case "replace":
+		// Replace all occurrences of #x9 (tab), #xA (line feed) and #xD (carriage return) with a single space
+		value = strings.ReplaceAll(value, "\t", " ")
+		value = strings.ReplaceAll(value, "\n", " ")
+		value = strings.ReplaceAll(value, "\r", " ")
+		return value
+	case "collapse":
+		// First apply replace processing
+		value = strings.ReplaceAll(value, "\t", " ")
+		value = strings.ReplaceAll(value, "\n", " ")
+		value = strings.ReplaceAll(value, "\r", " ")
+		// Then collapse sequences of spaces to a single space and trim leading/trailing spaces
+		value = regexp.MustCompile(`\s+`).ReplaceAllString(value, " ")
+		value = strings.TrimSpace(value)
+		return value
+	case "preserve":
+		fallthrough
+	default:
+		// Preserve all whitespace as-is
+		return value
+	}
 }
 
 // GenerateValidationReport generates a detailed validation report
@@ -824,4 +1138,65 @@ func (r *ValidationReport) String() string {
 	}
 
 	return builder.String()
+}
+
+// validateOccurrenceConstraints validates minOccurs and maxOccurs constraints
+func (v *XSDValidator) validateOccurrenceConstraints(elementDef *types.XSDElement, ctx *ValidationContext) error {
+	min, max := types.ParseOccurs(elementDef.MinOccurs, elementDef.MaxOccurs)
+
+	// Basic sanity checks
+	if min < 0 {
+		ctx.errors = append(ctx.errors, ValidationError{
+			Message: fmt.Sprintf("invalid minOccurs value %d for element '%s'", min, elementDef.Name),
+			Line:    ctx.line,
+			Column:  ctx.column,
+			Element: elementDef.Name,
+		})
+	}
+
+	if max != -1 && max < min {
+		ctx.errors = append(ctx.errors, ValidationError{
+			Message: fmt.Sprintf("maxOccurs (%d) is less than minOccurs (%d) for element '%s'", max, min, elementDef.Name),
+			Line:    ctx.line,
+			Column:  ctx.column,
+			Element: elementDef.Name,
+		})
+	}
+
+	return nil
+}
+
+// isValidType checks if a type is valid (built-in or defined in schema)
+func (v *XSDValidator) isValidType(typeName string) bool {
+	// Check built-in types
+	builtinTypes := []string{
+		"string", "int", "integer", "decimal", "float", "double", "boolean",
+		"date", "dateTime", "time", "duration", "base64Binary", "hexBinary",
+		"anyURI", "QName", "NOTATION", "normalizedString", "token", "language",
+		"NMTOKEN", "NMTOKENS", "Name", "NCName", "ID", "IDREF", "IDREFS", "ENTITY", "ENTITIES",
+		"byte", "unsignedByte", "short", "unsignedShort", "long", "unsignedLong",
+		"positiveInteger", "nonPositiveInteger", "negativeInteger", "nonNegativeInteger",
+		"gYear", "gYearMonth", "gMonth", "gMonthDay", "gDay",
+	}
+
+	for _, builtin := range builtinTypes {
+		if typeName == builtin || typeName == "xs:"+builtin || typeName == "xsd:"+builtin {
+			return true
+		}
+	}
+
+	// Check schema-defined types
+	for _, complexType := range v.schema.ComplexTypes {
+		if complexType.Name == typeName {
+			return true
+		}
+	}
+
+	for _, simpleType := range v.schema.SimpleTypes {
+		if simpleType.Name == typeName {
+			return true
+		}
+	}
+
+	return false
 }
