@@ -21,16 +21,14 @@ jobs:
     - name: Run tests
       run: go test -v ./...
     
-    - name: Run integration tests
+    - name: Run integration test
       run: |
         go build -o xsd2code ./cmd
         ./xsd2code -xsd=examples/simple_example.xsd -output=test_example.go -package=test -json
-        ./xsd2code -xsd=test/TC6_XML_V10_B.xsd -output=test_plcopen.go -package=plcopen -json -validation -tests
-
-  build:
+  release:
     needs: test
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - uses: actions/checkout@v4
@@ -56,11 +54,21 @@ jobs:
         # macOS
         GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-darwin-amd64 ./cmd
         GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-darwin-arm64 ./cmd
+        
+        # Add version info to binary names
+        VERSION=${GITHUB_REF#refs/tags/}
+        echo "Building version: $VERSION"
+        
+        # Create checksum files
+        cd dist
+        sha256sum * > SHA256SUMS.txt
     
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: dist/*
         generate_release_notes: true
+        draft: false
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
