@@ -16,31 +16,35 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22.3'
-      - name: Run tests
-        run: go test -v ./...
-      - name: Run integration test
-        run: |
-          go build -o xsd2code ./cmd
-          ./xsd2code -xsd=docs/TC6_XML_V10_B.xsd -output=tc6_xml_v10_b.go -package=test -json
-
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.22
+    
+    - name: Run tests
+      run: go test -v ./...
+    
+    - name: Run integration test
+      run: |
+        go build -o xsd2code ./cmd
+        ./xsd2code -xsd=docs/TC6_XML_V10_B.xsd -output=tc6_xml_v10_b.go -package=test -json
   release:
     needs: test
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-      steps:
-      - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22.3'
-        
-      - name: Build for multiple platforms
-        run: |
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.22
+    
+    - name: Build for multiple platforms
+      run: |
           set -e  # Exit on any error
           mkdir -p dist
           
@@ -147,56 +151,66 @@ jobs:
           else
             echo "No artifacts were built successfully!"
           fi
+    
+    # - name: Create Release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     files: dist/*
+    #     generate_release_notes: true
+    #     draft: false
+    #     prerelease: false
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+        body: |
+          ## XSD2Code ${{ github.ref_name }} 🚀
           
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: dist/*
-          generate_release_notes: true
-          draft: false
-          prerelease: false
-          body: |
-            ## XSD2Code ${{ github.ref_name }} 🚀
-            
-            通用XSD到多语言代码转换工具 - 新版本发布！
-            
-            ### 📦 下载说明
-            
-            选择适合您系统的版本：
-            
-            | 操作系统 | 架构 | 下载文件 |
-            |---------|------|----------|
-            | **Windows** | x64 | `xsd2code-${{ github.ref_name }}-windows-amd64.zip` |
-            | **Windows** | x86 | `xsd2code-${{ github.ref_name }}-windows-386.zip` |
-            | **Windows** | ARM64 | `xsd2code-${{ github.ref_name }}-windows-arm64.zip` |
-            | **Linux** | x64 | `xsd2code-${{ github.ref_name }}-linux-amd64.tar.gz` |
-            | **Linux** | ARM64 | `xsd2code-${{ github.ref_name }}-linux-arm64.tar.gz` |
-            | **macOS** | Intel | `xsd2code-${{ github.ref_name }}-darwin-amd64.tar.gz` |
-            | **macOS** | Apple Silicon | `xsd2code-${{ github.ref_name }}-darwin-arm64.tar.gz` |
-            
-            ### 🛡️ 安全验证
-            
-            使用 `SHA256SUMS.txt` 文件验证下载的文件完整性：
-            
-            ```bash
-            # Linux/macOS
-            sha256sum -c SHA256SUMS.txt
-            
-            # Windows (PowerShell)
-            Get-FileHash filename.zip -Algorithm SHA256
-            ```
-            
-            ### 🚀 快速开始
-            
-            ```bash
-            # 下载并解压后
-            ./xsd2code -xsd=your-schema.xsd -lang=go -output=generated.go
-            ```
-            
-            更多使用方法请查看 [文档](https://github.com/suifei/xsd2code/wiki)
-            
-            ### 📋 完整更新日志
-            
-            详细的更新内容请查看 [CHANGELOG.md](https://github.com/suifei/xsd2code/blob/main/CHANGELOG.md)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          通用XSD到多语言代码转换工具 - 新版本发布！
+          
+          ### 📦 下载说明
+          
+          选择适合您系统的版本：
+          
+          | 操作系统 | 架构 | 下载文件 |
+          |---------|------|----------|
+          | **Windows** | x64 | `xsd2code-${{ github.ref_name }}-windows-amd64.zip` |
+          | **Windows** | x86 | `xsd2code-${{ github.ref_name }}-windows-386.zip` |
+          | **Windows** | ARM64 | `xsd2code-${{ github.ref_name }}-windows-arm64.zip` |
+          | **Linux** | x64 | `xsd2code-${{ github.ref_name }}-linux-amd64.tar.gz` |
+          | **Linux** | ARM64 | `xsd2code-${{ github.ref_name }}-linux-arm64.tar.gz` |
+          | **macOS** | Intel | `xsd2code-${{ github.ref_name }}-darwin-amd64.tar.gz` |
+          | **macOS** | Apple Silicon | `xsd2code-${{ github.ref_name }}-darwin-arm64.tar.gz` |
+          
+          ### 🛡️ 安全验证
+          
+          使用 `SHA256SUMS.txt` 文件验证下载的文件完整性：
+          
+          ```bash
+          # Linux/macOS
+          sha256sum -c SHA256SUMS.txt
+          
+          # Windows (PowerShell)
+          Get-FileHash filename.zip -Algorithm SHA256
+          ```
+          
+          ### 🚀 快速开始
+          
+          ```bash
+          # 下载并解压后
+          ./xsd2code -xsd=your-schema.xsd -lang=go -output=generated.go
+          ```
+          
+          更多使用方法请查看 [文档](https://github.com/suifei/xsd2code/wiki)
+          
+          ### 📋 完整更新日志
+          
+          详细的更新内容请查看 [CHANGELOG.md](https://github.com/suifei/xsd2code/blob/main/CHANGELOG.md)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
