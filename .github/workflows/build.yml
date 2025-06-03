@@ -12,7 +12,8 @@ permissions:
   contents: write  # 这允许推送到存储库，包括创建releases
   pull-requests: write  # 如果需要评论PR等
   
-jobs:  test:
+jobs:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -28,15 +29,15 @@ jobs:  test:
     - name: Run integration test
       run: |
         go build -o xsd2code ./cmd
-        ./xsd2code -xsd=docs/TC6_XML_V10_B.xsd -output=tc6_xml_v10_b.go -package=test -json
-  release:
+        ./xsd2code -xsd=docs/TC6_XML_V10_B.xsd -output=tc6_xml_v10_b.go -package=test -json  release:
     needs: test
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - uses: actions/checkout@v4
-      - name: Set up Go
+    
+    - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.22.3'
@@ -137,9 +138,7 @@ jobs:  test:
           fi
         done
         
-        cd ..
-
-        echo "=== Creating Checksums ==="
+        cd ..        echo "=== Creating Checksums ==="
         # Create checksum files
         cd dist
         if [ -n "$(ls -A .)" ]; then
@@ -147,7 +146,8 @@ jobs:  test:
           echo "Built $(ls -1 | wc -l) artifacts:"
           ls -la
         else
-          echo "No artifacts were built successfully!"        fi
+          echo "No artifacts were built successfully!"
+        fi
         
     - name: Create Release
       uses: softprops/action-gh-release@v1
