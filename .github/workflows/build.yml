@@ -16,188 +16,187 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22.3'
-    
-    - name: Run tests
-      run: go test -v ./...
-    
-    - name: Run integration test
-      run: |
-        go build -o xsd2code ./cmd
-        ./xsd2code -xsd=docs/TC6_XML_V10_B.xsd -output=tc6_xml_v10_b.go -package=test -json  release:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.3'
+      - name: Run tests
+        run: go test -v ./...
+      - name: Run integration test
+        run: |
+          go build -o xsd2code ./cmd
+          ./xsd2code -xsd=docs/TC6_XML_V10_B.xsd -output=tc6_xml_v10_b.go -package=test -json
+
+  release:
     needs: test
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22.3'
+      steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.3'
         
-    - name: Build for multiple platforms
-      run: |
-        set -e  # Exit on any error
-        mkdir -p dist
-        
-        # Add version info to binary names
-        VERSION=${GITHUB_REF#refs/tags/}
-        echo "Building version: $VERSION"
-        
-        # Function to build with error handling
-        build_target() {
-          local goos=$1
-          local goarch=$2
-          local suffix=$3
-          local output="dist/xsd2code-$VERSION-$goos-$goarch$suffix"
+      - name: Build for multiple platforms
+        run: |
+          set -e  # Exit on any error
+          mkdir -p dist
           
-          echo "Building $goos/$goarch..."
-          if ! GOOS=$goos GOARCH=$goarch go build -ldflags="-s -w" -o "$output" ./cmd; then
-            echo "Warning: Failed to build $goos/$goarch, skipping..."
-            return 1
+          # Add version info to binary names
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "Building version: $VERSION"
+          
+          # Function to build with error handling
+          build_target() {
+            local goos=$1
+            local goarch=$2
+            local suffix=$3
+            local output="dist/xsd2code-$VERSION-$goos-$goarch$suffix"
+            
+            echo "Building $goos/$goarch..."
+            if ! GOOS=$goos GOARCH=$goarch go build -ldflags="-s -w" -o "$output" ./cmd; then
+              echo "Warning: Failed to build $goos/$goarch, skipping..."
+              return 1
+            fi
+            echo "✓ Successfully built $goos/$goarch"
+            return 0
+          }
+          
+          # Core platforms (most commonly used)
+          echo "=== Building Core Platforms ==="
+          
+          # Linux (most popular server OS)
+          build_target linux amd64 ""
+          build_target linux arm64 ""
+          build_target linux 386 ""
+          build_target linux arm ""
+          
+          # Windows (most popular desktop OS)
+          build_target windows amd64 ".exe"
+          build_target windows 386 ".exe"
+          build_target windows arm64 ".exe"
+          
+          # macOS (popular development platform)
+          build_target darwin amd64 ""
+          build_target darwin arm64 ""
+          
+          echo "=== Building Extended Platforms ==="
+          
+          # FreeBSD (popular server alternative)
+          build_target freebsd amd64 "" || true
+          build_target freebsd 386 "" || true
+          build_target freebsd arm64 "" || true
+          
+          # OpenBSD
+          build_target openbsd amd64 "" || true
+          build_target openbsd 386 "" || true
+          
+          # NetBSD
+          build_target netbsd amd64 "" || true
+          build_target netbsd 386 "" || true
+          
+          # Other architectures for Linux
+          build_target linux ppc64le "" || true
+          build_target linux s390x "" || true
+          build_target linux riscv64 "" || true
+          
+          # Special platforms
+          echo "=== Building Special Platforms ==="
+          
+          # WebAssembly
+          build_target js wasm ".wasm" || true
+          
+          # AIX (enterprise)
+          build_target aix ppc64 "" || true
+          
+          # Solaris
+          build_target solaris amd64 "" || true
+          
+          echo "=== Creating Archives ==="
+          
+          # Create tar.gz files for Unix-like systems
+          cd dist
+          for file in xsd2code-$VERSION-*; do
+            if [[ -f "$file" && "$file" != *.exe && "$file" != *.wasm && "$file" != *.tar.gz && "$file" != *.zip ]]; then
+              echo "Creating archive for $file..."
+              tar -czf "${file}.tar.gz" "$file"
+              rm "$file"
+            fi
+          done
+          
+          # Create zip files for Windows executables
+          for file in *.exe; do
+            if [[ -f "$file" ]]; then
+              echo "Creating zip for $file..."
+              zip "${file%.exe}.zip" "$file"
+              rm "$file"
+            fi        
+          done
+          
+          cd ..
+
+          echo "=== Creating Checksums ==="
+          # Create checksum files
+          cd dist
+          if [ -n "$(ls -A .)" ]; then
+            sha256sum * > SHA256SUMS.txt
+            echo "Built $(ls -1 | wc -l) artifacts:"
+            ls -la
+          else
+            echo "No artifacts were built successfully!"
           fi
-          echo "✓ Successfully built $goos/$goarch"
-          return 0
-        }
-        
-        # Core platforms (most commonly used)
-        echo "=== Building Core Platforms ==="
-        
-        # Linux (most popular server OS)
-        build_target linux amd64 ""
-        build_target linux arm64 ""
-        build_target linux 386 ""
-        build_target linux arm ""
-        
-        # Windows (most popular desktop OS)
-        build_target windows amd64 ".exe"
-        build_target windows 386 ".exe"
-        build_target windows arm64 ".exe"
-        
-        # macOS (popular development platform)
-        build_target darwin amd64 ""
-        build_target darwin arm64 ""
-        
-        echo "=== Building Extended Platforms ==="
-        
-        # FreeBSD (popular server alternative)
-        build_target freebsd amd64 "" || true
-        build_target freebsd 386 "" || true
-        build_target freebsd arm64 "" || true
-        
-        # OpenBSD
-        build_target openbsd amd64 "" || true
-        build_target openbsd 386 "" || true
-        
-        # NetBSD
-        build_target netbsd amd64 "" || true
-        build_target netbsd 386 "" || true
-        
-        # Other architectures for Linux
-        build_target linux ppc64le "" || true
-        build_target linux s390x "" || true
-        build_target linux riscv64 "" || true
-        
-        # Special platforms
-        echo "=== Building Special Platforms ==="
-        
-        # WebAssembly
-        build_target js wasm ".wasm" || true
-        
-        # AIX (enterprise)
-        build_target aix ppc64 "" || true
-        
-        # Solaris
-        build_target solaris amd64 "" || true
-        
-        echo "=== Creating Archives ==="
-        
-        # Create tar.gz files for Unix-like systems
-        cd dist
-        for file in xsd2code-$VERSION-*; do
-          if [[ -f "$file" && "$file" != *.exe && "$file" != *.wasm && "$file" != *.tar.gz && "$file" != *.zip ]]; then
-            echo "Creating archive for $file..."
-            tar -czf "${file}.tar.gz" "$file"
-            rm "$file"
-          fi
-        done
-        
-        # Create zip files for Windows executables
-        for file in *.exe; do
-          if [[ -f "$file" ]]; then
-            echo "Creating zip for $file..."
-            zip "${file%.exe}.zip" "$file"
-            rm "$file"
-          fi
-        done
-        
-        cd ..        echo "=== Creating Checksums ==="
-        # Create checksum files
-        cd dist
-        if [ -n "$(ls -A .)" ]; then
-          sha256sum * > SHA256SUMS.txt
-          echo "Built $(ls -1 | wc -l) artifacts:"
-          ls -la
-        else
-          echo "No artifacts were built successfully!"
-        fi
-        
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: dist/*
-        generate_release_notes: true
-        draft: false
-        prerelease: false
-        body: |
-          ## XSD2Code ${{ github.ref_name }} 🚀
           
-          通用XSD到多语言代码转换工具 - 新版本发布！
-          
-          ### 📦 下载说明
-          
-          选择适合您系统的版本：
-          
-          | 操作系统 | 架构 | 下载文件 |
-          |---------|------|----------|
-          | **Windows** | x64 | `xsd2code-${{ github.ref_name }}-windows-amd64.zip` |
-          | **Windows** | x86 | `xsd2code-${{ github.ref_name }}-windows-386.zip` |
-          | **Windows** | ARM64 | `xsd2code-${{ github.ref_name }}-windows-arm64.zip` |
-          | **Linux** | x64 | `xsd2code-${{ github.ref_name }}-linux-amd64.tar.gz` |
-          | **Linux** | ARM64 | `xsd2code-${{ github.ref_name }}-linux-arm64.tar.gz` |
-          | **macOS** | Intel | `xsd2code-${{ github.ref_name }}-darwin-amd64.tar.gz` |
-          | **macOS** | Apple Silicon | `xsd2code-${{ github.ref_name }}-darwin-arm64.tar.gz` |
-          
-          ### 🛡️ 安全验证
-          
-          使用 `SHA256SUMS.txt` 文件验证下载的文件完整性：
-          
-          ```bash
-          # Linux/macOS
-          sha256sum -c SHA256SUMS.txt
-          
-          # Windows (PowerShell)
-          Get-FileHash filename.zip -Algorithm SHA256
-          ```
-          
-          ### 🚀 快速开始
-          
-          ```bash
-          # 下载并解压后
-          ./xsd2code -xsd=your-schema.xsd -lang=go -output=generated.go
-          ```
-          
-          更多使用方法请查看 [文档](https://github.com/suifei/xsd2code/wiki)
-          
-          ### 📋 完整更新日志
-          
-          详细的更新内容请查看 [CHANGELOG.md](https://github.com/suifei/xsd2code/blob/main/CHANGELOG.md)
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          body: |
+            ## XSD2Code ${{ github.ref_name }} 🚀
+            
+            通用XSD到多语言代码转换工具 - 新版本发布！
+            
+            ### 📦 下载说明
+            
+            选择适合您系统的版本：
+            
+            | 操作系统 | 架构 | 下载文件 |
+            |---------|------|----------|
+            | **Windows** | x64 | `xsd2code-${{ github.ref_name }}-windows-amd64.zip` |
+            | **Windows** | x86 | `xsd2code-${{ github.ref_name }}-windows-386.zip` |
+            | **Windows** | ARM64 | `xsd2code-${{ github.ref_name }}-windows-arm64.zip` |
+            | **Linux** | x64 | `xsd2code-${{ github.ref_name }}-linux-amd64.tar.gz` |
+            | **Linux** | ARM64 | `xsd2code-${{ github.ref_name }}-linux-arm64.tar.gz` |
+            | **macOS** | Intel | `xsd2code-${{ github.ref_name }}-darwin-amd64.tar.gz` |
+            | **macOS** | Apple Silicon | `xsd2code-${{ github.ref_name }}-darwin-arm64.tar.gz` |
+            
+            ### 🛡️ 安全验证
+            
+            使用 `SHA256SUMS.txt` 文件验证下载的文件完整性：
+            
+            ```bash
+            # Linux/macOS
+            sha256sum -c SHA256SUMS.txt
+            
+            # Windows (PowerShell)
+            Get-FileHash filename.zip -Algorithm SHA256
+            ```
+            
+            ### 🚀 快速开始
+            
+            ```bash
+            # 下载并解压后
+            ./xsd2code -xsd=your-schema.xsd -lang=go -output=generated.go
+            ```
+            
+            更多使用方法请查看 [文档](https://github.com/suifei/xsd2code/wiki)
+            
+            ### 📋 完整更新日志
+            
+            详细的更新内容请查看 [CHANGELOG.md](https://github.com/suifei/xsd2code/blob/main/CHANGELOG.md)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
