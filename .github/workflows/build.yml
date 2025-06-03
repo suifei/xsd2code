@@ -47,23 +47,101 @@ jobs:
       run: |
         mkdir -p dist
         
-        # Windows
-        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-windows-amd64.exe ./cmd
-        GOOS=windows GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-windows-386.exe ./cmd
-        
-        # Linux
-        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-linux-amd64 ./cmd
-        GOOS=linux GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-linux-386 ./cmd
-        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-linux-arm64 ./cmd
-        
-        # macOS
-        GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-darwin-amd64 ./cmd
-        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-darwin-arm64 ./cmd
-        
         # Add version info to binary names
         VERSION=${GITHUB_REF#refs/tags/}
         echo "Building version: $VERSION"
+        # AIX
+        GOOS=aix GOARCH=ppc64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-aix-ppc64 ./cmd
         
+        # Android
+        GOOS=android GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-386 ./cmd
+        GOOS=android GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-amd64 ./cmd
+        GOOS=android GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-arm ./cmd
+        GOOS=android GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-arm64 ./cmd
+        
+        # Darwin (macOS)
+        GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-darwin-amd64 ./cmd
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-darwin-arm64 ./cmd
+        
+        # DragonFly BSD
+        GOOS=dragonfly GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-dragonfly-amd64 ./cmd
+        
+        # FreeBSD
+        GOOS=freebsd GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-freebsd-386 ./cmd
+        GOOS=freebsd GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-freebsd-amd64 ./cmd
+        GOOS=freebsd GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-freebsd-arm ./cmd
+        
+        # Illumos
+        GOOS=illumos GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-illumos-amd64 ./cmd
+        
+        # iOS
+        GOOS=ios GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-ios-arm64 ./cmd
+        
+        # JavaScript/WebAssembly
+        GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-js-wasm.wasm ./cmd
+        
+        # Linux
+        GOOS=linux GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-386 ./cmd
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-amd64 ./cmd
+        GOOS=linux GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-arm ./cmd
+        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-arm64 ./cmd
+        GOOS=linux GOARCH=loong64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-loong64 ./cmd
+        GOOS=linux GOARCH=mips go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mips ./cmd
+        GOOS=linux GOARCH=mipsle go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mipsle ./cmd
+        GOOS=linux GOARCH=mips64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mips64 ./cmd
+        GOOS=linux GOARCH=mips64le go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mips64le ./cmd
+        GOOS=linux GOARCH=ppc64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-ppc64 ./cmd
+        GOOS=linux GOARCH=ppc64le go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-ppc64le ./cmd
+        GOOS=linux GOARCH=riscv64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-riscv64 ./cmd
+        GOOS=linux GOARCH=s390x go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-s390x ./cmd
+        
+        # NetBSD
+        GOOS=netbsd GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-netbsd-386 ./cmd
+        GOOS=netbsd GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-netbsd-amd64 ./cmd
+        GOOS=netbsd GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-netbsd-arm ./cmd
+        
+        # OpenBSD
+        GOOS=openbsd GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-386 ./cmd
+        GOOS=openbsd GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-amd64 ./cmd
+        GOOS=openbsd GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-arm ./cmd
+        GOOS=openbsd GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-arm64 ./cmd
+        
+        # Plan 9
+        GOOS=plan9 GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-plan9-386 ./cmd
+        GOOS=plan9 GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-plan9-amd64 ./cmd
+        GOOS=plan9 GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-plan9-arm ./cmd
+        
+        # Solaris
+        GOOS=solaris GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-solaris-amd64 ./cmd
+        
+        # WASI
+        GOOS=wasip1 GOARCH=wasm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-wasip1-wasm.wasm ./cmd
+        
+        # Windows
+        GOOS=windows GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-386.exe ./cmd
+        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-amd64.exe ./cmd
+        GOOS=windows GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-arm.exe ./cmd
+        GOOS=windows GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-arm64.exe ./cmd
+        
+        # Create tar.gz files for Unix-like systems
+        cd dist
+        for file in xsd2code-$VERSION-*; do
+          if [[ "$file" != *.exe && "$file" != *.wasm ]]; then
+            tar -czf "${file}.tar.gz" "$file"
+            rm "$file"
+          fi
+        done
+        
+        # Create zip files for Windows executables
+        for file in *.exe; do
+          if [[ -f "$file" ]]; then
+            zip "${file%.exe}.zip" "$file"
+            rm "$file"
+          fi
+        done
+        
+        cd ..
+
         # Create checksum files
         cd dist
         sha256sum * > SHA256SUMS.txt
