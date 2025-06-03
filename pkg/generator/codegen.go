@@ -9,6 +9,13 @@ import (
 	"github.com/suifei/xsd2code/pkg/types"
 )
 
+// Global type mapping registry initialized on package load
+var typeMappingRegistry *CommonTypeMappingRegistry
+
+func init() {
+	typeMappingRegistry = NewCommonTypeMappingRegistry()
+}
+
 // TargetLanguage represents the target programming language for code generation
 type TargetLanguage string
 
@@ -77,84 +84,13 @@ type GoLanguageMapper struct {
 
 // GetBuiltinTypeMappings returns the mapping from XSD built-in types to Go types
 func (g *GoLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
-	return []TypeMapping{
-		// Standard XSD types
-		{"string", "string"},
-		{"normalizedString", "string"},
-		{"token", "string"},
-		{"anyURI", "string"},
-		{"language", "string"},
-		{"NMTOKEN", "string"},
-		{"NMTOKENS", "[]string"},
-		{"Name", "string"},
-		{"NCName", "string"},
-		{"ID", "string"},
-		{"IDREF", "string"},
-		{"IDREFS", "[]string"},
-		{"ENTITY", "string"},
-		{"ENTITIES", "[]string"},
-		{"QName", "string"},
-
-		{"boolean", "bool"},
-
-		{"decimal", "float64"},
-		{"float", "float32"},
-		{"double", "float64"},
-
-		{"duration", "string"}, // Could be time.Duration in future
-		{"dateTime", "time.Time"},
-		{"time", "string"},
-		{"date", "string"},
-		{"gYearMonth", "string"},
-		{"gYear", "string"},
-		{"gMonthDay", "string"},
-		{"gDay", "string"},
-		{"gMonth", "string"},
-
-		{"hexBinary", "[]byte"},
-		{"base64Binary", "[]byte"},
-
-		{"integer", "int64"},
-		{"nonPositiveInteger", "int64"},
-		{"negativeInteger", "int64"},
-		{"long", "int64"},
-		{"int", "int32"},
-		{"short", "int16"},
-		{"byte", "int8"},
-		{"nonNegativeInteger", "uint64"},
-		{"unsignedLong", "uint64"},
-		{"unsignedInt", "uint32"},
-		{"unsignedShort", "uint16"},
-		{"unsignedByte", "uint8"},
-		{"positiveInteger", "uint64"},
-		{"anyType", "interface{}"},
-	}
+	return typeMappingRegistry.GetMappingsForLanguage(LanguageGo)
 }
 
 // GetCustomTypeMappings returns custom type mappings (e.g., PLC types)
 func (g *GoLanguageMapper) GetCustomTypeMappings() []TypeMapping {
-	return []TypeMapping{
-		// PLC Open IEC 61131-3 elementary types mapped to appropriate Go types
-		{"BOOL", "bool"},          // Boolean
-		{"BYTE", "uint8"},         // 8-bit unsigned integer (0-255)
-		{"WORD", "uint16"},        // 16-bit unsigned integer (0-65535)
-		{"DWORD", "uint32"},       // 32-bit unsigned integer (0-4294967295)
-		{"LWORD", "uint64"},       // 64-bit unsigned integer (0-18446744073709551615)
-		{"SINT", "int8"},          // Small signed integer (-128 to 127)
-		{"INT", "int16"},          // Signed integer (-32768 to 32767)
-		{"DINT", "int32"},         // Double signed integer (-2147483648 to 2147483647)
-		{"LINT", "int64"},         // Long signed integer (-9223372036854775808 to 9223372036854775807)
-		{"USINT", "uint8"},        // Unsigned small integer (0-255)
-		{"UINT", "uint16"},        // Unsigned integer (0-65535)
-		{"UDINT", "uint32"},       // Unsigned double integer (0-4294967295)
-		{"ULINT", "uint64"},       // Unsigned long integer (0-18446744073709551615)
-		{"REAL", "float32"},       // Single precision floating point
-		{"LREAL", "float64"},      // Double precision floating point
-		{"TIME", "time.Duration"}, // Time duration
-		{"DATE", "time.Time"},     // Date
-		{"DT", "time.Time"},       // Date and time
-		{"TOD", "time.Time"},      // Time of day
-	}
+	// Return empty slice as custom mappings are included in the registry
+	return []TypeMapping{}
 }
 
 // GetLanguage returns the target language
@@ -205,84 +141,13 @@ type JavaLanguageMapper struct {
 
 // GetBuiltinTypeMappings returns the mapping from XSD built-in types to Java types
 func (j *JavaLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
-	return []TypeMapping{
-		// Standard XSD types mapped to Java
-		{"string", "String"},
-		{"normalizedString", "String"},
-		{"token", "String"},
-		{"anyURI", "String"},
-		{"language", "String"},
-		{"NMTOKEN", "String"},
-		{"NMTOKENS", "List<String>"},
-		{"Name", "String"},
-		{"NCName", "String"},
-		{"ID", "String"},
-		{"IDREF", "String"},
-		{"IDREFS", "List<String>"},
-		{"ENTITY", "String"},
-		{"ENTITIES", "List<String>"},
-		{"QName", "String"},
-
-		{"boolean", "Boolean"},
-
-		{"decimal", "BigDecimal"},
-		{"float", "Float"},
-		{"double", "Double"},
-
-		{"duration", "Duration"},
-		{"dateTime", "LocalDateTime"},
-		{"time", "LocalTime"},
-		{"date", "LocalDate"},
-		{"gYearMonth", "YearMonth"},
-		{"gYear", "Year"},
-		{"gMonthDay", "MonthDay"},
-		{"gDay", "String"},
-		{"gMonth", "String"},
-
-		{"hexBinary", "byte[]"},
-		{"base64Binary", "byte[]"},
-
-		{"integer", "BigInteger"},
-		{"nonPositiveInteger", "BigInteger"},
-		{"negativeInteger", "BigInteger"},
-		{"long", "Long"},
-		{"int", "Integer"},
-		{"short", "Short"},
-		{"byte", "Byte"},
-		{"nonNegativeInteger", "BigInteger"},
-		{"unsignedLong", "BigInteger"},
-		{"unsignedInt", "Long"},
-		{"unsignedShort", "Integer"},
-		{"unsignedByte", "Short"},
-		{"positiveInteger", "BigInteger"},
-		{"anyType", "Object"},
-	}
+	return typeMappingRegistry.GetMappingsForLanguage(LanguageJava)
 }
 
 // GetCustomTypeMappings returns custom type mappings for Java
 func (j *JavaLanguageMapper) GetCustomTypeMappings() []TypeMapping {
-	return []TypeMapping{
-		// PLC Open IEC 61131-3 elementary types mapped to appropriate Java types
-		{"BOOL", "Boolean"},     // Boolean
-		{"BYTE", "Byte"},        // 8-bit unsigned integer (0-255), closest Java equivalent
-		{"WORD", "Integer"},     // 16-bit unsigned integer (0-65535), use Integer for safety
-		{"DWORD", "Long"},       // 32-bit unsigned integer (0-4294967295), use Long for safety
-		{"LWORD", "BigInteger"}, // 64-bit unsigned integer, BigInteger to handle full range
-		{"SINT", "Byte"},        // Small signed integer (-128 to 127)
-		{"INT", "Short"},        // Signed integer (-32768 to 32767)
-		{"DINT", "Integer"},     // Double signed integer (-2147483648 to 2147483647)
-		{"LINT", "Long"},        // Long signed integer (-9223372036854775808 to 9223372036854775807)
-		{"USINT", "Short"},      // Unsigned small integer (0-255), use Short for safety
-		{"UINT", "Integer"},     // Unsigned integer (0-65535), use Integer for safety
-		{"UDINT", "Long"},       // Unsigned double integer (0-4294967295), use Long for safety
-		{"ULINT", "BigInteger"}, // Unsigned long integer, BigInteger to handle full range
-		{"REAL", "Float"},       // Single precision floating point
-		{"LREAL", "Double"},     // Double precision floating point
-		{"TIME", "Duration"},    // Time duration
-		{"DATE", "LocalDate"},   // Date
-		{"DT", "LocalDateTime"}, // Date and time
-		{"TOD", "LocalTime"},    // Time of day
-	}
+	// Return empty slice as custom mappings are included in the registry
+	return []TypeMapping{}
 }
 
 // GetLanguage returns the target language
@@ -351,59 +216,7 @@ type CSharpLanguageMapper struct {
 
 // GetBuiltinTypeMappings returns the mapping from XSD built-in types to C# types
 func (c *CSharpLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
-	return []TypeMapping{
-		// Standard XSD types mapped to C#
-		{"string", "string"},
-		{"normalizedString", "string"},
-		{"token", "string"},
-		{"anyURI", "string"},
-		{"language", "string"},
-		{"NMTOKEN", "string"},
-		{"NMTOKENS", "List<string>"},
-		{"Name", "string"},
-		{"NCName", "string"},
-		{"ID", "string"},
-		{"IDREF", "string"},
-		{"IDREFS", "List<string>"},
-		{"ENTITY", "string"},
-		{"ENTITIES", "List<string>"},
-		{"QName", "string"},
-
-		{"boolean", "bool"},
-
-		{"decimal", "decimal"},
-		{"float", "float"},
-		{"double", "double"},
-
-		{"duration", "TimeSpan"},
-		{"dateTime", "DateTime"},
-		{"time", "TimeSpan"},
-		{"date", "DateTime"},
-		{"gYearMonth", "DateTime"},
-		{"gYear", "DateTime"},
-		{"gMonthDay", "DateTime"},
-		{"gDay", "string"},
-		{"gMonth", "string"},
-
-		{"hexBinary", "byte[]"},
-		{"base64Binary", "byte[]"},
-
-		{"integer", "long"},
-		{"nonPositiveInteger", "long"},
-		{"negativeInteger", "long"},
-		{"long", "long"},
-		{"int", "int"},
-		{"short", "short"},
-		{"byte", "sbyte"},
-		{"nonNegativeInteger", "ulong"},
-		{"unsignedLong", "ulong"},
-		{"unsignedInt", "uint"},
-		{"unsignedShort", "ushort"},
-		{"unsignedByte", "byte"},
-		{"positiveInteger", "ulong"},
-
-		{"anyType", "object"},
-	}
+	return typeMappingRegistry.GetMappingsForLanguage(LanguageCSharp)
 }
 
 // GetCustomTypeMappings returns custom type mappings for C#
@@ -487,85 +300,13 @@ func (p *PythonLanguageMapper) GetLanguage() TargetLanguage {
 
 // GetBuiltinTypeMappings returns the builtin type mappings for Python
 func (p *PythonLanguageMapper) GetBuiltinTypeMappings() []TypeMapping {
-	return []TypeMapping{
-		{"xs:string", "str"},
-		{"xs:int", "int"},
-		{"xs:long", "int"},
-		{"xs:short", "int"},
-		{"xs:byte", "int"},
-		{"xs:unsignedInt", "int"},
-		{"xs:unsignedLong", "int"},
-		{"xs:unsignedShort", "int"},
-		{"xs:unsignedByte", "int"},
-		{"xs:boolean", "bool"},
-		{"xs:decimal", "float"},
-		{"xs:float", "float"},
-		{"xs:double", "float"},
-		{"xs:dateTime", "datetime"},
-		{"xs:date", "date"},
-		{"xs:time", "time"},
-		{"xs:duration", "timedelta"},
-		{"xs:base64Binary", "bytes"},
-		{"xs:hexBinary", "bytes"},
-		{"xs:anyURI", "str"},
-		{"xs:QName", "str"},
-		{"xs:NOTATION", "str"},
-		{"xs:normalizedString", "str"},
-		{"xs:token", "str"},
-		{"xs:language", "str"},
-		{"xs:NMTOKEN", "str"},
-		{"xs:NMTOKENS", "List[str]"},
-		{"xs:Name", "str"},
-		{"xs:NCName", "str"},
-		{"xs:ID", "str"},
-		{"xs:IDREF", "str"},
-		{"xs:IDREFS", "List[str]"},
-		{"xs:ENTITY", "str"},
-		{"xs:ENTITIES", "List[str]"},
-		{"xs:integer", "int"},
-		{"xs:nonPositiveInteger", "int"},
-		{"xs:negativeInteger", "int"},
-		{"xs:nonNegativeInteger", "int"},
-		{"xs:positiveInteger", "int"},
-		{"xs:gYearMonth", "str"},
-		{"xs:gYear", "str"},
-		{"xs:gMonthDay", "str"},
-		{"xs:gDay", "str"},
-		{"xs:gMonth", "str"},
-	}
+	return typeMappingRegistry.GetMappingsForLanguage(LanguagePython)
 }
 
 // GetCustomTypeMappings returns custom type mappings for PLC/industrial types
 func (p *PythonLanguageMapper) GetCustomTypeMappings() []TypeMapping {
-	return []TypeMapping{
-		// PLC/工业自动化类型映射
-		{"BOOL", "bool"},
-		{"BYTE", "int"},
-		{"WORD", "int"},
-		{"DWORD", "int"},
-		{"LWORD", "int"},
-		{"SINT", "int"},
-		{"INT", "int"},
-		{"DINT", "int"},
-		{"LINT", "int"},
-		{"USINT", "int"},
-		{"UINT", "int"},
-		{"UDINT", "int"},
-		{"ULINT", "int"},
-		{"REAL", "float"},
-		{"LREAL", "float"},
-		{"STRING", "str"},
-		{"WSTRING", "str"},
-		{"TIME", "timedelta"},
-		{"LTIME", "timedelta"},
-		{"DATE", "date"},
-		{"TIME_OF_DAY", "time"},
-		{"TOD", "time"},
-		{"DATE_AND_TIME", "datetime"},
-		{"DT", "datetime"},
-		{"LTOD", "time"},
-		{"LDT", "datetime"},
-	}
+	// Return empty slice as custom mappings are included in the registry
+	return []TypeMapping{}
 }
 
 // FormatTypeName formats type names according to Python conventions
