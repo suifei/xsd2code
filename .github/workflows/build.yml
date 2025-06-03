@@ -12,8 +12,7 @@ permissions:
   contents: write  # 这允许推送到存储库，包括创建releases
   pull-requests: write  # 如果需要评论PR等
   
-jobs:
-  test:
+jobs:  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -21,7 +20,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.22
+        go-version: '1.22.3'
     
     - name: Run tests
       run: go test -v ./...
@@ -37,96 +36,93 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Set up Go
+      - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.22
-    
+        go-version: '1.22.3'
+        
     - name: Build for multiple platforms
       run: |
+        set -e  # Exit on any error
         mkdir -p dist
         
         # Add version info to binary names
         VERSION=${GITHUB_REF#refs/tags/}
         echo "Building version: $VERSION"
-        # AIX
-        GOOS=aix GOARCH=ppc64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-aix-ppc64 ./cmd
         
-        # Android
-        GOOS=android GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-386 ./cmd
-        GOOS=android GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-amd64 ./cmd
-        GOOS=android GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-arm ./cmd
-        GOOS=android GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-android-arm64 ./cmd
+        # Function to build with error handling
+        build_target() {
+          local goos=$1
+          local goarch=$2
+          local suffix=$3
+          local output="dist/xsd2code-$VERSION-$goos-$goarch$suffix"
+          
+          echo "Building $goos/$goarch..."
+          if ! GOOS=$goos GOARCH=$goarch go build -ldflags="-s -w" -o "$output" ./cmd; then
+            echo "Warning: Failed to build $goos/$goarch, skipping..."
+            return 1
+          fi
+          echo "✓ Successfully built $goos/$goarch"
+          return 0
+        }
         
-        # Darwin (macOS)
-        GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-darwin-amd64 ./cmd
-        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-darwin-arm64 ./cmd
+        # Core platforms (most commonly used)
+        echo "=== Building Core Platforms ==="
         
-        # DragonFly BSD
-        GOOS=dragonfly GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-dragonfly-amd64 ./cmd
+        # Linux (most popular server OS)
+        build_target linux amd64 ""
+        build_target linux arm64 ""
+        build_target linux 386 ""
+        build_target linux arm ""
         
-        # FreeBSD
-        GOOS=freebsd GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-freebsd-386 ./cmd
-        GOOS=freebsd GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-freebsd-amd64 ./cmd
-        GOOS=freebsd GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-freebsd-arm ./cmd
+        # Windows (most popular desktop OS)
+        build_target windows amd64 ".exe"
+        build_target windows 386 ".exe"
+        build_target windows arm64 ".exe"
         
-        # Illumos
-        GOOS=illumos GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-illumos-amd64 ./cmd
+        # macOS (popular development platform)
+        build_target darwin amd64 ""
+        build_target darwin arm64 ""
         
-        # iOS
-        GOOS=ios GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-ios-arm64 ./cmd
+        echo "=== Building Extended Platforms ==="
         
-        # JavaScript/WebAssembly
-        GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-js-wasm.wasm ./cmd
-        
-        # Linux
-        GOOS=linux GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-386 ./cmd
-        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-amd64 ./cmd
-        GOOS=linux GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-arm ./cmd
-        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-arm64 ./cmd
-        GOOS=linux GOARCH=loong64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-loong64 ./cmd
-        GOOS=linux GOARCH=mips go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mips ./cmd
-        GOOS=linux GOARCH=mipsle go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mipsle ./cmd
-        GOOS=linux GOARCH=mips64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mips64 ./cmd
-        GOOS=linux GOARCH=mips64le go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-mips64le ./cmd
-        GOOS=linux GOARCH=ppc64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-ppc64 ./cmd
-        GOOS=linux GOARCH=ppc64le go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-ppc64le ./cmd
-        GOOS=linux GOARCH=riscv64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-riscv64 ./cmd
-        GOOS=linux GOARCH=s390x go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-linux-s390x ./cmd
-        
-        # NetBSD
-        GOOS=netbsd GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-netbsd-386 ./cmd
-        GOOS=netbsd GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-netbsd-amd64 ./cmd
-        GOOS=netbsd GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-netbsd-arm ./cmd
+        # FreeBSD (popular server alternative)
+        build_target freebsd amd64 "" || true
+        build_target freebsd 386 "" || true
+        build_target freebsd arm64 "" || true
         
         # OpenBSD
-        GOOS=openbsd GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-386 ./cmd
-        GOOS=openbsd GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-amd64 ./cmd
-        GOOS=openbsd GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-arm ./cmd
-        GOOS=openbsd GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-openbsd-arm64 ./cmd
+        build_target openbsd amd64 "" || true
+        build_target openbsd 386 "" || true
         
-        # Plan 9
-        GOOS=plan9 GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-plan9-386 ./cmd
-        GOOS=plan9 GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-plan9-amd64 ./cmd
-        GOOS=plan9 GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-plan9-arm ./cmd
+        # NetBSD
+        build_target netbsd amd64 "" || true
+        build_target netbsd 386 "" || true
+        
+        # Other architectures for Linux
+        build_target linux ppc64le "" || true
+        build_target linux s390x "" || true
+        build_target linux riscv64 "" || true
+        
+        # Special platforms
+        echo "=== Building Special Platforms ==="
+        
+        # WebAssembly
+        build_target js wasm ".wasm" || true
+        
+        # AIX (enterprise)
+        build_target aix ppc64 "" || true
         
         # Solaris
-        GOOS=solaris GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-solaris-amd64 ./cmd
+        build_target solaris amd64 "" || true
         
-        # WASI
-        GOOS=wasip1 GOARCH=wasm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-wasip1-wasm.wasm ./cmd
-        
-        # Windows
-        GOOS=windows GOARCH=386 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-386.exe ./cmd
-        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-amd64.exe ./cmd
-        GOOS=windows GOARCH=arm go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-arm.exe ./cmd
-        GOOS=windows GOARCH=arm64 go build -ldflags="-s -w" -o dist/xsd2code-$VERSION-windows-arm64.exe ./cmd
+        echo "=== Creating Archives ==="
         
         # Create tar.gz files for Unix-like systems
         cd dist
         for file in xsd2code-$VERSION-*; do
-          if [[ "$file" != *.exe && "$file" != *.wasm ]]; then
+          if [[ -f "$file" && "$file" != *.exe && "$file" != *.wasm && "$file" != *.tar.gz && "$file" != *.zip ]]; then
+            echo "Creating archive for $file..."
             tar -czf "${file}.tar.gz" "$file"
             rm "$file"
           fi
@@ -135,6 +131,7 @@ jobs:
         # Create zip files for Windows executables
         for file in *.exe; do
           if [[ -f "$file" ]]; then
+            echo "Creating zip for $file..."
             zip "${file%.exe}.zip" "$file"
             rm "$file"
           fi
@@ -142,10 +139,16 @@ jobs:
         
         cd ..
 
+        echo "=== Creating Checksums ==="
         # Create checksum files
         cd dist
-        sha256sum * > SHA256SUMS.txt
-    
+        if [ -n "$(ls -A .)" ]; then
+          sha256sum * > SHA256SUMS.txt
+          echo "Built $(ls -1 | wc -l) artifacts:"
+          ls -la
+        else
+          echo "No artifacts were built successfully!"        fi
+        
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
@@ -153,5 +156,48 @@ jobs:
         generate_release_notes: true
         draft: false
         prerelease: false
+        body: |
+          ## XSD2Code ${{ github.ref_name }} 🚀
+          
+          通用XSD到多语言代码转换工具 - 新版本发布！
+          
+          ### 📦 下载说明
+          
+          选择适合您系统的版本：
+          
+          | 操作系统 | 架构 | 下载文件 |
+          |---------|------|----------|
+          | **Windows** | x64 | `xsd2code-${{ github.ref_name }}-windows-amd64.zip` |
+          | **Windows** | x86 | `xsd2code-${{ github.ref_name }}-windows-386.zip` |
+          | **Windows** | ARM64 | `xsd2code-${{ github.ref_name }}-windows-arm64.zip` |
+          | **Linux** | x64 | `xsd2code-${{ github.ref_name }}-linux-amd64.tar.gz` |
+          | **Linux** | ARM64 | `xsd2code-${{ github.ref_name }}-linux-arm64.tar.gz` |
+          | **macOS** | Intel | `xsd2code-${{ github.ref_name }}-darwin-amd64.tar.gz` |
+          | **macOS** | Apple Silicon | `xsd2code-${{ github.ref_name }}-darwin-arm64.tar.gz` |
+          
+          ### 🛡️ 安全验证
+          
+          使用 `SHA256SUMS.txt` 文件验证下载的文件完整性：
+          
+          ```bash
+          # Linux/macOS
+          sha256sum -c SHA256SUMS.txt
+          
+          # Windows (PowerShell)
+          Get-FileHash filename.zip -Algorithm SHA256
+          ```
+          
+          ### 🚀 快速开始
+          
+          ```bash
+          # 下载并解压后
+          ./xsd2code -xsd=your-schema.xsd -lang=go -output=generated.go
+          ```
+          
+          更多使用方法请查看 [文档](https://github.com/suifei/xsd2code/wiki)
+          
+          ### 📋 完整更新日志
+          
+          详细的更新内容请查看 [CHANGELOG.md](https://github.com/suifei/xsd2code/blob/main/CHANGELOG.md)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
