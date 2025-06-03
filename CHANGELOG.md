@@ -1,5 +1,42 @@
 # 更新日志
 
+## [v3.1.2] - 2025-06-03
+
+### 改进
+- 🔧 优化GitHub Actions工作流：调整步骤顺序，确保构建和发布流程的清晰性
+- 🔧 优化GitHub Actions工作流：重构构建和发布作业，增强多平台支持
+- 🐛 修复GitHub Actions工作流中的格式问题，确保测试和发布作业的正确缩进
+- 🔧 优化GitHub Actions构建流程：修复CGO依赖问题
+- 📝 增强README.md：添加项目徽章、统计信息和社区链接
+- ⚡ 实现代码改进以增强功能和提升性能
+
+### 核心系统
+- 🚀 feat(core): 实现核心管理系统，包含性能指标、日志记录和资源管理
+- 🔄 第一次迭代: 重构类型映射系统，消除代码重复
+- 📁 重构代码结构，提升可读性和可维护性
+- 📚 添加wiki子模块配置
+
+### 清理和优化
+- 🧹 移除生成的验证函数
+- 🗑️ 删除过期的xsd2code文件
+
+## [v3.1.1] - 2025-06-02
+
+### CI/CD改进
+- 🔧 ci: 为GitHub Actions添加必要的write权限，修复403错误
+- 🔧 ci: 修复CI工作流，移除错误的测试步骤并增强自动发布功能
+
+### 文档更新
+- 📝 文档修复：更新文档与实际代码同步，修复示例代码的正则表达式问题
+- 📝 更新项目文档: 添加行为准则, 更新Wiki文档, 完善代码文档
+- 📚 docs: 添加GitHub Wiki完成报告
+- 📚 docs: 增强README和添加GitHub Wiki设置指南
+- 📚 docs: 添加完整的GitHub Wiki文档
+- 📚 docs: Add comprehensive project description and enhanced README
+
+### 文档清理
+- 🗑️ Remove Troubleshooting and XSD Features documentation files
+
 ## [v3.1.0] - 2025-06-01
 
 ### 新增功能

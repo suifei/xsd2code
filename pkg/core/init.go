@@ -189,5 +189,5 @@ func IsInitialized() bool {
 
 // GetVersion 获取版本信息
 func GetVersion() string {
-	return "XSD2Code v2.0.0 - Second Iteration with Core Optimization"
+	return "XSD2Code v3.1.2 - Enhanced Edition with Advanced Features"
 }

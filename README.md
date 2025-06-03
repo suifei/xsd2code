@@ -1,5 +1,5 @@
 
-# XSD2Code - 通用XSD到多语言代码转换工具 v3.1 (增强版)
+# XSD2Code - 通用XSD到多语言代码转换工具 v3.1.2 (增强版)
 
 [![Go Version](https://img.shields.io/badge/go-1.22.3+-blue.svg)](https://golang.org/dl/)
 [![Latest Release](https://img.shields.io/github/v/release/suifei/xsd2code?include_prereleases&label=latest)](https://github.com/suifei/xsd2code/releases/latest)
