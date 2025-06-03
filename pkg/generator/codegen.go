@@ -569,9 +569,9 @@ func (g *CodeGenerator) determineNeededImports() []string {
 	imports["\"encoding/xml\""] = true
 
 	// Check if JSON compatibility is needed
-	if g.jsonCompatible {
-		imports["\"encoding/json\""] = true
-	}
+	// if g.jsonCompatible {
+	// 	imports["\"encoding/json\""] = true
+	// }
 
 	// Check if time package is needed
 	if g.needsTimePackage() {
@@ -834,12 +834,11 @@ func (g *CodeGenerator) writeComment(builder *strings.Builder, comment, indent s
 // GenerateValidationCode generates validation functions for XSD types
 func (g *CodeGenerator) GenerateValidationCode() string {
 	var builder strings.Builder
-
 	builder.WriteString("// Generated validation functions\n\n")
 	builder.WriteString("import (\n")
 	builder.WriteString("\t\"fmt\"\n")
 	builder.WriteString("\t\"regexp\"\n")
-	builder.WriteString("\t\"strconv\"\n")
+	builder.WriteString("\t\"strings\"\n")
 	builder.WriteString("\t\"time\"\n")
 	builder.WriteString(")\n\n")
 
@@ -1033,11 +1032,16 @@ func (g *CodeGenerator) generateTypeTest(builder *strings.Builder, goType *types
 	typeName := goType.Name
 	// Test XML marshaling/unmarshaling
 	builder.WriteString(fmt.Sprintf("func Test%sXMLMarshaling(t *testing.T) {\n", typeName))
-
-	// Use heuristic to detect enum types and generate appropriate initialization
-	if strings.HasSuffix(typeName, "Type") && !strings.Contains(typeName, "DataType") {
-		// For string-based enum types, use value initialization instead of pointer
-		builder.WriteString(fmt.Sprintf("\toriginal := %s(\"\")\n\n", typeName))
+	// Check if this is an enum type or struct type
+	if goType.IsEnum || (len(goType.Fields) == 0 && len(goType.Constants) > 0) {
+		// For enum types, use value initialization instead of pointer
+		if len(goType.Constants) > 0 {
+			// Use the first constant name directly
+			builder.WriteString(fmt.Sprintf("\toriginal := %s\n\n", goType.Constants[0].Name))
+		} else {
+			// Fallback to empty string for string-based enums
+			builder.WriteString(fmt.Sprintf("\toriginal := %s(\"\")\n\n", typeName))
+		}
 	} else {
 		// For struct types, use pointer initialization
 		builder.WriteString(fmt.Sprintf("\toriginal := &%s{\n", typeName))
@@ -1176,21 +1180,46 @@ func (g *CodeGenerator) generateValidationTest(builder *strings.Builder, goType 
 
 	// Test valid case
 	builder.WriteString("\t// Test valid case\n")
-	builder.WriteString(fmt.Sprintf("\tvalid := &%s{\n", typeName))
-	for _, field := range goType.Fields {
-		if !field.IsOptional {
-			g.generateTestFieldData(builder, &field)
+	// Check if this is an enum type or struct type
+	if goType.IsEnum || (len(goType.Fields) == 0 && len(goType.Constants) > 0) {
+		// For enum types, create a value directly
+		if len(goType.Constants) > 0 {
+			// Use the first constant name directly instead of wrapping the value in quotes
+			builder.WriteString(fmt.Sprintf("\tvalid := %s\n", goType.Constants[0].Name))
+		} else {
+			// Fallback to empty string for string-based enums
+			builder.WriteString(fmt.Sprintf("\tvalid := %s(\"\")\n", typeName))
 		}
-	}
-	builder.WriteString("\t}\n")
-	builder.WriteString("\tif err := valid.Validate(); err != nil {\n")
-	builder.WriteString("\t\tt.Errorf(\"Valid object should not have validation errors: %v\", err)\n")
-	builder.WriteString("\t}\n\n")
+		builder.WriteString("\tif err := valid.Validate(); err != nil {\n")
+		builder.WriteString("\t\tt.Errorf(\"Valid object should not have validation errors: %v\", err)\n")
+		builder.WriteString("\t}\n\n")
 
-	// Test invalid cases for required fields
-	for _, field := range goType.Fields {
-		if !field.IsOptional {
-			g.generateInvalidFieldTest(builder, &field, typeName)
+		// For enum types, test invalid values if there are constants defined
+		if len(goType.Constants) > 0 {
+			builder.WriteString("\t// Test invalid enum value\n")
+			builder.WriteString(fmt.Sprintf("\tinvalid := %s(\"invalid_value\")\n", typeName))
+			builder.WriteString("\tif err := invalid.Validate(); err == nil {\n")
+			builder.WriteString("\t\tt.Error(\"Invalid enum value should cause validation error\")\n")
+			builder.WriteString("\t}\n\n")
+		}
+	} else {
+		// For struct types, use the existing logic
+		builder.WriteString(fmt.Sprintf("\tvalid := &%s{\n", typeName))
+		for _, field := range goType.Fields {
+			if !field.IsOptional {
+				g.generateTestFieldData(builder, &field)
+			}
+		}
+		builder.WriteString("\t}\n")
+		builder.WriteString("\tif err := valid.Validate(); err != nil {\n")
+		builder.WriteString("\t\tt.Errorf(\"Valid object should not have validation errors: %v\", err)\n")
+		builder.WriteString("\t}\n\n")
+
+		// Test invalid cases for required fields
+		for _, field := range goType.Fields {
+			if !field.IsOptional {
+				g.generateInvalidFieldTest(builder, &field, typeName)
+			}
 		}
 	}
 

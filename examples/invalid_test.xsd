@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           targetNamespace="http://example.com/invalid"
+           elementFormDefault="qualified">
+  <!-- 故意的语法错误 -->
+  <xs:element name="invalid">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="test" type="unknownType"/>
+        <!-- 未闭合的标签 -->
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- 缺少闭合标签 -->
