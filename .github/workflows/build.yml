@@ -29,7 +29,7 @@ jobs:
     - name: Run integration test
       run: |
         go build -o xsd2code ./cmd
-        ./xsd2code -xsd=examples/simple_example.xsd -output=test_example.go -package=test -json
+        ./xsd2code -xsd=docs/TC6_XML_V10_B.xsd -output=tc6_xml_v10_b.go -package=test -json
   release:
     needs: test
     runs-on: ubuntu-latest

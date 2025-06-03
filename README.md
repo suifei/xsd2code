@@ -437,7 +437,6 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 ### 🏆 质量徽章
 
 ![Go Report Card](https://goreportcard.com/badge/github.com/suifei/xsd2code)
-![CodeQL](https://github.com/suifei/xsd2code/workflows/CodeQL/badge.svg)
 ![Security](https://img.shields.io/badge/security-scan%20passed-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-85%25-green)
 
