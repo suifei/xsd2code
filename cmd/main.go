@@ -93,9 +93,9 @@ func parseFlags() *XSDConverterConfig {
 	flag.BoolVar(&config.PerformanceMode, "perf", false, "启用性能监控模式")
 	help := flag.Bool("help", false, "显示帮助信息")
 	version := flag.Bool("version", false, "显示版本信息")
-		flag.Parse()
+	flag.Parse()
 	if *version {
-		fmt.Println("XSD到多语言转换工具 v3.1.2 (增强版)")
+		fmt.Println("XSD到多语言转换工具 v3.1.3 (增强版)")
 		fmt.Println("支持完整 XML Schema 规范，多语言代码生成")
 		fmt.Println("支持: Go, Java, C#, Python")
 		fmt.Println("新增: 验证代码生成、测试代码生成、自定义类型映射")
